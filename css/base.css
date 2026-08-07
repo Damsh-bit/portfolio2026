@@ -1,0 +1,102 @@
+/* ==========================================
+   BASE & RESET STYLES
+   ========================================== */
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+::selection {
+  background: var(--violet-primary);
+  color: #ffffff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  background: none;
+  border: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+@media (max-width: 600px) {
+  .wrap {
+    padding: 0 22px;
+  }
+}
+
+/* Custom Violet Cursor */
+.cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--violet-light);
+  box-shadow: 0 0 15px var(--violet-primary), 0 0 30px var(--violet-glow);
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s var(--ease), height 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.cursor.grow {
+  width: 52px;
+  height: 52px;
+  background: rgba(168, 85, 247, 0.25);
+  border: 1px solid var(--violet-light);
+  box-shadow: 0 0 25px var(--violet-glow);
+}
+
+@media (hover: none), (pointer: coarse) {
+  body {
+    cursor: auto;
+  }
+  .cursor {
+    display: none;
+  }
+}
+
+/* Page wrapper over fixed background canvas */
+.page {
+  position: relative;
+  z-index: 1;
+}

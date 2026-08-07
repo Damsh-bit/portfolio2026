@@ -1,0 +1,39 @@
+/* ==========================================
+   DESIGN SYSTEM & VARIABLES - VIOLET COSMIC
+   ========================================== */
+
+:root {
+  /* Color Palette - Deep Space & Cosmic Violet */
+  --bg: #070510;
+  --bg-soft: #0e0b1d;
+  --bg-card: #0d0a1b;
+  
+  --ink: #f5f3ff;
+  --ink-dim: #948fb3;
+  --ink-muted: #646080;
+
+  /* Violet Accents */
+  --violet-primary: #a855f7;
+  --violet-light: #c084fc;
+  --violet-bright: #d8b4fe;
+  --violet-dark: #7c3aed;
+  --violet-deep: #581c87;
+  --violet-glow: rgba(168, 85, 247, 0.35);
+  --violet-glow-soft: rgba(168, 85, 247, 0.12);
+
+  /* Lines & Borders */
+  --line: #1c1833;
+  --line-strong: #332b57;
+  --line-violet: rgba(168, 85, 247, 0.3);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Easing & Transitions */
+  --ease: cubic-bezier(.16, .84, .44, 1);
+  --transition-fast: 0.2s var(--ease);
+  --transition-normal: 0.35s var(--ease);
+  --transition-slow: 0.6s var(--ease);
+}

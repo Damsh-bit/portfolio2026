@@ -1,0 +1,25 @@
+/* ==========================================
+   UNIVERSE BACKGROUND STYLES
+   ========================================== */
+
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Subtle ambient cosmic glow overlays */
+.space-ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(circle at 15% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(9, 7, 20, 0.4) 0%, rgba(7, 5, 16, 0.95) 100%);
+}
