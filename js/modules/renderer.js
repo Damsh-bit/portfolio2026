@@ -111,8 +111,8 @@ function renderProjects() {
     gridEl.innerHTML = portfolioData.projects.map((project, idx) => `
       <div class="work-card reveal" data-project="${idx}">
         <div class="thumb">
-          ${project.image 
-            ? `<img src="${project.image}" alt="${project.title}">` 
+          ${project.image
+            ? `<img src="${project.image}" alt="${project.title}" loading="lazy">`
             : `<span>${project.subtitle || 'Ver detalles del proyecto'}</span>`}
         </div>
         <div class="meta">

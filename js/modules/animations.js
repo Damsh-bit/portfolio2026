@@ -76,6 +76,27 @@ export function initAnimations() {
       });
     });
 
+    // Parallax on project thumbnails: image drifts opposite to scroll,
+    // oversized in CSS (height: 124%) so the drift never reveals empty edges.
+    gsap.utils.toArray('.work-card .thumb').forEach((thumb) => {
+      const img = thumb.querySelector('img');
+      if (!img) return;
+
+      gsap.fromTo(img,
+        { yPercent: -8 },
+        {
+          yPercent: 8,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: thumb,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true
+          }
+        }
+      );
+    });
+
     gsap.utils.toArray('.exp-row').forEach((row, i) => {
       gsap.to(row, {
         opacity: 1,
