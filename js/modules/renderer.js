@@ -110,6 +110,12 @@ function renderHero() {
     ctaSecondaryEl.textContent = hero.ctas.secondary;
     if (linkedin) ctaSecondaryEl.href = linkedin.url;
   }
+
+  const upwork = personal.socials.find(s => s.name === 'Upwork');
+  const ratingEl = document.getElementById('heroRating');
+  const ratingTextEl = document.getElementById('heroRatingText');
+  if (ratingEl && upwork) ratingEl.href = upwork.url;
+  if (ratingTextEl) ratingTextEl.textContent = `${personal.upworkRating} en Upwork`;
 }
 
 /** Selected Work Grid */

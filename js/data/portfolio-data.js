@@ -17,14 +17,15 @@ export const portfolioData = {
     currentCompany: "DigitalYA — Madrid, España",
     focus: "Desarrollo Web · WordPress · JavaScript",
     languagesSummary: "ES nativo · EN B1 · PT A1",
+    upworkRating: "5.0",
     bioParagraphs: [
       "Soy <strong>desarrollador WordPress senior</strong> y webmaster técnico, con más de tres años construyendo, optimizando y escalando sitios en producción para agencias de <strong>Argentina, España y Estados Unidos</strong>.",
       "Especializado en desarrollo de temas y plugins a medida, soluciones e-commerce con <strong>WooCommerce</strong>, optimización de <strong>Core Web Vitals</strong> y SEO técnico — entregando entornos rápidos, seguros y mantenibles en coordinación con equipos de diseño y marketing."
     ],
     socials: [
-      { name: "GitHub", url: "https://github.com" },
+      { name: "GitHub", url: "https://github.com/Damsh-bit" },
       { name: "LinkedIn", url: "https://www.linkedin.com/in/damian-coronel-849b901b5/" },
-      { name: "Upwork", url: "https://upwork.com" }
+      { name: "Upwork", url: "https://www.upwork.com/freelancers/~01791b0632a4d94424" }
     ],
     meta: {
       description: "Damián Coronel — Desarrollador WordPress Senior y Webmaster Técnico con más de 3 años de experiencia en WordPress, WooCommerce, PHP, optimización de Core Web Vitals, SEO técnico e integraciones de CRM y pasarelas de pago.",

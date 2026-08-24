@@ -20,6 +20,7 @@ export function initAnimations() {
   if (!reduced) {
     gsap.set('.eyebrow span', { yPercent: 110 });
     gsap.set('.hero-cta .cta-btn', { opacity: 0, y: 16 });
+    gsap.set('.hero-rating', { opacity: 0, y: 12 });
 
     const tl = gsap.timeline({ delay: 0.15 });
 
@@ -35,6 +36,12 @@ export function initAnimations() {
       stagger: 0.1,
       ease: 'power3.out'
     }, '-=0.1')
+    .to('.hero-rating', {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power2.out'
+    }, '-=0.3')
     .from('.hero-foot > div', {
       opacity: 0,
       y: 16,
