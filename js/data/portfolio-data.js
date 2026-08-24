@@ -11,11 +11,11 @@ export const portfolioData = {
     name: "Leandro Coronel",
     fullName: "Leandro Damian Coronel",
     jobTitle: "Senior WordPress Developer | WooCommerce, PHP, Core Web Vitals",
-    shortRole: "SR. WORDPRESS DEVELOPER — ESPECIALISTA EN RENDIMIENTO WEB Y CMS",
+    shortRole: "DESARROLLADOR WEB — SITIOS A MEDIDA, DE INICIO A FIN",
     email: "damiancoronel.dev@gmail.com",
     baseLocation: "Argentina — remoto",
     currentCompany: "DigitalYA — Madrid, España",
-    focus: "WordPress · WooCommerce · Core Web Vitals",
+    focus: "Desarrollo Web · WordPress · JavaScript",
     languagesSummary: "ES nativo · EN B1 · PT A1",
     bioParagraphs: [
       "Soy <strong>desarrollador WordPress senior</strong> y webmaster técnico, con más de tres años construyendo, optimizando y escalando sitios en producción para agencias de <strong>Argentina, España y Estados Unidos</strong>.",
@@ -35,10 +35,14 @@ export const portfolioData = {
 
   hero: {
     titleLines: [
-      "Construyo y escalo",
-      "sitios <em>WordPress</em>",
-      "de alto rendimiento."
+      "Hola, soy Leandro.",
+      "Desarrollo <em>sitios web</em>",
+      "completos, de punta a punta."
     ],
+    ctas: {
+      primary: "Hablemos de tu proyecto",
+      secondary: "Escribime sin compromiso"
+    },
     scrollCue: "SCROLL"
   },
 
@@ -54,6 +58,7 @@ export const portfolioData = {
       image: "assets/projects/reconocer.png",
       gallery: ["assets/projects/reconocer.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -67,6 +72,7 @@ export const portfolioData = {
       image: "assets/projects/azahara.png",
       gallery: ["assets/projects/azahara.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -80,6 +86,7 @@ export const portfolioData = {
       image: "assets/projects/macarena.png",
       gallery: ["assets/projects/macarena.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -93,6 +100,7 @@ export const portfolioData = {
       image: "assets/projects/bonded-finance.png",
       gallery: ["assets/projects/bonded-finance.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -106,6 +114,7 @@ export const portfolioData = {
       image: "assets/projects/nova-carlaria.png",
       gallery: ["assets/projects/nova-carlaria.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -119,6 +128,7 @@ export const portfolioData = {
       image: "assets/projects/quinta.png",
       gallery: ["assets/projects/quinta.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -132,6 +142,7 @@ export const portfolioData = {
       image: "assets/projects/conica.png",
       gallery: ["assets/projects/conica.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -145,6 +156,7 @@ export const portfolioData = {
       image: "assets/projects/puntosil.png",
       gallery: ["assets/projects/puntosil.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -158,6 +170,7 @@ export const portfolioData = {
       image: "assets/projects/king-nutrition.png",
       gallery: ["assets/projects/king-nutrition.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -171,6 +184,7 @@ export const portfolioData = {
       image: "assets/projects/fix-home.png",
       gallery: ["assets/projects/fix-home.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -184,6 +198,7 @@ export const portfolioData = {
       image: "assets/projects/polackio.png",
       gallery: ["assets/projects/polackio.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -197,6 +212,7 @@ export const portfolioData = {
       image: "assets/projects/legal-partners.png",
       gallery: ["assets/projects/legal-partners.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     },
     {
@@ -210,6 +226,7 @@ export const portfolioData = {
       image: "assets/projects/ventura.png",
       gallery: ["assets/projects/ventura.png"],
       link: "#",
+      type: "trabajo",
       featured: true
     }
   ],
@@ -219,7 +236,7 @@ export const portfolioData = {
       period: "Nov 2022 — Actualidad",
       title: "Desarrollador WordPress Senior / Webmaster Técnico",
       company: "DigitalYA — Madrid, España · Remoto",
-      description: "Lidero el ciclo completo de proyectos WordPress y WooCommerce personalizados, optimizo Core Web Vitals e integro APIs y CRM (Zoho) para automatizar flujos de clientes, coordinando sprints con equipos de diseño y marketing."
+      description: "Me encargo de desarrollar sitios web complejos y completos de inicio a fin: arquitectura, maquetación y funcionalidades a medida con ACF, JavaScript y WooCommerce. Optimizo Core Web Vitals e integro APIs y CRM (Zoho) para automatizar los flujos de los clientes, coordinando sprints con equipos de diseño y marketing."
     },
     {
       period: "Jul 2022 — Nov 2022",

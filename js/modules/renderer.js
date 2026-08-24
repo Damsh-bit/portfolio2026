@@ -96,6 +96,12 @@ function renderHero() {
       <div><strong>Foco</strong><span class="mono">${personal.focus}</span></div>
     `;
   }
+
+  const ctaPrimaryEl = document.getElementById('heroCtaPrimary');
+  if (ctaPrimaryEl) ctaPrimaryEl.innerHTML = `${hero.ctas.primary} <span class="arrow">→</span>`;
+
+  const ctaSecondaryEl = document.getElementById('heroCtaSecondary');
+  if (ctaSecondaryEl) ctaSecondaryEl.textContent = hero.ctas.secondary;
 }
 
 /** Selected Work Grid */
@@ -109,7 +115,7 @@ function renderProjects() {
 
   if (gridEl) {
     gridEl.innerHTML = portfolioData.projects.map((project, idx) => `
-      <div class="work-card reveal" data-project="${idx}">
+      <div class="work-card reveal" data-project="${idx}" data-type="${project.type || 'trabajo'}">
         <div class="thumb">
           ${project.image
             ? `<img src="${project.image}" alt="${project.title}" loading="lazy">`

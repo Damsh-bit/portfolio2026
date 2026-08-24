@@ -50,8 +50,14 @@
     <section class="hero">
       <p class="eyebrow mono" id="heroEyebrow"></p>
       <h1 class="hero-title" id="heroTitle"></h1>
+
+      <div class="hero-cta">
+        <button type="button" class="cta-btn primary mono" id="heroCtaPrimary" data-open-popup></button>
+        <button type="button" class="cta-btn ghost mono" id="heroCtaSecondary" data-open-popup></button>
+      </div>
+
       <div class="hero-foot" id="heroFoot"></div>
-      
+
       <div class="scroll-cue">
         <div class="stick"><i></i></div>
         <span class="mono">SCROLL</span>
@@ -63,6 +69,11 @@
       <div class="section-head">
         <h2 data-typewriter>Trabajos seleccionados</h2>
         <span class="count mono" id="workCount">(00)</span>
+      </div>
+      <div class="work-filters mono" id="workFilters">
+        <button type="button" class="filter-btn active" data-filter="all">Todos</button>
+        <button type="button" class="filter-btn" data-filter="trabajo">Trabajos</button>
+        <button type="button" class="filter-btn" data-filter="personal">Proyectos personales</button>
       </div>
       <div class="work-grid" id="workGrid">
         <!-- Rendered dynamically from portfolio-data.js -->
@@ -109,7 +120,7 @@
       <p class="eyebrow mono reveal">¿TRABAJAMOS JUNTOS?</p>
       <h2 class="reveal" data-typewriter>Escribime y armamos<br>tu próximo proyecto.</h2>
 
-      <form class="contact-form reveal" id="contactForm" novalidate>
+      <form class="contact-form reveal" id="contactForm" data-contact-form novalidate>
         <div class="form-row">
           <label for="cfName">Nombre</label>
           <input type="text" id="cfName" name="name" required autocomplete="name">
@@ -171,6 +182,41 @@
     </div>
     <button type="button" class="modal-nav prev" id="mPrev" aria-label="Proyecto anterior">‹</button>
     <button type="button" class="modal-nav next" id="mNext" aria-label="Proyecto siguiente">›</button>
+  </div>
+
+  <!-- Contact Popup (opened from Hero CTAs) -->
+  <div class="contact-popup" id="contactPopup" aria-hidden="true">
+    <div class="popup-overlay" data-popup-close></div>
+    <div class="popup-card">
+      <button type="button" class="close-btn mono popup-close" data-popup-close aria-label="Cerrar">
+        <span>CERRAR</span><span class="x">×</span>
+      </button>
+      <span class="eyebrow mono">SIN COMPROMISO</span>
+      <h3>Contame tu proyecto</h3>
+      <p class="popup-note">Escribime un mensaje y te respondo a la brevedad. Sin compromiso, solo para charlar sobre tu idea.</p>
+
+      <form class="contact-form" id="popupContactForm" data-contact-form novalidate>
+        <div class="form-row">
+          <label for="pfName">Nombre</label>
+          <input type="text" id="pfName" name="name" required autocomplete="name">
+          <span class="form-error"></span>
+        </div>
+        <div class="form-row">
+          <label for="pfEmail">Tu email</label>
+          <input type="email" id="pfEmail" name="email" required autocomplete="email">
+          <span class="form-error"></span>
+        </div>
+        <div class="form-row">
+          <label for="pfMessage">Mensaje</label>
+          <textarea id="pfMessage" name="message" rows="4" required></textarea>
+          <span class="form-error"></span>
+        </div>
+        <button type="submit" class="form-submit mono">
+          Enviar mensaje <span class="arrow">→</span>
+        </button>
+        <p class="form-note mono"></p>
+      </form>
+    </div>
   </div>
 
   <!-- Floating LinkedIn Button -->

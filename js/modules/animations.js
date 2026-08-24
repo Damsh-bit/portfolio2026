@@ -19,6 +19,7 @@ export function initAnimations() {
   // typing.js, not by this timeline — only the eyebrow/foot/scroll-cue tween.
   if (!reduced) {
     gsap.set('.eyebrow span', { yPercent: 110 });
+    gsap.set('.hero-cta .cta-btn', { opacity: 0, y: 16 });
 
     const tl = gsap.timeline({ delay: 0.15 });
 
@@ -27,6 +28,13 @@ export function initAnimations() {
       duration: 0.8,
       ease: 'power4.out'
     })
+    .to('.hero-cta .cta-btn', {
+      opacity: 1,
+      y: 0,
+      duration: 0.7,
+      stagger: 0.1,
+      ease: 'power3.out'
+    }, '-=0.1')
     .from('.hero-foot > div', {
       opacity: 0,
       y: 16,
