@@ -37,7 +37,7 @@
 
   <!-- Navigation Header -->
   <header>
-    <div class="logo mono" id="headerLogo">LEANDRO CORONEL</div>
+    <div class="logo mono" id="headerLogo">DAMIÁN CORONEL</div>
     <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="siteNav">
       <span class="bar"></span><span class="bar"></span><span class="bar"></span>
     </button>
@@ -58,8 +58,8 @@
       <h1 class="hero-title" id="heroTitle"></h1>
 
       <div class="hero-cta">
-        <button type="button" class="cta-btn primary mono" id="heroCtaPrimary" data-open-popup></button>
-        <button type="button" class="cta-btn ghost mono" id="heroCtaSecondary" data-open-popup></button>
+        <a href="" class="cta-btn primary mono" id="heroCtaPrimary" target="_blank" rel="noopener noreferrer"></a>
+        <a href="" class="cta-btn ghost mono" id="heroCtaSecondary" target="_blank" rel="noopener noreferrer"></a>
       </div>
 
       <div class="hero-foot" id="heroFoot"></div>
@@ -126,35 +126,14 @@
       <p class="eyebrow mono reveal">¿TRABAJAMOS JUNTOS?</p>
       <h2 class="reveal" data-typewriter>Escribime y armamos<br>tu próximo proyecto.</h2>
 
-      <form class="contact-form reveal" id="contactForm" data-contact-form novalidate>
-        <div class="form-hp" aria-hidden="true">
-          <label for="cfWebsite">Sitio web</label>
-          <input type="text" id="cfWebsite" name="website" tabindex="-1" autocomplete="off">
-        </div>
-        <div class="form-row">
-          <label for="cfName">Nombre</label>
-          <input type="text" id="cfName" name="name" required autocomplete="name">
-          <span class="form-error" id="cfNameError"></span>
-        </div>
-        <div class="form-row">
-          <label for="cfEmail">Tu email</label>
-          <input type="email" id="cfEmail" name="email" required autocomplete="email">
-          <span class="form-error" id="cfEmailError"></span>
-        </div>
-        <div class="form-row">
-          <label for="cfMessage">Mensaje</label>
-          <textarea id="cfMessage" name="message" rows="5" required></textarea>
-          <span class="form-error" id="cfMessageError"></span>
-        </div>
-        <button type="submit" class="form-submit mono">
-          Enviar mensaje <span class="arrow">→</span>
-        </button>
-        <p class="form-note mono" id="formNote"></p>
-      </form>
-
-      <a href="" class="email-link mono reveal" id="contactEmail">
-        <span class="underline"></span>
-      </a>
+      <div class="contact-actions reveal">
+        <a href="" id="contactLinkedin" class="cta-btn primary mono" target="_blank" rel="noopener noreferrer">
+          Escribime por LinkedIn <span class="arrow">→</span>
+        </a>
+        <a href="" class="email-link mono" id="contactEmail">
+          <span class="underline"></span>
+        </a>
+      </div>
     </section>
 
   </main>
@@ -192,45 +171,6 @@
     </div>
     <button type="button" class="modal-nav prev" id="mPrev" aria-label="Proyecto anterior">‹</button>
     <button type="button" class="modal-nav next" id="mNext" aria-label="Proyecto siguiente">›</button>
-  </div>
-
-  <!-- Contact Popup (opened from Hero CTAs) -->
-  <div class="contact-popup" id="contactPopup" aria-hidden="true">
-    <div class="popup-overlay" data-popup-close></div>
-    <div class="popup-card">
-      <button type="button" class="close-btn mono popup-close" data-popup-close aria-label="Cerrar">
-        <span>CERRAR</span><span class="x">×</span>
-      </button>
-      <span class="eyebrow mono">SIN COMPROMISO</span>
-      <h3>Contame tu proyecto</h3>
-      <p class="popup-note">Escribime un mensaje y te respondo a la brevedad. Sin compromiso, solo para charlar sobre tu idea.</p>
-
-      <form class="contact-form" id="popupContactForm" data-contact-form novalidate>
-        <div class="form-hp" aria-hidden="true">
-          <label for="pfWebsite">Sitio web</label>
-          <input type="text" id="pfWebsite" name="website" tabindex="-1" autocomplete="off">
-        </div>
-        <div class="form-row">
-          <label for="pfName">Nombre</label>
-          <input type="text" id="pfName" name="name" required autocomplete="name">
-          <span class="form-error"></span>
-        </div>
-        <div class="form-row">
-          <label for="pfEmail">Tu email</label>
-          <input type="email" id="pfEmail" name="email" required autocomplete="email">
-          <span class="form-error"></span>
-        </div>
-        <div class="form-row">
-          <label for="pfMessage">Mensaje</label>
-          <textarea id="pfMessage" name="message" rows="4" required></textarea>
-          <span class="form-error"></span>
-        </div>
-        <button type="submit" class="form-submit mono">
-          Enviar mensaje <span class="arrow">→</span>
-        </button>
-        <p class="form-note mono"></p>
-      </form>
-    </div>
   </div>
 
   <!-- Floating LinkedIn Button -->

@@ -97,11 +97,19 @@ function renderHero() {
     `;
   }
 
+  const linkedin = personal.socials.find(s => s.name === 'LinkedIn');
+
   const ctaPrimaryEl = document.getElementById('heroCtaPrimary');
-  if (ctaPrimaryEl) ctaPrimaryEl.innerHTML = `${hero.ctas.primary} <span class="arrow">→</span>`;
+  if (ctaPrimaryEl) {
+    ctaPrimaryEl.innerHTML = `${hero.ctas.primary} <span class="arrow">→</span>`;
+    if (linkedin) ctaPrimaryEl.href = linkedin.url;
+  }
 
   const ctaSecondaryEl = document.getElementById('heroCtaSecondary');
-  if (ctaSecondaryEl) ctaSecondaryEl.textContent = hero.ctas.secondary;
+  if (ctaSecondaryEl) {
+    ctaSecondaryEl.textContent = hero.ctas.secondary;
+    if (linkedin) ctaSecondaryEl.href = linkedin.url;
+  }
 }
 
 /** Selected Work Grid */
@@ -203,6 +211,10 @@ function renderAbout() {
 /** Contact Section */
 function renderContact() {
   const { personal } = portfolioData;
+
+  const linkedin = personal.socials.find(s => s.name === 'LinkedIn');
+  const linkedinEl = document.getElementById('contactLinkedin');
+  if (linkedinEl && linkedin) linkedinEl.href = linkedin.url;
 
   const emailEl = document.getElementById('contactEmail');
   if (emailEl) {

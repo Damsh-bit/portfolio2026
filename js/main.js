@@ -12,8 +12,6 @@ import { initModal } from './modules/modal.js';
 import { initNav } from './modules/nav.js';
 import { initAnimations } from './modules/animations.js';
 import { initTyping } from './modules/typing.js';
-import { initContactForm } from './modules/contact-form.js';
-import { initContactPopup } from './modules/contact-popup.js';
 import { initProjectFilters } from './modules/project-filters.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,12 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 7. Initialize Typewriter Title Animations
   initTyping();
 
-  // 8. Initialize Contact Form(s)
-  initContactForm();
-
-  // 9. Initialize Hero Contact Popup
-  initContactPopup();
-
-  // 10. Initialize Project Grid Filters
+  // 8. Initialize Project Grid Filters
   initProjectFilters();
 });
