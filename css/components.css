@@ -1,5 +1,5 @@
 /* ==========================================
-   PORTFOLIO COMPONENTS - VIOLET COSMIC THEME
+   PORTFOLIO COMPONENTS - MONOCHROME COSMIC THEME
    ========================================== */
 
 /* ---------- Header & Navigation ---------- */
@@ -8,7 +8,7 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 100;
+  z-index: 155;
   padding: 26px 40px;
   display: flex;
   justify-content: space-between;
@@ -16,8 +16,8 @@ header {
   gap: 16px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  background: rgba(7, 5, 16, 0.65);
-  border-bottom: 1px solid rgba(168, 85, 247, 0.08);
+  background: rgba(7, 7, 7, 0.65);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   transition: padding 0.3s var(--ease), background 0.3s var(--ease);
 }
 
@@ -38,8 +38,8 @@ header .logo::before {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--violet-primary);
-  box-shadow: 0 0 10px var(--violet-primary);
+  background: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary);
 }
 
 header nav {
@@ -57,8 +57,50 @@ header nav a {
 
 header nav a:hover {
   opacity: 1;
-  color: var(--violet-bright);
-  text-shadow: 0 0 8px var(--violet-glow);
+  color: var(--accent-bright);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  z-index: 160;
+}
+
+.nav-toggle .bar {
+  width: 100%;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+  transition: transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.nav-toggle[aria-expanded="true"] .bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.nav-toggle[aria-expanded="true"] .bar:nth-child(2) {
+  opacity: 0;
+}
+
+.nav-toggle[aria-expanded="true"] .bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.nav-scrim {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 149;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.nav-scrim.open {
+  display: block;
 }
 
 @media (max-width: 640px) {
@@ -68,16 +110,39 @@ header nav a:hover {
   header .logo {
     font-size: 12px;
   }
-  header nav {
-    gap: 14px;
-    font-size: 11px;
-  }
-}
 
-@media (max-width: 400px) {
+  .nav-toggle {
+    display: flex;
+  }
+
   header nav {
-    gap: 10px;
-    font-size: 10px;
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;
+    width: min(78vw, 320px);
+    z-index: 150;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 28px;
+    padding: 40px;
+    font-size: 15px;
+    background: rgba(7, 7, 7, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-left: 1px solid var(--line-strong);
+    transform: translateX(100%);
+    transition: transform 0.4s var(--ease);
+  }
+
+  header nav.open {
+    transform: translateX(0);
+  }
+
+  header nav a {
+    opacity: 1;
+    font-size: 15px;
   }
 }
 
@@ -94,7 +159,7 @@ header nav a:hover {
 
 .hero .eyebrow {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   margin-bottom: 28px;
   overflow: hidden;
   letter-spacing: 0.05em;
@@ -102,7 +167,7 @@ header nav a:hover {
 
 .hero .eyebrow span {
   display: inline-block;
-  background: linear-gradient(90deg, var(--violet-light), #e9d5ff);
+  background: linear-gradient(90deg, var(--accent-light), #ffffff);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 500;
@@ -129,11 +194,28 @@ header nav a:hover {
 
 .hero-title em {
   font-style: normal;
-  color: var(--violet-primary);
-  background: linear-gradient(135deg, var(--violet-bright) 0%, var(--violet-primary) 50%, var(--violet-dark) 100%);
+  color: var(--accent-primary);
+  background: linear-gradient(135deg, var(--accent-bright) 0%, var(--accent-primary) 50%, var(--accent-dark) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px var(--violet-glow);
+  text-shadow: 0 0 30px var(--accent-glow);
+}
+
+.type-caret {
+  display: inline-block;
+  margin-left: 2px;
+  opacity: 1;
+  animation: caret-blink 0.85s step-end infinite;
+}
+
+@keyframes caret-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .type-caret {
+    display: none;
+  }
 }
 
 .hero-foot {
@@ -147,7 +229,7 @@ header nav a:hover {
 
 .hero-foot > div {
   padding-left: 14px;
-  border-left: 2px solid var(--violet-dark);
+  border-left: 2px solid var(--accent-dark);
 }
 
 .hero-foot strong {
@@ -195,8 +277,8 @@ header nav a:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background: var(--violet-light);
-  box-shadow: 0 0 8px var(--violet-primary);
+  background: var(--accent-light);
+  box-shadow: 0 0 8px var(--accent-primary);
   animation: cue 2.2s ease-in-out infinite;
 }
 
@@ -231,7 +313,7 @@ section {
   left: 0;
   width: 80px;
   height: 1px;
-  background: linear-gradient(90deg, var(--violet-primary), transparent);
+  background: linear-gradient(90deg, var(--accent-primary), transparent);
 }
 
 @media (max-width: 600px) {
@@ -252,11 +334,11 @@ section {
 
 .section-head .count {
   font-size: 12px;
-  color: var(--violet-light);
-  background: var(--violet-glow-soft);
+  color: var(--accent-light);
+  background: var(--accent-glow-soft);
   padding: 4px 10px;
   border-radius: 12px;
-  border: 1px solid var(--line-violet);
+  border: 1px solid var(--line-accent);
 }
 
 /* ---------- Work Grid & Cards ---------- */
@@ -285,8 +367,8 @@ section {
 
 .work-card:hover {
   transform: translateY(-4px);
-  border-color: var(--violet-primary);
-  box-shadow: 0 12px 30px -10px var(--violet-glow-soft);
+  border-color: var(--accent-primary);
+  box-shadow: 0 12px 30px -10px var(--accent-glow-soft);
 }
 
 .work-card .thumb {
@@ -304,18 +386,18 @@ section {
 .work-card .thumb span {
   font-size: 11px;
   color: var(--ink-dim);
-  border: 1px dashed var(--line-violet);
+  border: 1px dashed var(--line-accent);
   padding: 8px 16px;
   border-radius: 100px;
-  background: rgba(7, 5, 16, 0.8);
+  background: rgba(7, 7, 7, 0.8);
   backdrop-filter: blur(4px);
   transition: transform 0.4s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease);
 }
 
 .work-card:hover .thumb span {
   transform: scale(1.06);
-  color: var(--violet-bright);
-  border-color: var(--violet-primary);
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
 }
 
 .work-card .thumb img {
@@ -350,7 +432,7 @@ section {
 
 .work-card .meta .index {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   display: block;
   margin-bottom: 6px;
 }
@@ -370,7 +452,7 @@ section {
   bottom: -2px;
   height: 2px;
   width: 100%;
-  background: linear-gradient(90deg, var(--violet-primary), var(--violet-light));
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-light));
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.4s var(--ease);
@@ -401,9 +483,9 @@ section {
 }
 
 .work-card:hover .meta .arrow {
-  color: var(--violet-bright);
-  border-color: var(--violet-primary);
-  background: var(--violet-glow-soft);
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
   transform: rotate(45deg);
 }
 
@@ -412,7 +494,7 @@ section {
   position: fixed;
   inset: 0;
   z-index: 200;
-  background: rgba(7, 5, 16, 0.94);
+  background: rgba(7, 7, 7, 0.94);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   visibility: hidden;
@@ -441,7 +523,7 @@ section {
 
 .modal .modal-top .label {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   letter-spacing: 0.05em;
 }
 
@@ -458,9 +540,9 @@ section {
 }
 
 .modal .close-btn:hover {
-  color: var(--violet-bright);
-  border-color: var(--violet-primary);
-  background: var(--violet-glow-soft);
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
 }
 
 .modal .close-btn .x {
@@ -501,9 +583,9 @@ section {
 }
 
 .modal-nav:hover {
-  color: var(--violet-bright);
-  border-color: var(--violet-primary);
-  background: var(--violet-glow-soft);
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
   transform: translateY(-50%) scale(1.08);
 }
 
@@ -531,7 +613,7 @@ section {
 
 .modal-body .m-index {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   margin-bottom: 16px;
 }
 
@@ -549,7 +631,7 @@ section {
   width: 100%;
   aspect-ratio: 16/9;
   background: radial-gradient(circle at 50% 50%, #15112b 0%, #0a0718 100%);
-  border: 1px solid var(--line-violet);
+  border: 1px solid var(--line-accent);
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -579,9 +661,9 @@ section {
 
 .modal-body .m-tags span {
   font-size: 11.5px;
-  color: var(--violet-bright);
-  background: var(--violet-glow-soft);
-  border: 1px solid var(--line-violet);
+  color: var(--accent-bright);
+  background: var(--accent-glow-soft);
+  border: 1px solid var(--line-accent);
   border-radius: 100px;
   padding: 6px 14px;
 }
@@ -600,9 +682,9 @@ section {
   gap: 8px;
   margin-top: 16px;
   font-size: 13.5px;
-  color: var(--violet-bright);
-  border: 1px solid var(--violet-primary);
-  background: var(--violet-glow-soft);
+  color: var(--accent-bright);
+  border: 1px solid var(--accent-primary);
+  background: var(--accent-glow-soft);
   padding: 10px 20px;
   border-radius: 100px;
   transition: transform 0.3s var(--ease), background 0.3s var(--ease), box-shadow 0.3s var(--ease);
@@ -610,9 +692,9 @@ section {
 
 .modal-body .m-link:hover {
   transform: translateY(-2px);
-  background: var(--violet-primary);
+  background: var(--accent-primary);
   color: #ffffff;
-  box-shadow: 0 4px 20px var(--violet-glow);
+  box-shadow: 0 4px 20px var(--accent-glow);
 }
 
 /* ---------- Project Modal — Justified Gallery ---------- */
@@ -647,8 +729,8 @@ section {
 }
 
 .g-item:hover {
-  border-color: var(--violet-primary);
-  box-shadow: 0 8px 24px -8px var(--violet-glow-soft);
+  border-color: var(--accent-primary);
+  box-shadow: 0 8px 24px -8px var(--accent-glow-soft);
 }
 
 .g-item img {
@@ -676,8 +758,8 @@ section {
   justify-content: center;
   font-size: 14px;
   color: var(--ink);
-  background: rgba(7, 5, 16, 0.55);
-  border: 1px solid var(--line-violet);
+  background: rgba(7, 7, 7, 0.55);
+  border: 1px solid var(--line-accent);
   backdrop-filter: blur(4px);
   opacity: 0;
   transform: translateY(-6px);
@@ -721,7 +803,7 @@ section {
   object-fit: contain;
   border-radius: 10px;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
-  border: 1px solid var(--line-violet);
+  border: 1px solid var(--line-accent);
 }
 
 .lightbox button {
@@ -737,9 +819,9 @@ section {
 }
 
 .lightbox button:hover {
-  color: var(--violet-bright);
-  border-color: var(--violet-primary);
-  background: var(--violet-glow-soft);
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
 }
 
 .lightbox .lb-close {
@@ -824,13 +906,13 @@ section {
 
 .lang-line {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   margin-top: 16px;
   display: inline-block;
   padding: 6px 12px;
-  border: 1px solid var(--line-violet);
+  border: 1px solid var(--line-accent);
   border-radius: 6px;
-  background: var(--violet-glow-soft);
+  background: var(--accent-glow-soft);
 }
 
 .skills-group {
@@ -864,10 +946,10 @@ section {
 }
 
 .skills-group .tag:hover {
-  border-color: var(--violet-primary);
-  color: var(--violet-bright);
+  border-color: var(--accent-primary);
+  color: var(--accent-bright);
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px var(--violet-glow-soft);
+  box-shadow: 0 4px 15px var(--accent-glow-soft);
 }
 
 .skills-group .tag img.tech-icon {
@@ -906,12 +988,12 @@ section {
 }
 
 .exp-row:hover {
-  border-bottom-color: var(--line-violet);
+  border-bottom-color: var(--line-accent);
 }
 
 .exp-row .period {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   padding-top: 4px;
 }
 
@@ -966,14 +1048,14 @@ section {
 }
 
 .edu-item span:last-child {
-  color: var(--violet-light);
+  color: var(--accent-light);
   font-size: 12px;
 }
 
 /* ---------- Contact Section ---------- */
 .contact .eyebrow {
   font-size: 12px;
-  color: var(--violet-light);
+  color: var(--accent-light);
   margin-bottom: 24px;
   letter-spacing: 0.05em;
 }
@@ -994,7 +1076,7 @@ section {
   font-size: clamp(1.1rem, 3vw, 1.7rem);
   position: relative;
   padding-bottom: 8px;
-  color: var(--violet-bright);
+  color: var(--accent-bright);
 }
 
 .contact .email-link .underline {
@@ -1003,7 +1085,7 @@ section {
   bottom: 0;
   height: 2px;
   width: 100%;
-  background: linear-gradient(90deg, var(--violet-primary), var(--violet-light));
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-light));
   transform: scaleX(1);
   transform-origin: right;
   transition: transform 0.5s var(--ease);
@@ -1012,6 +1094,85 @@ section {
 .contact .email-link:hover .underline {
   transform-origin: left;
   transform: scaleX(0);
+}
+
+/* ---------- Contact Form ---------- */
+.contact-form {
+  max-width: 480px;
+  margin: 0 0 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-row label {
+  font-size: 12px;
+  color: var(--ink-muted);
+  letter-spacing: 0.05em;
+}
+
+.form-row input,
+.form-row textarea {
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 14.5px;
+  resize: vertical;
+  transition: border-color 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.form-row input:focus,
+.form-row textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  background: var(--bg-soft);
+}
+
+.form-row input.invalid,
+.form-row textarea.invalid {
+  border-color: #a1a1aa;
+}
+
+.form-error {
+  font-size: 12px;
+  color: #d4d4d8;
+  min-height: 14px;
+}
+
+.form-submit {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  color: var(--accent-bright);
+  border: 1px solid var(--accent-primary);
+  background: var(--accent-glow-soft);
+  padding: 12px 24px;
+  border-radius: 100px;
+  transition: transform 0.3s var(--ease), background 0.3s var(--ease), box-shadow 0.3s var(--ease), color 0.3s var(--ease);
+}
+
+.form-submit:hover {
+  transform: translateY(-2px);
+  background: var(--accent-primary);
+  color: #000;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.form-note {
+  font-size: 12px;
+  color: var(--ink-dim);
+  min-height: 14px;
 }
 
 /* ---------- Footer ---------- */
@@ -1036,7 +1197,64 @@ footer .socials a {
 }
 
 footer .socials a:hover {
-  color: var(--violet-bright);
+  color: var(--accent-bright);
+}
+
+@media (max-width: 600px) {
+  footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 28px 0 48px;
+  }
+
+  footer .socials {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+}
+
+/* ---------- Floating LinkedIn Button ---------- */
+.linkedin-fab {
+  position: fixed;
+  right: 28px;
+  bottom: 28px;
+  z-index: 120;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(16, 16, 16, 0.75);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.linkedin-fab:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+  transform: translateY(-3px);
+}
+
+body.modal-open .linkedin-fab,
+body.lightbox-open .linkedin-fab {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .linkedin-fab {
+    right: 18px;
+    bottom: 18px;
+    width: 48px;
+    height: 48px;
+  }
 }
 
 .reveal {

@@ -23,7 +23,7 @@ export const portfolioData = {
     ],
     socials: [
       { name: "GitHub", url: "https://github.com" },
-      { name: "LinkedIn", url: "https://linkedin.com" },
+      { name: "LinkedIn", url: "https://www.linkedin.com/in/damian-coronel-849b901b5/" },
       { name: "Upwork", url: "https://upwork.com" }
     ],
     meta: {

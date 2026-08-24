@@ -1,6 +1,6 @@
 # Portfolio Personal — Leandro Coronel
 
-Portfolio profesional con arquitectura modular escalable, animaciones en Canvas de universo minimalista y tema violeta espacial.
+Portfolio profesional con arquitectura modular escalable, animaciones en Canvas de universo minimalista y tema monocromático espacial.
 
 ## 🚀 Arquitectura y Escalabilidad
 
@@ -12,7 +12,7 @@ El proyecto ha sido diseñado para separar completamente **el contenido y la inf
 Portfolio/
 ├── index.html                    # Plantilla HTML semántica y ligera
 ├── css/
-│   ├── variables.css             # Tokens de diseño (Violet Cosmic palette, tipografías)
+│   ├── variables.css             # Tokens de diseño (Monochrome Cosmic palette, tipografías)
 │   ├── base.css                  # Estilos base, resets y cursor personalizado
 │   ├── universe.css              # Capa de fondo y canvas espacial
 │   └── components.css            # Estilos de Header, Hero, Work, Modal, Skills, Contacto
@@ -22,7 +22,7 @@ Portfolio/
 │   ├── modules/
 │   │   ├── universe-bg.js        # Motor Canvas de Universo (estrellas, planetas, stardust)
 │   │   ├── renderer.js           # Generador de DOM y SEO (JSON-LD) dinámico
-│   │   ├── cursor.js             # Cursor inteligente con brillo violeta
+│   │   ├── cursor.js             # Cursor inteligente con brillo monocromático
 │   │   ├── modal.js              # Controlador de vistas de proyectos
 │   │   └── animations.js         # Transiciones de entrada y ScrollTrigger con GSAP
 │   └── main.js                   # Script principal de inicialización
@@ -89,11 +89,11 @@ En el objeto `skills`, puedes modificar o crear grupos con iconos de [SimpleIcon
 
 ---
 
-## 🎨 Animación de Universo y Tema Violeta
+## 🎨 Animación de Universo y Tema Monocromático
 
 - **Estrellas y Polvo Cósmico:** Canvas dinámico optimizado a 60 FPS con profundidad multi-capa.
-- **Planetas Minimalistas:** Cuerpos celestes flotantes con suaves gradientes en tonos violeta y anillos de luz.
-- **Interactividad:** El movimiento del cursor genera reacciones magnéticas en el polvo estelar y destellos láser violeta.
+- **Planetas Minimalistas:** Cuerpos celestes flotantes con suaves gradientes en tonos grises/blancos y anillos de luz.
+- **Interactividad:** El movimiento del cursor genera reacciones magnéticas en el polvo estelar y destellos láser grises; los planetas esconden easter eggs al hacer clic.
 - **Modo Accesibilidad:** Respeta automáticamente la preferencia `prefers-reduced-motion` del sistema operativo.
 
 ---

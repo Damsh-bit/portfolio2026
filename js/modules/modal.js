@@ -79,6 +79,7 @@ export function initModal() {
     gsap.set(inner, { x: 0, opacity: 1 });
 
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
     modal.style.visibility = 'visible';
 
     gsap.fromTo(modal,
@@ -99,6 +100,7 @@ export function initModal() {
       onComplete: () => {
         modal.style.visibility = 'hidden';
         document.body.style.overflow = '';
+        document.body.classList.remove('modal-open');
       }
     });
   }

@@ -27,7 +27,7 @@ body {
 }
 
 ::selection {
-  background: var(--violet-primary);
+  background: var(--accent-primary);
   color: #ffffff;
 }
 
@@ -61,7 +61,7 @@ button {
   }
 }
 
-/* Custom Violet Cursor */
+/* Custom Monochrome Cursor */
 .cursor {
   position: fixed;
   top: 0;
@@ -69,8 +69,8 @@ button {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: var(--violet-light);
-  box-shadow: 0 0 15px var(--violet-primary), 0 0 30px var(--violet-glow);
+  background: var(--accent-light);
+  box-shadow: 0 0 15px var(--accent-primary), 0 0 30px var(--accent-glow);
   pointer-events: none;
   z-index: 999;
   mix-blend-mode: screen;
@@ -81,9 +81,9 @@ button {
 .cursor.grow {
   width: 52px;
   height: 52px;
-  background: rgba(168, 85, 247, 0.25);
-  border: 1px solid var(--violet-light);
-  box-shadow: 0 0 25px var(--violet-glow);
+  background: rgba(212, 212, 216, 0.25);
+  border: 1px solid var(--accent-light);
+  box-shadow: 0 0 25px var(--accent-glow);
 }
 
 @media (hover: none), (pointer: coarse) {

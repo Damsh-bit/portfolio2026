@@ -180,7 +180,7 @@ function renderAbout() {
         <span class="label mono">${group.category}</span>
         <div class="tags">
           ${group.items.map(item => {
-            const iconUrl = item.icon ? `https://cdn.simpleicons.org/${item.icon}/a855f7` : null;
+            const iconUrl = item.icon ? `https://cdn.simpleicons.org/${item.icon}/d4d4d8` : null;
             return `
               <span class="tag">
                 ${iconUrl ? `<img class="tech-icon" src="${iconUrl}" alt="" onerror="this.remove()">` : ''}
@@ -216,4 +216,8 @@ function renderFooter() {
       <a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name}</a>
     `).join('');
   }
+
+  const linkedinFab = document.getElementById('linkedinFab');
+  const linkedin = portfolioData.personal.socials.find(s => s.name === 'LinkedIn');
+  if (linkedinFab && linkedin) linkedinFab.href = linkedin.url;
 }

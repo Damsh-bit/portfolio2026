@@ -18,8 +18,37 @@
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background: 
-    radial-gradient(circle at 15% 20%, rgba(124, 58, 237, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 85% 75%, rgba(168, 85, 247, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 50% 50%, rgba(9, 7, 20, 0.4) 0%, rgba(7, 5, 16, 0.95) 100%);
+  background:
+    radial-gradient(circle at 15% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(180, 180, 190, 0.045) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(10, 10, 10, 0.4) 0%, rgba(7, 7, 7, 0.95) 100%);
+}
+
+/* Intermittent digital-interference glitch burst */
+.glitch-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  background:
+    linear-gradient(90deg, rgba(255, 0, 60, 0.06) 0%, transparent 2%),
+    linear-gradient(90deg, transparent 96%, rgba(0, 220, 255, 0.06) 100%);
+  animation: bg-glitch 9s steps(1) infinite;
+}
+
+@keyframes bg-glitch {
+  0%, 92%, 100% { opacity: 0; transform: translate3d(0, 0, 0); clip-path: inset(0 0 0 0); }
+  92.5% { opacity: 1; transform: translate3d(-6px, 0, 0); clip-path: inset(10% 0 65% 0); }
+  93.2% { opacity: 1; transform: translate3d(5px, 0, 0); clip-path: inset(55% 0 20% 0); }
+  93.8% { opacity: 0.6; transform: translate3d(-3px, 0, 0); clip-path: inset(30% 0 40% 0); }
+  94.2% { opacity: 0; transform: translate3d(0, 0, 0); clip-path: inset(0 0 0 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch-overlay {
+    animation: none;
+    opacity: 0;
+  }
 }

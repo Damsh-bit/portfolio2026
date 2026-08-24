@@ -188,11 +188,13 @@ function openLightbox(images, index) {
   currentImages = images;
   showLightbox(index);
   lightboxEl.classList.add('active');
+  document.body.classList.add('lightbox-open');
 }
 
 function closeLightbox() {
   if (!lightboxEl) return;
   lightboxEl.classList.remove('active');
+  document.body.classList.remove('lightbox-open');
 }
 
 export function isLightboxActive() {

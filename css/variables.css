@@ -1,30 +1,30 @@
 /* ==========================================
-   DESIGN SYSTEM & VARIABLES - VIOLET COSMIC
+   DESIGN SYSTEM & VARIABLES - MONOCHROME COSMIC
    ========================================== */
 
 :root {
-  /* Color Palette - Deep Space & Cosmic Violet */
-  --bg: #070510;
-  --bg-soft: #0e0b1d;
-  --bg-card: #0d0a1b;
-  
-  --ink: #f5f3ff;
-  --ink-dim: #948fb3;
-  --ink-muted: #646080;
+  /* Color Palette - Deep Space & Monochrome */
+  --bg: #070707;
+  --bg-soft: #121212;
+  --bg-card: #101010;
 
-  /* Violet Accents */
-  --violet-primary: #a855f7;
-  --violet-light: #c084fc;
-  --violet-bright: #d8b4fe;
-  --violet-dark: #7c3aed;
-  --violet-deep: #581c87;
-  --violet-glow: rgba(168, 85, 247, 0.35);
-  --violet-glow-soft: rgba(168, 85, 247, 0.12);
+  --ink: #f5f5f7;
+  --ink-dim: #9a9aa2;
+  --ink-muted: #66666e;
+
+  /* Monochrome Accents */
+  --accent-primary: #d4d4d8;
+  --accent-light: #e4e4e7;
+  --accent-bright: #ffffff;
+  --accent-dark: #71717a;
+  --accent-deep: #3f3f46;
+  --accent-glow: rgba(212, 212, 216, 0.35);
+  --accent-glow-soft: rgba(212, 212, 216, 0.12);
 
   /* Lines & Borders */
-  --line: #1c1833;
-  --line-strong: #332b57;
-  --line-violet: rgba(168, 85, 247, 0.3);
+  --line: #1c1c1f;
+  --line-strong: #333338;
+  --line-accent: rgba(212, 212, 216, 0.3);
 
   /* Typography */
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;

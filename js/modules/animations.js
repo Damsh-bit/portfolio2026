@@ -15,36 +15,31 @@ export function initAnimations() {
   const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Hero Section Intro Animation
+  // NOTE: the hero title itself is revealed by the typewriter effect in
+  // typing.js, not by this timeline — only the eyebrow/foot/scroll-cue tween.
   if (!reduced) {
-    gsap.set('.hero-title .line span', { yPercent: 110 });
     gsap.set('.eyebrow span', { yPercent: 110 });
 
     const tl = gsap.timeline({ delay: 0.15 });
 
-    tl.to('.eyebrow span', { 
-      yPercent: 0, 
-      duration: 0.8, 
-      ease: 'power4.out' 
+    tl.to('.eyebrow span', {
+      yPercent: 0,
+      duration: 0.8,
+      ease: 'power4.out'
     })
-    .to('.hero-title .line span', { 
-      yPercent: 0, 
-      duration: 1.0, 
-      stagger: 0.12, 
-      ease: 'power4.out' 
-    }, '-=0.4')
-    .from('.hero-foot > div', { 
-      opacity: 0, 
-      y: 16, 
-      duration: 0.8, 
-      stagger: 0.1, 
-      ease: 'power2.out' 
-    }, '-=0.5')
-    .from('.scroll-cue', { 
-      opacity: 0, 
-      duration: 0.8 
+    .from('.hero-foot > div', {
+      opacity: 0,
+      y: 16,
+      duration: 0.8,
+      stagger: 0.1,
+      ease: 'power2.out'
+    }, '-=0.3')
+    .from('.scroll-cue', {
+      opacity: 0,
+      duration: 0.8
     }, '-=0.6');
   } else {
-    gsap.set('.hero-title .line span, .eyebrow span', { yPercent: 0 });
+    gsap.set('.eyebrow span', { yPercent: 0 });
   }
 
   // Scroll Reveals for Sections and Items

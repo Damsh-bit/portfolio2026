@@ -1,6 +1,6 @@
 /**
  * =========================================================================
- * CUSTOM VIOLET GLOW CURSOR MODULE
+ * CUSTOM MONOCHROME GLOW CURSOR MODULE
  * =========================================================================
  * Provides dynamic cursor tracking with inertia using GSAP quickTo.
  */

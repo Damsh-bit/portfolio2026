@@ -20,9 +20,10 @@
 
 <!-- Minimalist Cosmic Canvas & Ambient Gradient -->
 <div class="space-ambient"></div>
+<div class="glitch-overlay" aria-hidden="true"></div>
 <canvas id="bg-canvas"></canvas>
 
-<!-- Custom Violet Glowing Cursor -->
+<!-- Custom Monochrome Glowing Cursor -->
 <div class="cursor" id="cursor"></div>
 
 <!-- Main Page Layer -->
@@ -31,13 +32,17 @@
   <!-- Navigation Header -->
   <header>
     <div class="logo mono" id="headerLogo">LEANDRO CORONEL</div>
-    <nav class="mono">
+    <button type="button" class="nav-toggle" id="navToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="siteNav">
+      <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+    </button>
+    <nav class="mono" id="siteNav">
       <a href="#work">Trabajos</a>
       <a href="#experience">Experiencia</a>
       <a href="#about">Sobre mí</a>
       <a href="#contact">Contacto</a>
     </nav>
   </header>
+  <div class="nav-scrim" id="navScrim"></div>
 
   <main class="wrap">
 
@@ -56,7 +61,7 @@
     <!-- Selected Work Section -->
     <section id="work">
       <div class="section-head">
-        <h2>Trabajos seleccionados</h2>
+        <h2 data-typewriter>Trabajos seleccionados</h2>
         <span class="count mono" id="workCount">(00)</span>
       </div>
       <div class="work-grid" id="workGrid">
@@ -67,7 +72,7 @@
     <!-- Experience & Education Section -->
     <section id="experience">
       <div class="section-head">
-        <h2>Experiencia</h2>
+        <h2 data-typewriter>Experiencia</h2>
         <span class="count mono" id="expCount">(00)</span>
       </div>
 
@@ -86,7 +91,7 @@
     <!-- About Section -->
     <section id="about">
       <div class="section-head">
-        <h2>Sobre mí</h2>
+        <h2 data-typewriter>Sobre mí</h2>
         <span class="count mono">(01)</span>
       </div>
       <div class="about-grid reveal">
@@ -102,7 +107,30 @@
     <!-- Contact Section -->
     <section id="contact" class="contact">
       <p class="eyebrow mono reveal">¿TRABAJAMOS JUNTOS?</p>
-      <h2 class="reveal">Escribime y armamos<br>tu próximo proyecto.</h2>
+      <h2 class="reveal" data-typewriter>Escribime y armamos<br>tu próximo proyecto.</h2>
+
+      <form class="contact-form reveal" id="contactForm" novalidate>
+        <div class="form-row">
+          <label for="cfName">Nombre</label>
+          <input type="text" id="cfName" name="name" required autocomplete="name">
+          <span class="form-error" id="cfNameError"></span>
+        </div>
+        <div class="form-row">
+          <label for="cfEmail">Tu email</label>
+          <input type="email" id="cfEmail" name="email" required autocomplete="email">
+          <span class="form-error" id="cfEmailError"></span>
+        </div>
+        <div class="form-row">
+          <label for="cfMessage">Mensaje</label>
+          <textarea id="cfMessage" name="message" rows="5" required></textarea>
+          <span class="form-error" id="cfMessageError"></span>
+        </div>
+        <button type="submit" class="form-submit mono">
+          Enviar mensaje <span class="arrow">→</span>
+        </button>
+        <p class="form-note mono" id="formNote"></p>
+      </form>
+
       <a href="" class="email-link mono reveal" id="contactEmail">
         <span class="underline"></span>
       </a>
@@ -144,6 +172,13 @@
     <button type="button" class="modal-nav prev" id="mPrev" aria-label="Proyecto anterior">‹</button>
     <button type="button" class="modal-nav next" id="mNext" aria-label="Proyecto siguiente">›</button>
   </div>
+
+  <!-- Floating LinkedIn Button -->
+  <a href="#" id="linkedinFab" class="linkedin-fab" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Leandro Coronel">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/>
+    </svg>
+  </a>
 
 </div><!-- /.page -->
 
