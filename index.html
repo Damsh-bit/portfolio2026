@@ -3,8 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leandro Coronel — Senior WordPress Developer</title>
-  
+  <title>Damián Coronel — Senior WordPress Developer</title>
+
+  <!-- Favicon -->
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="icon" href="assets/favicon-16.png" sizes="16x16" type="image/png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -121,6 +127,10 @@
       <h2 class="reveal" data-typewriter>Escribime y armamos<br>tu próximo proyecto.</h2>
 
       <form class="contact-form reveal" id="contactForm" data-contact-form novalidate>
+        <div class="form-hp" aria-hidden="true">
+          <label for="cfWebsite">Sitio web</label>
+          <input type="text" id="cfWebsite" name="website" tabindex="-1" autocomplete="off">
+        </div>
         <div class="form-row">
           <label for="cfName">Nombre</label>
           <input type="text" id="cfName" name="name" required autocomplete="name">
@@ -151,7 +161,7 @@
 
   <!-- Footer -->
   <footer class="wrap">
-    <span>© 2026 Leandro Coronel</span>
+    <span>© 2026 Damián Coronel</span>
     <div class="socials mono" id="footerSocials">
       <!-- Rendered dynamically from portfolio-data.js -->
     </div>
@@ -196,6 +206,10 @@
       <p class="popup-note">Escribime un mensaje y te respondo a la brevedad. Sin compromiso, solo para charlar sobre tu idea.</p>
 
       <form class="contact-form" id="popupContactForm" data-contact-form novalidate>
+        <div class="form-hp" aria-hidden="true">
+          <label for="pfWebsite">Sitio web</label>
+          <input type="text" id="pfWebsite" name="website" tabindex="-1" autocomplete="off">
+        </div>
         <div class="form-row">
           <label for="pfName">Nombre</label>
           <input type="text" id="pfName" name="name" required autocomplete="name">
@@ -220,7 +234,7 @@
   </div>
 
   <!-- Floating LinkedIn Button -->
-  <a href="#" id="linkedinFab" class="linkedin-fab" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Leandro Coronel">
+  <a href="#" id="linkedinFab" class="linkedin-fab" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Damián Coronel">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
       <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/>
     </svg>

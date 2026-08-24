@@ -1,4 +1,4 @@
-# Portfolio Personal — Leandro Coronel
+# Portfolio Personal — Damián Coronel
 
 Portfolio profesional con arquitectura modular escalable, animaciones en Canvas de universo minimalista y tema monocromático espacial.
 
@@ -41,7 +41,7 @@ Portfolio/
 #### 1. Editar Datos Personales y Hero
 ```javascript
 personal: {
-  name: "Leandro Coronel",
+  name: "Damián Coronel",
   jobTitle: "Senior WordPress Developer | WooCommerce, PHP, Core Web Vitals",
   email: "tuemail@ejemplo.com",
   ...

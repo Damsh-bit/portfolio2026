@@ -8,8 +8,8 @@
 
 export const portfolioData = {
   personal: {
-    name: "Leandro Coronel",
-    fullName: "Leandro Damian Coronel",
+    name: "Damián Coronel",
+    fullName: "Damián Coronel",
     jobTitle: "Senior WordPress Developer | WooCommerce, PHP, Core Web Vitals",
     shortRole: "DESARROLLADOR WEB — SITIOS A MEDIDA, DE INICIO A FIN",
     email: "damiancoronel.dev@gmail.com",
@@ -27,15 +27,15 @@ export const portfolioData = {
       { name: "Upwork", url: "https://upwork.com" }
     ],
     meta: {
-      description: "Leandro Damian Coronel — Desarrollador WordPress Senior y Webmaster Técnico con más de 3 años de experiencia en WordPress, WooCommerce, PHP, optimización de Core Web Vitals, SEO técnico e integraciones de CRM y pasarelas de pago.",
+      description: "Damián Coronel — Desarrollador WordPress Senior y Webmaster Técnico con más de 3 años de experiencia en WordPress, WooCommerce, PHP, optimización de Core Web Vitals, SEO técnico e integraciones de CRM y pasarelas de pago.",
       keywords: "WordPress Developer, Senior WordPress Developer, WooCommerce Developer, PHP Developer, Webmaster Técnico, Elementor, ACF, Gutenberg, Divi, Core Web Vitals, SEO técnico, JavaScript ES6, MySQL, Zoho CRM, Stripe, PayPal, cPanel, Plesk, Git, Figma, Desarrollador Web Argentina",
-      author: "Leandro Damian Coronel"
+      author: "Damián Coronel"
     }
   },
 
   hero: {
     titleLines: [
-      "Hola, soy Leandro.",
+      "Hola, soy Damián.",
       "Desarrollo <em>sitios web</em>",
       "completos, de punta a punta."
     ],

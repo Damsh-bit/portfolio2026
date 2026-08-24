@@ -1278,6 +1278,18 @@ section {
   min-height: 14px;
 }
 
+.form-note.is-error {
+  color: #ff6b6b;
+}
+
+.form-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 /* ---------- Contact Popup (Hero CTAs) ---------- */
 .contact-popup {
   position: fixed;

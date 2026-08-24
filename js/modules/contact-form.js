@@ -3,13 +3,11 @@
  * CONTACT FORM CONTROLLER
  * =========================================================================
  * Validates every form marked [data-contact-form] (the contact section form
- * and the hero popup form) and hands the message off via a mailto: link
- * (this is a static site with no backend, so there is nowhere to POST it).
- * The visitor's email client opens with the subject/body pre-filled —
- * they only need to hit send.
+ * and the hero popup form) and submits it to mail/send.php, which relays
+ * the message through Hostinger's SMTP mailer via PHPMailer.
  */
 
-import { portfolioData } from '../data/portfolio-data.js';
+const ENDPOINT = '/mail/send.php';
 
 export function initContactForm() {
   document.querySelectorAll('form[data-contact-form]').forEach(initSingleForm);
@@ -21,7 +19,9 @@ function initSingleForm(form) {
     email: form.querySelector('[name="email"]'),
     message: form.querySelector('[name="message"]')
   };
+  const honeypot = form.querySelector('[name="website"]');
   const note = form.querySelector('.form-note');
+  const submitBtn = form.querySelector('.form-submit');
 
   function errorFor(input) {
     return input.closest('.form-row').querySelector('.form-error');
@@ -57,21 +57,46 @@ function initSingleForm(form) {
     return valid;
   }
 
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
-    if (note) note.textContent = '';
+    if (note) {
+      note.textContent = '';
+      note.classList.remove('is-error');
+    }
 
     if (!validate()) return;
 
-    const name = fields.name.value.trim();
-    const senderEmail = fields.email.value.trim();
-    const message = fields.message.value.trim();
+    const payload = {
+      name: fields.name.value.trim(),
+      email: fields.email.value.trim(),
+      message: fields.message.value.trim(),
+      website: honeypot ? honeypot.value.trim() : ''
+    };
 
-    const subject = encodeURIComponent(`Contacto desde portfolio — ${name}`);
-    const body = encodeURIComponent(`${message}\n\n---\nDe: ${name} (${senderEmail})`);
+    if (submitBtn) submitBtn.disabled = true;
+    if (note) note.textContent = 'Enviando…';
 
-    window.location.href = `mailto:${portfolioData.personal.email}?subject=${subject}&body=${body}`;
+    try {
+      const res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
 
-    if (note) note.textContent = 'Se abrió tu cliente de email con el mensaje listo para enviar.';
+      if (!res.ok || !data.ok) {
+        throw new Error(data.message || 'No se pudo enviar el mensaje.');
+      }
+
+      if (note) note.textContent = data.message || 'Mensaje enviado. Te responderé a la brevedad.';
+      form.reset();
+    } catch (err) {
+      if (note) {
+        note.textContent = err.message || 'No se pudo enviar el mensaje. Intentá de nuevo más tarde.';
+        note.classList.add('is-error');
+      }
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
   });
 }
