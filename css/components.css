@@ -24,22 +24,47 @@ header {
 header .logo {
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.02em;
   white-space: nowrap;
   color: var(--ink);
   display: flex;
   align-items: center;
-  gap: 8px;
+  cursor: default;
 }
 
-header .logo::before {
-  content: '';
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  box-shadow: 0 0 10px var(--accent-primary);
+header .logo .logo-bracket {
+  color: var(--accent-primary);
+  transition: color 0.3s var(--ease), text-shadow 0.3s var(--ease);
+}
+
+header .logo .logo-name {
+  margin: 0 1px;
+  transition: color 0.3s var(--ease), text-shadow 0.3s var(--ease);
+}
+
+header .logo:hover .logo-bracket,
+header .logo:hover .logo-name {
+  color: #fff;
+  animation: logo-neon 1.4s ease-in-out infinite;
+}
+
+header .logo:hover .logo-bracket {
+  animation-delay: 0.1s;
+}
+
+@keyframes logo-neon {
+  0%, 100% {
+    text-shadow:
+      0 0 4px var(--accent-glow),
+      0 0 10px var(--accent-glow),
+      0 0 20px rgba(212, 212, 216, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 8px #fff,
+      0 0 18px var(--accent-primary),
+      0 0 34px rgba(212, 212, 216, 0.7);
+  }
 }
 
 header nav {
@@ -148,19 +173,19 @@ header nav a:hover {
 
 /* ---------- Hero Section ---------- */
 .hero {
-  min-height: 100vh;
+  min-height: 92vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   padding-top: 90px;
-  padding-bottom: 40px;
+  padding-bottom: 32px;
   position: relative;
 }
 
 .hero .eyebrow {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--accent-light);
-  margin-bottom: 28px;
+  margin-bottom: 14px;
   overflow: hidden;
   letter-spacing: 0.05em;
 }
@@ -173,12 +198,36 @@ header nav a:hover {
   font-weight: 500;
 }
 
+.hero-role {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 8px;
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--accent-bright);
+  padding: 6px 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--line-accent);
+  border-radius: 100px;
+  background: var(--accent-glow-soft);
+}
+
+.hero-role::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary);
+}
+
 .hero-title {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2.4rem, 7.5vw, 5.8rem);
-  line-height: 1.02;
-  letter-spacing: -0.025em;
+  font-size: clamp(1.9rem, 5.4vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
   color: var(--ink);
 }
 
@@ -201,6 +250,26 @@ header nav a:hover {
   text-shadow: 0 0 30px var(--accent-glow);
 }
 
+/* Continuous looping glitch flicker on every title in the page */
+.hero-title,
+.section-head h2,
+.contact h2,
+.modal-body h2 {
+  animation: title-glitch 3.2s infinite steps(1);
+}
+
+@keyframes title-glitch {
+  0%, 4%, 46%, 50%, 100% {
+    text-shadow: none;
+  }
+  1% { text-shadow: -2px 0 rgba(255, 0, 60, 0.75), 2px 0 rgba(0, 220, 255, 0.75); }
+  2% { text-shadow: 2px 0 rgba(255, 0, 60, 0.75), -2px 0 rgba(0, 220, 255, 0.75); }
+  3% { text-shadow: -1px 0 rgba(255, 0, 60, 0.55), 1px 0 rgba(0, 220, 255, 0.55); }
+  47% { text-shadow: 2px 0 rgba(255, 0, 60, 0.75), -2px 0 rgba(0, 220, 255, 0.75); }
+  48% { text-shadow: -2px 0 rgba(255, 0, 60, 0.75), 2px 0 rgba(0, 220, 255, 0.75); }
+  49% { text-shadow: -1px 0 rgba(255, 0, 60, 0.55), 1px 0 rgba(0, 220, 255, 0.55); }
+}
+
 .type-caret {
   display: inline-block;
   margin-left: 2px;
@@ -219,13 +288,21 @@ header nav a:hover {
   .section-note .dot {
     animation: none;
   }
+  .hero-title,
+  .section-head h2,
+  .contact h2,
+  .modal-body h2,
+  header .logo:hover .logo-bracket,
+  header .logo:hover .logo-name {
+    animation: none;
+  }
 }
 
 .hero-cta {
   display: flex;
-  gap: 16px;
+  gap: 14px;
   flex-wrap: wrap;
-  margin-top: 40px;
+  margin-top: 26px;
 }
 
 .cta-btn {
@@ -283,12 +360,43 @@ header nav a:hover {
   }
 }
 
+.hero-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.hero-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  padding: 7px 14px;
+  color: var(--ink-dim);
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  background: var(--bg-card);
+  transition: transform 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.hero-link svg {
+  flex-shrink: 0;
+}
+
+.hero-link:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  color: var(--accent-bright);
+  background: var(--accent-glow-soft);
+}
+
 .hero-rating {
   display: inline-flex;
   align-self: flex-start;
   align-items: center;
   gap: 10px;
-  margin-top: 24px;
+  margin-top: 16px;
   padding: 8px 16px;
   font-size: 12.5px;
   color: var(--ink-dim);
@@ -299,9 +407,10 @@ header nav a:hover {
 }
 
 .hero-rating .stars {
-  color: var(--accent-light);
+  color: #ffc94a;
   letter-spacing: 2px;
   font-size: 13px;
+  text-shadow: 0 0 6px rgba(255, 201, 74, 0.85), 0 0 14px rgba(255, 201, 74, 0.5);
 }
 
 .hero-rating:hover {
@@ -311,9 +420,9 @@ header nav a:hover {
 }
 
 .hero-foot {
-  margin-top: 56px;
+  margin-top: 36px;
   display: flex;
-  gap: 48px;
+  gap: 40px;
   flex-wrap: wrap;
   font-size: 12.5px;
   color: var(--ink-dim);
@@ -333,14 +442,17 @@ header nav a:hover {
 
 @media (max-width: 600px) {
   .hero {
-    padding-top: 70px;
+    padding-top: 64px;
+  }
+  .hero-links {
+    margin-top: 14px;
   }
   .hero-rating {
-    margin-top: 18px;
+    margin-top: 14px;
   }
   .hero-foot {
-    margin-top: 36px;
-    gap: 20px 28px;
+    margin-top: 26px;
+    gap: 16px 24px;
   }
   .scroll-cue {
     display: none;
