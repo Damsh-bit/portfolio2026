@@ -1181,11 +1181,26 @@ section {
   margin-bottom: 12px;
 }
 
-.exp-row p {
+.exp-row ul {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 64ch;
+}
+
+.exp-row li {
+  position: relative;
+  padding-left: 18px;
   color: var(--ink-dim);
   font-size: 14.5px;
-  max-width: 60ch;
   line-height: 1.6;
+}
+
+.exp-row li::before {
+  content: '—';
+  position: absolute;
+  left: 0;
+  color: var(--accent-dark);
 }
 
 @media (max-width: 640px) {

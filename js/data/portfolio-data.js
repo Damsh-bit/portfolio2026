@@ -234,22 +234,39 @@ export const portfolioData = {
 
   experience: [
     {
-      period: "Nov 2022 — Actualidad",
+      period: "Sep 2023 — Actualidad",
       title: "Desarrollador WordPress Senior / Webmaster Técnico",
       company: "DigitalYA — Madrid, España · Remoto",
-      description: "Me encargo de desarrollar sitios web complejos y completos de inicio a fin: arquitectura, maquetación y funcionalidades a medida con ACF, JavaScript y WooCommerce. Optimizo Core Web Vitals e integro APIs y CRM (Zoho) para automatizar los flujos de los clientes, coordinando sprints con equipos de diseño y marketing."
+      description: [
+        "Diseñé y mantuve la arquitectura de un portfolio de sitios WordPress en producción, garantizando un uptime del 99,9 %, plugins y temas actualizados y cero vulnerabilidades críticas de seguridad mediante gestión proactiva de parches.",
+        "Lideré el ciclo completo de desarrollo de proyectos a medida en WordPress y WooCommerce: desde el relevamiento técnico y la personalización de temas y plugins hasta el despliegue y el soporte post-lanzamiento.",
+        "Optimicé las Core Web Vitals (LCP, CLS, FID) en múltiples sitios de clientes, mejorando los puntajes de Google PageSpeed y contribuyendo a avances medibles en el posicionamiento SEO.",
+        "Coordiné sprints interdisciplinarios con los equipos de diseño y marketing, traduciendo requerimientos de negocio en implementaciones escalables y pixel-perfect con Elementor y ACF.",
+        "Integré APIs de terceros y herramientas de CRM (ZOHO) para automatizar la captación de leads y agilizar los flujos de trabajo del cliente, reduciendo la carga manual de datos.",
+        "Implementé entornos de staging y checklists de despliegue que redujeron los incidentes en producción y aceleraron los ciclos de release."
+      ]
     },
     {
-      period: "Jul 2022 — Nov 2022",
-      title: "Desarrollador Web",
-      company: "Bubo Branding — CABA, Argentina",
-      description: "Desarrollo de sitios WordPress responsivos y accesibles, revisión de código de desarrolladores junior y mejoras de rendimiento mediante caché, optimización de imágenes y ajuste de consultas a base de datos."
+      period: "Jul 2023 — Ago 2023",
+      title: "Desarrollador WordPress",
+      company: "Bubo Branding — Buenos Aires, Argentina",
+      description: [
+        "Desarrollé sitios WordPress responsive y accesibles (estándar ADA), desde la entrega del diseño hasta el lanzamiento, cumpliendo consistentemente con los plazos y el alcance acordados.",
+        "Supervisé las revisiones de código de desarrolladores junior, haciendo cumplir estándares y buenas prácticas que elevaron la calidad general del equipo.",
+        "Mejoré el rendimiento de los sitios de clientes mediante estrategias de caché, pipelines de optimización de imágenes y tuning de consultas a base de datos, logrando tiempos de carga más rápidos y mayor retención de usuarios.",
+        "Aumenté la visibilidad orgánica de varios clientes a través de auditorías de SEO on-page e implementación de datos estructurados (Schema.org), mejorando el posicionamiento en las SERP."
+      ]
     },
     {
-      period: "Mar 2019 — Jul 2022",
+      period: "Mar 2023 — Jul 2023",
       title: "Desarrollador Web y Soporte Técnico",
       company: "Digitaliza — Florida, Miami, EE. UU. · Remoto",
-      description: "Desarrollo de sitios a medida desde diseños en Figma/PSD, configuración de hosting, DNS y SSL, integraciones de CRM (Zoho, HubSpot) y migraciones de servidor sin pérdida de datos."
+      description: [
+        "Desarrollé y lancé sitios WordPress a medida a partir de diseños en Figma/PSD aprobados por el cliente, gestionando la configuración completa de hosting: DNS, certificados SSL y ajustes del lado del servidor.",
+        "Implementé y configuré múltiples integraciones de CRM (ZOHO, HubSpot), adaptando los flujos de trabajo a los procesos de cada cliente y reduciendo los tiempos de onboarding.",
+        "Brindé soporte técnico post-venta 24/7 a una cartera de clientes en crecimiento, sosteniendo altos niveles de retención gracias a la rápida resolución de incidentes.",
+        "Gestioné migraciones de servidor de más de 10 sitios activos sin pérdida de datos y con mínima interrupción del servicio, aplicando procedimientos de despliegue escalonado."
+      ]
     }
   ],
 

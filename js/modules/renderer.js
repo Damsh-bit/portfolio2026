@@ -165,7 +165,7 @@ function renderExperience() {
         <div>
           <h3>${item.title}</h3>
           <div class="company mono">${item.company}</div>
-          <p>${item.description}</p>
+          <ul>${item.description.map(point => `<li>${point}</li>`).join('')}</ul>
         </div>
       </div>
     `).join('');
