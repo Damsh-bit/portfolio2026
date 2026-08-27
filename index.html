@@ -6,10 +6,21 @@
   <title>Damián Coronel — Senior WordPress Developer</title>
 
   <!-- Favicon -->
-  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="icon" href="assets/favicon-32.png" sizes="32x32" type="image/png">
   <link rel="icon" href="assets/favicon-16.png" sizes="16x16" type="image/png">
   <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+
+  <!-- Open Graph / Social Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Damián Coronel — Senior WordPress Developer">
+  <meta property="og:description" content="Desarrollador WordPress Senior y Webmaster Técnico con más de 3 años de experiencia en WordPress, WooCommerce, PHP, optimización de Core Web Vitals, SEO técnico e integraciones de CRM y pasarelas de pago.">
+  <meta property="og:image" content="assets/favicon.png">
+  <meta property="og:image:width" content="600">
+  <meta property="og:image:height" content="243">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Damián Coronel — Senior WordPress Developer">
+  <meta name="twitter:description" content="Desarrollador WordPress Senior y Webmaster Técnico con más de 3 años de experiencia en WordPress, WooCommerce, PHP, optimización de Core Web Vitals, SEO técnico e integraciones de CRM y pasarelas de pago.">
+  <meta name="twitter:image" content="assets/favicon.png">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -212,6 +223,43 @@
   </a>
 
 </div><!-- /.page -->
+
+<!-- Toggle Button: Hide interface to appreciate the universe background -->
+<button type="button" id="uiToggle" class="ui-toggle-btn" aria-label="Ocultar interfaz" aria-pressed="false">
+  <svg class="icon-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+    <circle cx="12" cy="12" r="3"/>
+  </svg>
+  <svg class="icon-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+    <line x1="1" y1="1" x2="23" y2="23"/>
+  </svg>
+</button>
+
+<!-- Alpha Muscae Hover Tooltip -->
+<div class="star-tooltip mono" id="starTooltip">Alfa Muscae</div>
+
+<!-- Alpha Muscae Star Lightbox (planet click easter egg) -->
+<div class="star-lightbox" id="starLightbox">
+  <div class="star-lightbox-backdrop" id="starLightboxBackdrop"></div>
+  <div class="star-card">
+    <button type="button" class="star-close" id="starLightboxClose" aria-label="Cerrar">×</button>
+    <span class="star-eyebrow mono">EASTER EGG · CONSTELACIÓN MUSCA</span>
+    <h3 class="star-name">Alfa Muscae</h3>
+    <span class="star-designation mono">α Mus · HD 109668 · HR 4798</span>
+    <div class="star-stats mono">
+      <div><span>Magnitud aparente</span><strong>2.69</strong></div>
+      <div><span>Tipo espectral</span><strong>B2 IV-V</strong></div>
+      <div><span>Distancia</span><strong>~315 años luz</strong></div>
+      <div><span>Masa</span><strong>8.8 M☉</strong></div>
+    </div>
+    <p class="star-desc">
+      La estrella más brillante de Musca, la Mosca — una pequeña constelación austral cerca de la Cruz del Sur.
+      Es una subgigante azul-blanca variable de tipo Beta Cephei que pulsa cada 2.17 horas, y con 8.8 masas
+      solares es candidata a terminar su vida como supernova.
+    </p>
+  </div>
+</div>
 
 <!-- Animation Libraries (GSAP) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>

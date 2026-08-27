@@ -52,3 +52,15 @@
     opacity: 0;
   }
 }
+
+/* Hide the whole interface layer to appreciate the universe background */
+.page {
+  transition: opacity 0.5s var(--ease), visibility 0s linear 0s;
+}
+
+body.ui-hidden .page {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.5s var(--ease), visibility 0s linear 0.5s;
+}

@@ -13,6 +13,8 @@ import { initNav } from './modules/nav.js';
 import { initAnimations } from './modules/animations.js';
 import { initTyping } from './modules/typing.js';
 import { initProjectFilters } from './modules/project-filters.js';
+import { initUiToggle } from './modules/ui-toggle.js';
+import { initStarLightbox } from './modules/star-lightbox.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Render all dynamic content from portfolio-data.js
@@ -38,4 +40,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 8. Initialize Project Grid Filters
   initProjectFilters();
+
+  // 9. Initialize UI Visibility Toggle (hide interface to view background)
+  initUiToggle();
+
+  // 10. Initialize Alpha Muscae Star Lightbox (planet click easter egg)
+  initStarLightbox();
 });

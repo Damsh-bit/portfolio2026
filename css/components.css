@@ -1540,6 +1540,206 @@ body.lightbox-open .linkedin-fab {
   }
 }
 
+/* ---------- UI Visibility Toggle Button ---------- */
+.ui-toggle-btn {
+  position: fixed;
+  left: 28px;
+  bottom: 28px;
+  z-index: 130;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(16, 16, 16, 0.75);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.ui-toggle-btn:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+  transform: translateY(-3px);
+}
+
+.ui-toggle-btn .icon-eye-off {
+  display: none;
+}
+
+body.ui-hidden .ui-toggle-btn {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+}
+
+body.ui-hidden .ui-toggle-btn .icon-eye {
+  display: none;
+}
+
+body.ui-hidden .ui-toggle-btn .icon-eye-off {
+  display: block;
+}
+
+@media (max-width: 600px) {
+  .ui-toggle-btn {
+    left: 18px;
+    bottom: 18px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ---------- Alpha Muscae Hover Tooltip ---------- */
+.star-tooltip {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 260;
+  padding: 6px 12px;
+  background: rgba(16, 16, 16, 0.85);
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  color: var(--ink);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s var(--ease);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---------- Alpha Muscae Star Lightbox (easter egg) ---------- */
+.star-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  visibility: hidden;
+  opacity: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.star-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(7, 7, 7, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.star-card {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 18px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.7);
+}
+
+.star-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink-dim);
+  border: 1px solid var(--line-strong);
+  font-size: 18px;
+  line-height: 1;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease);
+}
+
+.star-close:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+}
+
+.star-eyebrow {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  margin-bottom: 14px;
+}
+
+.star-name {
+  font-family: var(--font-display);
+  font-size: 28px;
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+
+.star-designation {
+  display: block;
+  font-size: 12.5px;
+  color: var(--accent-light);
+  margin-bottom: 20px;
+  letter-spacing: 0.02em;
+}
+
+.star-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  margin-bottom: 20px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.star-stats div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.star-stats span {
+  font-size: 10.5px;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.star-stats strong {
+  font-size: 14px;
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.star-desc {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  margin: 0;
+}
+
+@media (max-width: 460px) {
+  .star-card {
+    padding: 26px 20px 22px;
+  }
+
+  .star-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(28px);

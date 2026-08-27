@@ -20,7 +20,28 @@ export function initUniverseBg() {
   let stardust = [];
   let planets = [];
   let burstParticles = [];
+  let asteroids = [];
+  let shootingStars = [];
   const mouse = { x: -9999, y: -9999, targetX: -9999, targetY: -9999 };
+  let parallaxX = 0;
+  let parallaxY = 0;
+  let asteroidTimer = 1500 + Math.random() * 1800; // ~25-55s at 60fps
+  let shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
+  const starTooltip = document.getElementById('starTooltip');
+
+  // Observe-mode planet focus/zoom state
+  let focusIndex = -1;
+  let focusTarget = 0;
+  let focusProgress = 0;
+
+  function enterFocus(index) {
+    focusIndex = index;
+    focusTarget = 1;
+  }
+
+  function exitFocus() {
+    focusTarget = 0;
+  }
 
   // Responsive setup
   function resize() {
@@ -31,6 +52,8 @@ export function initUniverseBg() {
     createStardust();
     createPlanets();
     burstParticles = [];
+    asteroids = [];
+    shootingStars = [];
   }
 
   // Create multi-layer starfield
@@ -46,6 +69,7 @@ export function initUniverseBg() {
         baseAlpha: Math.random() * 0.7 + 0.15,
         twinkleSpeed: Math.random() * 0.02 + 0.005,
         phase: Math.random() * Math.PI * 2,
+        parallax: Math.random() * 0.6 + 0.15,
         color: Math.random() > 0.45 ? 'rgba(245, 245, 247, ' : 'rgba(180, 180, 190, '
       });
     }
@@ -89,7 +113,8 @@ export function initUniverseBg() {
         ...createPlanetInteractionState()
       },
       {
-        // Small Distant Gray Orb
+        // Alpha Muscae (α Mus) — brightest star of Musca, the Fly.
+        // Click easter egg reveals its real astronomical data.
         relX: 0.12,
         relY: 0.72,
         radius: 22,
@@ -121,6 +146,243 @@ export function initUniverseBg() {
         ...createPlanetInteractionState()
       }
     ];
+  }
+
+  // ------------------------------------------------------------------
+  // Musca constellation, anchored on the "Alpha Muscae" planet (index 1).
+  // Companion star offsets (px) reproduce the traditional Musca stick
+  // figure: a β–δ–γ–α kite with an ε–λ tail trailing off toward the edge.
+  // ------------------------------------------------------------------
+
+  const MUSCA_STARS = [
+    { name: 'β', dx: -45, dy: -50, mag: 3.05 },
+    { name: 'ε', dx: 78, dy: -62, mag: 4.11 },
+    { name: 'λ', dx: 172, dy: -102, mag: 3.67 },
+    { name: 'γ', dx: 18, dy: 148, mag: 3.84 },
+    { name: 'δ', dx: -92, dy: 158, mag: 3.62 }
+  ];
+  const MUSCA_LINES = [
+    ['α', 'β'], ['β', 'δ'], ['δ', 'γ'], ['γ', 'α'], ['α', 'ε'], ['ε', 'λ']
+  ];
+
+  function drawMuscaConstellation(p) {
+    const nodes = { 'α': { dx: 0, dy: 0 } };
+    MUSCA_STARS.forEach((s) => { nodes[s.name] = s; });
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(212, 212, 216, 0.22)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < MUSCA_LINES.length; i++) {
+      const [a, b] = MUSCA_LINES[i];
+      const na = nodes[a];
+      const nb = nodes[b];
+      ctx.beginPath();
+      ctx.moveTo(p.px + na.dx, p.py + na.dy);
+      ctx.lineTo(p.px + nb.dx, p.py + nb.dy);
+      ctx.stroke();
+    }
+
+    ctx.font = '10px "IBM Plex Mono", monospace';
+    for (let i = 0; i < MUSCA_STARS.length; i++) {
+      const s = MUSCA_STARS[i];
+      const r = Math.max(0.7, 2.6 - s.mag * 0.35);
+      const alpha = Math.max(0.35, 1 - s.mag * 0.13);
+      const sx = p.px + s.dx;
+      const sy = p.py + s.dy;
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(245, 245, 247, ${alpha})`;
+      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = 'rgba(212, 212, 216, 0.4)';
+      ctx.fillText(s.name, sx + r + 4, sy + 3);
+    }
+
+    ctx.fillStyle = 'rgba(212, 212, 216, 0.4)';
+    ctx.fillText('α', p.px + p.radius + 6, p.py + 4);
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Asteroids: a rocky body drifts across the screen at a fixed cadence
+  // ------------------------------------------------------------------
+
+  function createAsteroidShape(radius) {
+    const sides = 7 + Math.floor(Math.random() * 4);
+    const points = [];
+    for (let i = 0; i < sides; i++) {
+      const angle = (i / sides) * Math.PI * 2;
+      points.push({ angle, r: radius * (0.65 + Math.random() * 0.5) });
+    }
+    return points;
+  }
+
+  function spawnAsteroid() {
+    const fromLeft = Math.random() > 0.5;
+    const radius = 7 + Math.random() * 6;
+    const speed = 0.9 + Math.random() * 0.7;
+
+    asteroids.push({
+      x: fromLeft ? -80 : width + 80,
+      y: height * (0.08 + Math.random() * 0.55),
+      vx: (fromLeft ? 1 : -1) * speed,
+      vy: (Math.random() - 0.5) * 0.3,
+      radius,
+      rotation: Math.random() * Math.PI * 2,
+      rotationSpeed: (Math.random() - 0.5) * 0.025,
+      shape: createAsteroidShape(radius)
+    });
+  }
+
+  function updateAsteroids() {
+    if (!reducedMotion) {
+      asteroidTimer--;
+      if (asteroidTimer <= 0) {
+        spawnAsteroid();
+        asteroidTimer = 1500 + Math.random() * 1800; // occasional, ~25-55s at 60fps
+      }
+    }
+
+    for (let i = asteroids.length - 1; i >= 0; i--) {
+      const a = asteroids[i];
+      a.x += a.vx;
+      a.y += a.vy;
+      a.rotation += a.rotationSpeed;
+
+      if (a.x < -120 || a.x > width + 120 || a.y < -120 || a.y > height + 120) {
+        asteroids.splice(i, 1);
+      }
+    }
+  }
+
+  function drawAsteroids() {
+    for (let i = 0; i < asteroids.length; i++) {
+      const a = asteroids[i];
+
+      // Faint motion trail
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(161, 161, 170, 0.15)';
+      ctx.lineWidth = 1.5;
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(a.x - a.vx * 7, a.y - a.vy * 7);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate(a.x, a.y);
+      ctx.rotate(a.rotation);
+
+      ctx.beginPath();
+      for (let j = 0; j < a.shape.length; j++) {
+        const pt = a.shape[j];
+        const px = Math.cos(pt.angle) * pt.r;
+        const py = Math.sin(pt.angle) * pt.r;
+        if (j === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.closePath();
+
+      const grad = ctx.createRadialGradient(-a.radius * 0.3, -a.radius * 0.3, a.radius * 0.1, 0, 0, a.radius);
+      grad.addColorStop(0, '#9a9aa2');
+      grad.addColorStop(0.7, '#4a4a52');
+      grad.addColorStop(1, '#1c1c20');
+      ctx.fillStyle = grad;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      ctx.restore();
+    }
+  }
+
+  // ------------------------------------------------------------------
+  // Shooting stars: quick fading streaks crossing the whole site
+  // ------------------------------------------------------------------
+
+  function spawnShootingStar() {
+    const dir = Math.random() > 0.5 ? 1 : -1;
+    const angle = Math.PI * 0.22 + Math.random() * 0.2; // shallow downward diagonal
+    const speed = 4 + Math.random() * 2.5;
+
+    shootingStars.push({
+      x: Math.random() * width * 1.2 - width * 0.1,
+      y: -30 - Math.random() * 60,
+      vx: Math.cos(angle) * speed * dir,
+      vy: Math.sin(angle) * speed,
+      length: 220 + Math.random() * 140,
+      life: 0,
+      maxLife: 170 + Math.random() * 70
+    });
+  }
+
+  function updateShootingStars() {
+    if (!reducedMotion) {
+      shootingStarTimer--;
+      if (shootingStarTimer <= 0) {
+        spawnShootingStar();
+        shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
+      }
+    }
+
+    for (let i = shootingStars.length - 1; i >= 0; i--) {
+      const s = shootingStars[i];
+      s.x += s.vx;
+      s.y += s.vy;
+      s.life++;
+
+      if (s.life >= s.maxLife || s.x < -150 || s.x > width + 150 || s.y > height + 150) {
+        shootingStars.splice(i, 1);
+      }
+    }
+  }
+
+  function drawShootingStars() {
+    for (let i = 0; i < shootingStars.length; i++) {
+      const s = shootingStars[i];
+      const mag = Math.hypot(s.vx, s.vy) || 1;
+      const ux = s.vx / mag;
+      const uy = s.vy / mag;
+      const tailX = s.x - ux * s.length;
+      const tailY = s.y - uy * s.length;
+
+      let alpha = 1;
+      if (s.life < 14) alpha = s.life / 14;
+      else if (s.life > s.maxLife - 35) alpha = Math.max(0, (s.maxLife - s.life) / 35);
+
+      // Soft outer glow trail
+      const glowGrad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
+      glowGrad.addColorStop(0, `rgba(230, 235, 255, ${0.35 * alpha})`);
+      glowGrad.addColorStop(0.5, `rgba(200, 210, 255, ${0.14 * alpha})`);
+      glowGrad.addColorStop(1, 'rgba(200, 210, 255, 0)');
+
+      ctx.beginPath();
+      ctx.strokeStyle = glowGrad;
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(tailX, tailY);
+      ctx.stroke();
+
+      // Bright core trail
+      const grad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
+      grad.addColorStop(0, `rgba(255, 255, 255, ${0.95 * alpha})`);
+      grad.addColorStop(0.4, `rgba(245, 245, 247, ${0.55 * alpha})`);
+      grad.addColorStop(1, 'rgba(245, 245, 247, 0)');
+
+      ctx.beginPath();
+      ctx.strokeStyle = grad;
+      ctx.lineWidth = 1.8;
+      ctx.lineCap = 'round';
+      ctx.moveTo(s.x, s.y);
+      ctx.lineTo(tailX, tailY);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+      ctx.arc(s.x, s.y, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    }
   }
 
   // Shared ambient-glitch + easter-egg state every planet starts with
@@ -175,7 +437,10 @@ export function initUniverseBg() {
 
   function triggerPlanetEasterEgg(index, p) {
     if (index === 0) spawnSupernovaBurst(p);
-    else if (index === 1) spawnSatellite(p);
+    else if (index === 1) {
+      spawnSatellite(p);
+      window.dispatchEvent(new CustomEvent('open-star-lightbox'));
+    }
     else spawnGlitchPulse(p);
   }
 
@@ -231,8 +496,33 @@ export function initUniverseBg() {
     p.pendingRestore = true;
   }
 
-  // Hit-test clicks against each planet's last-rendered screen position
+  // Hit-test clicks against each planet's last-rendered screen position.
+  // In observe mode (UI hidden), clicks zoom into a planet instead of
+  // triggering the normal easter eggs.
   window.addEventListener('click', (e) => {
+    const observeMode = document.body.classList.contains('ui-hidden');
+
+    if (observeMode) {
+      if (focusIndex >= 0) {
+        exitFocus();
+        return;
+      }
+      for (let i = 0; i < planets.length; i++) {
+        const p = planets[i];
+        if (p.px === undefined) continue;
+
+        const dx = e.clientX - p.px;
+        const dy = e.clientY - p.py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist <= (p.currentRadius || p.radius) * 1.4) {
+          enterFocus(i);
+          break;
+        }
+      }
+      return;
+    }
+
     for (let i = 0; i < planets.length; i++) {
       const p = planets[i];
       if (p.px === undefined) continue;
@@ -248,15 +538,37 @@ export function initUniverseBg() {
     }
   });
 
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && focusIndex >= 0) exitFocus();
+  });
+
   // Mouse movement handlers
   window.addEventListener('mousemove', (e) => {
     mouse.targetX = e.clientX;
     mouse.targetY = e.clientY;
+
+    // Alpha Muscae hover tooltip
+    if (starTooltip) {
+      const alphaPlanet = planets[1];
+      if (alphaPlanet && alphaPlanet.px !== undefined) {
+        const dx = e.clientX - alphaPlanet.px;
+        const dy = e.clientY - alphaPlanet.py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist <= (alphaPlanet.currentRadius || alphaPlanet.radius) * 1.5) {
+          starTooltip.style.opacity = '1';
+          starTooltip.style.transform = `translate(${e.clientX + 16}px, ${e.clientY - 12}px)`;
+        } else {
+          starTooltip.style.opacity = '0';
+        }
+      }
+    }
   });
 
   window.addEventListener('mouseleave', () => {
     mouse.targetX = -9999;
     mouse.targetY = -9999;
+    if (starTooltip) starTooltip.style.opacity = '0';
   });
 
   window.addEventListener('resize', resize);
@@ -267,32 +579,79 @@ export function initUniverseBg() {
   function render() {
     time += reducedMotion ? 0.003 : 0.008;
 
+    // Observe-mode planet focus/zoom: auto-exit if the UI comes back, ease
+    // progress toward its target, and fully clear the focus once settled.
+    if (focusIndex >= 0 && !document.body.classList.contains('ui-hidden')) {
+      exitFocus();
+    }
+    focusProgress += ((focusIndex >= 0 ? focusTarget : 0) - focusProgress) * 0.09;
+    if (focusIndex >= 0 && focusTarget === 0 && focusProgress < 0.01) {
+      focusProgress = 0;
+      focusIndex = -1;
+    }
+    const dim = focusIndex >= 0 ? focusProgress : 0;
+
     // Smooth mouse interpolation
     mouse.x += (mouse.targetX - mouse.x) * 0.08;
     mouse.y += (mouse.targetY - mouse.y) * 0.08;
 
+    // Starfield parallax: pixel offset of the mouse from screen center, clamped
+    // and eased toward its target so stars drift as if the camera pans through space
+    const maxOffset = 600;
+    const rawTargetX = mouse.targetX > -9000 ? mouse.x - width / 2 : 0;
+    const rawTargetY = mouse.targetY > -9000 ? mouse.y - height / 2 : 0;
+    const targetParallaxX = Math.max(-maxOffset, Math.min(maxOffset, rawTargetX));
+    const targetParallaxY = Math.max(-maxOffset, Math.min(maxOffset, rawTargetY));
+    parallaxX += (targetParallaxX - parallaxX) * 0.06;
+    parallaxY += (targetParallaxY - parallaxY) * 0.06;
+
     ctx.clearRect(0, 0, width, height);
 
     // 1. Draw Starfield
+    const parallaxStrength = reducedMotion ? 0 : 0.26;
+    ctx.save();
+    ctx.globalAlpha = 1 - dim * 0.85;
     for (let i = 0; i < stars.length; i++) {
       const star = stars[i];
       const twinkle = Math.sin(time * star.twinkleSpeed * 100 + star.phase);
       const alpha = Math.max(0.05, Math.min(1, star.baseAlpha + twinkle * 0.3));
+      const sx = star.x - parallaxX * parallaxStrength * star.parallax;
+      const sy = star.y - parallaxY * parallaxStrength * star.parallax;
 
       ctx.beginPath();
       ctx.fillStyle = `${star.color}${alpha})`;
-      ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+      ctx.arc(sx, sy, star.radius, 0, Math.PI * 2);
       ctx.fill();
     }
+    ctx.restore();
 
     // 2. Draw Minimalist Planets
+    const bigRadius = Math.min(width, height) * 0.32;
     for (let i = 0; i < planets.length; i++) {
       const p = planets[i];
       const floatY = Math.sin(time * 0.8 + p.floatOffset) * 12;
-      const px = p.relX * width;
-      const py = p.relY * height + floatY;
+      const naturalPx = p.relX * width;
+      const naturalPy = p.relY * height + floatY;
+
+      let px = naturalPx;
+      let py = naturalPy;
+      let sizeScale = 1;
+
+      if (i === focusIndex) {
+        px = naturalPx + (width / 2 - naturalPx) * focusProgress;
+        py = naturalPy + (height / 2 - naturalPy) * focusProgress;
+        sizeScale = 1 + (bigRadius / p.radius - 1) * focusProgress;
+      }
+
       p.px = px;
       p.py = py;
+
+      if (i === 1) {
+        ctx.save();
+        ctx.globalAlpha = 1 - dim * 0.85;
+        drawMuscaConstellation(p);
+        ctx.restore();
+      }
 
       updatePlanetGlitch(p);
 
@@ -304,10 +663,11 @@ export function initUniverseBg() {
         radiusScale = 1 + 0.3 * Math.max(0, 1 - t);
         if (p.burst.frame >= p.burst.frames) p.burst = null;
       }
-      const effRadius = p.radius * radiusScale;
+      const effRadius = p.radius * radiusScale * sizeScale;
       p.currentRadius = effRadius;
 
       ctx.save();
+      if (i !== focusIndex && dim > 0) ctx.globalAlpha = 1 - dim * 0.9;
       ctx.translate(px, py);
 
       // Planet Glow Aura
@@ -324,7 +684,7 @@ export function initUniverseBg() {
         ctx.save();
         ctx.rotate(p.tilt);
         ctx.beginPath();
-        ctx.ellipse(0, 0, p.ringRadiusX, p.ringRadiusY, 0, Math.PI, Math.PI * 2);
+        ctx.ellipse(0, 0, p.ringRadiusX * sizeScale, p.ringRadiusY * sizeScale, 0, Math.PI, Math.PI * 2);
         ctx.strokeStyle = p.ringColor;
         ctx.lineWidth = 1.8;
         ctx.stroke();
@@ -368,7 +728,7 @@ export function initUniverseBg() {
         ctx.save();
         ctx.rotate(p.tilt);
         ctx.beginPath();
-        ctx.ellipse(0, 0, p.ringRadiusX, p.ringRadiusY, 0, 0, Math.PI);
+        ctx.ellipse(0, 0, p.ringRadiusX * sizeScale, p.ringRadiusY * sizeScale, 0, 0, Math.PI);
         ctx.strokeStyle = p.ringColor;
         ctx.lineWidth = 2.2;
         ctx.stroke();
@@ -429,7 +789,7 @@ export function initUniverseBg() {
           // Connect stardust near cursor with pale laser lines
           if (dist < 100) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(212, 212, 216, ${0.3 * factor})`;
+            ctx.strokeStyle = `rgba(212, 212, 216, ${0.3 * factor * (1 - dim * 0.85)})`;
             ctx.lineWidth = 0.8;
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
@@ -440,13 +800,27 @@ export function initUniverseBg() {
 
       ctx.beginPath();
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = Math.min(1, currentAlpha);
+      ctx.globalAlpha = Math.min(1, currentAlpha) * (1 - dim * 0.85);
       ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1.0;
     }
 
-    // 4. Draw Easter-Egg Burst Particles (supernova debris)
+    // 4. Draw Asteroids
+    updateAsteroids();
+    ctx.save();
+    ctx.globalAlpha = 1 - dim * 0.85;
+    drawAsteroids();
+    ctx.restore();
+
+    // 5. Draw Shooting Stars
+    updateShootingStars();
+    ctx.save();
+    ctx.globalAlpha = 1 - dim * 0.85;
+    drawShootingStars();
+    ctx.restore();
+
+    // 6. Draw Easter-Egg Burst Particles (supernova debris)
     for (let i = burstParticles.length - 1; i >= 0; i--) {
       const bp = burstParticles[i];
       bp.x += bp.vx;
@@ -460,7 +834,7 @@ export function initUniverseBg() {
 
       ctx.beginPath();
       ctx.fillStyle = bp.color;
-      ctx.globalAlpha = bp.alpha;
+      ctx.globalAlpha = bp.alpha * (1 - dim * 0.85);
       ctx.arc(bp.x, bp.y, bp.radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1.0;
