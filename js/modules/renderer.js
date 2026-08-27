@@ -84,15 +84,23 @@ const SOCIAL_ICONS = {
   Upwork: '<svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M18.56 7.6c-1.87 0-3.3 1.23-3.87 3.06-.42-1.83-1.13-3.06-2.6-3.06-1.2 0-2.03.77-2.5 1.79l-.16-1.52H6.85v6.5c0 1.24-.55 2.14-1.6 2.14-1.06 0-1.6-.9-1.6-2.14V7.87H1.06v6.4c0 2.48 1.55 4.3 4.19 4.3 2.34 0 3.6-1.5 3.6-3.9V9.9c.3-.68.86-1.24 1.56-1.24 1.05 0 1.4 1.02 1.4 2.55v5.7h2.6v-5.7c0-.3 0-.6-.03-.87.3-1.06 1-1.7 1.86-1.7 1.6 0 2.55 1.4 2.55 3.36 0 1.97-1 3.36-2.55 3.36-.4 0-.77-.1-1.1-.27l-.4 2.5c.5.2 1.06.32 1.68.32 3.05 0 5.1-2.5 5.1-5.9 0-3.4-2.03-5.94-5.36-5.94z"/></svg>'
 };
 
-/** Hero social links (GitHub, Upwork, LinkedIn) */
+/** Hero social links (GitHub, LinkedIn) — Upwork lives in the rating pill instead */
 function renderHeroLinks() {
   const linksEl = document.getElementById('heroLinks');
   if (!linksEl) return;
-  linksEl.innerHTML = portfolioData.personal.socials.map(s => `
+  linksEl.innerHTML = portfolioData.personal.socials
+    .filter(s => s.name !== 'Upwork')
+    .map(s => {
+      const nameSpan = s.name === 'GitHub'
+        ? `<span class="hero-link-name-neon-violet">${s.name}</span>`
+        : `<span>${s.name}</span>`;
+      const badge = s.name === 'LinkedIn' ? '<span class="open-to-work-badge">· Open to Work</span>' : '';
+      return `
     <a href="${s.url}" target="_blank" rel="noopener noreferrer" class="hero-link">
-      ${SOCIAL_ICONS[s.name] || ''}<span>${s.name}</span>
+      ${SOCIAL_ICONS[s.name] || ''}${nameSpan}${badge}
     </a>
-  `).join('');
+  `;
+    }).join('');
 }
 
 /** Hero Section */

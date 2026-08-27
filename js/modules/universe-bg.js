@@ -115,7 +115,7 @@ export function initUniverseBg() {
         floatOffset: 0,
         floatSpeed: 0.001,
         station: {
-          active: false,
+          active: true,
           progress: 0,
           angle: Math.random() * Math.PI * 2,
           speed: reducedMotion ? 0.0006 : 0.0016,
@@ -265,6 +265,12 @@ export function initUniverseBg() {
     return Math.min(sizeScale, maxOrbitR / baseOrbitR);
   }
 
+  // The station's orbit plane is rotated 90° from the ring's plane, so it
+  // crosses transversally over the ring instead of tracing alongside it.
+  function stationTilt(p) {
+    return p.tilt + Math.PI / 2;
+  }
+
   function updateStation(p, sizeScale, width, height) {
     const st = p.station;
     if (!st) return;
@@ -283,28 +289,36 @@ export function initUniverseBg() {
     const orbitRy = p.ringRadiusY * 1.45 * orbitScale;
     const ex = Math.cos(st.angle) * orbitRx;
     const ey = Math.sin(st.angle) * orbitRy;
-    const tiltCos = Math.cos(p.tilt);
-    const tiltSin = Math.sin(p.tilt);
+    const tilt = stationTilt(p);
+    const tiltCos = Math.cos(tilt);
+    const tiltSin = Math.sin(tilt);
     const localX = ex * tiltCos - ey * tiltSin;
     const localY = ex * tiltSin + ey * tiltCos;
 
     // Tangent to the tilted ellipse at this angle, so the station's own
     // orientation follows its travel direction instead of cutting across
-    // the ring plane.
+    // its orbit plane.
     const dEx = -Math.sin(st.angle) * orbitRx;
     const dEy = Math.cos(st.angle) * orbitRy;
     const tangentX = dEx * tiltCos - dEy * tiltSin;
     const tangentY = dEx * tiltSin + dEy * tiltCos;
 
+    // Normalized parametric angle decides which half of the loop the
+    // station is on — the same front/back split used for the ring's own
+    // near/far halves, so the opaque sphere naturally paints over it
+    // when it swings behind the planet.
+    const normAngle = ((st.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+
     st.localX = localX;
     st.localY = localY;
     st.travelAngle = Math.atan2(tangentY, tangentX);
+    st.isBack = normAngle >= Math.PI;
     st.screenX = p.px + localX;
     st.screenY = p.py + localY;
     st.hitRadius = 14 * Math.max(1, orbitScale * 0.7);
   }
 
-  function drawStation(p, sizeScale, width, height) {
+  function drawStationOrbitPath(p, sizeScale, width, height) {
     const st = p.station;
     if (!st || st.progress < 0.001) return;
 
@@ -315,7 +329,7 @@ export function initUniverseBg() {
     // Faint dashed orbit path
     ctx.save();
     ctx.globalAlpha *= st.progress;
-    ctx.rotate(p.tilt);
+    ctx.rotate(stationTilt(p));
     ctx.setLineDash([3, 6]);
     ctx.strokeStyle = 'rgba(212, 212, 216, 0.18)';
     ctx.lineWidth = 1;
@@ -324,9 +338,21 @@ export function initUniverseBg() {
     ctx.stroke();
     ctx.setLineDash([]);
     ctx.restore();
+  }
+
+  // Drawn twice per frame — once for 'back' (before the sphere fill) and
+  // once for 'front' (after it) — so only the half matching the station's
+  // current position actually renders, giving it real occlusion as it
+  // swings behind the planet.
+  function drawStationIcon(p, sizeScale, width, height, pass) {
+    const st = p.station;
+    if (!st || st.progress < 0.001) return;
+    if (st.isBack !== (pass === 'back')) return;
+
+    const orbitScale = stationOrbitScale(p, sizeScale, width, height);
 
     // Station icon: hub + truss + two solar-panel wings, oriented along
-    // its direction of travel around the ring plane
+    // its direction of travel around its orbit plane
     const scale = 1.3 * orbitScale * (0.6 + st.progress * 0.4);
     ctx.save();
     ctx.globalAlpha *= st.progress;
@@ -668,12 +694,16 @@ export function initUniverseBg() {
     if (index === 0) {
       spawnSupernovaBurst(p);
       if (p.station) p.station.active = true;
+      window.dispatchEvent(new CustomEvent('open-station-lightbox'));
     }
     else if (index === 1) {
       spawnSatellite(p);
       window.dispatchEvent(new CustomEvent('open-star-lightbox'));
     }
-    else spawnGlitchPulse(p);
+    else {
+      spawnGlitchPulse(p);
+      window.dispatchEvent(new CustomEvent('open-wanderer-lightbox'));
+    }
   }
 
   // Planet 1: supernova-style particle burst + brief size pulse
@@ -729,67 +759,42 @@ export function initUniverseBg() {
   }
 
   // Hit-test clicks against each planet's last-rendered screen position.
-  // In observe mode (UI hidden), clicks zoom into a planet instead of
-  // triggering the normal easter eggs.
+  // Planets are only interactive in observe mode (UI hidden via the eye
+  // button) — clicking one there zooms in, opens its info Card, and
+  // reveals its curiosity markers, all at once.
   window.addEventListener('click', (e) => {
     const observeMode = document.body.classList.contains('ui-hidden');
+    if (!observeMode) return;
 
-    if (observeMode) {
-      if (focusIndex >= 0) {
-        const fp = planets[focusIndex];
+    if (focusIndex >= 0) {
+      const fp = planets[focusIndex];
 
-        // Station click (bigger, easier target while zoomed in)
-        if (fp.station && fp.station.screenX !== undefined) {
-          const sdx = e.clientX - fp.station.screenX;
-          const sdy = e.clientY - fp.station.screenY;
-          if (Math.hypot(sdx, sdy) <= fp.station.hitRadius) {
-            window.dispatchEvent(new CustomEvent('open-station-lightbox'));
+      // Station click (bigger, easier target while zoomed in)
+      if (fp.station && fp.station.screenX !== undefined) {
+        const sdx = e.clientX - fp.station.screenX;
+        const sdy = e.clientY - fp.station.screenY;
+        if (Math.hypot(sdx, sdy) <= fp.station.hitRadius) {
+          window.dispatchEvent(new CustomEvent('open-station-lightbox'));
+          return;
+        }
+      }
+
+      // Info marker click: toggle its expanded caption, stay zoomed in
+      if (fp.infoPoints) {
+        for (let j = 0; j < fp.infoPoints.length; j++) {
+          const pt = fp.infoPoints[j];
+          if (pt.screenX === undefined) continue;
+          const mdx = e.clientX - pt.screenX;
+          const mdy = e.clientY - pt.screenY;
+          if (Math.hypot(mdx, mdy) <= 13) {
+            pt.expanded = !pt.expanded;
             return;
           }
         }
-
-        // Info marker click: toggle its expanded caption, stay zoomed in
-        if (fp.infoPoints) {
-          for (let j = 0; j < fp.infoPoints.length; j++) {
-            const pt = fp.infoPoints[j];
-            if (pt.screenX === undefined) continue;
-            const mdx = e.clientX - pt.screenX;
-            const mdy = e.clientY - pt.screenY;
-            if (Math.hypot(mdx, mdy) <= 13) {
-              pt.expanded = !pt.expanded;
-              return;
-            }
-          }
-        }
-
-        exitFocus();
-        return;
       }
-      for (let i = 0; i < planets.length; i++) {
-        const p = planets[i];
-        if (p.px === undefined) continue;
 
-        const dx = e.clientX - p.px;
-        const dy = e.clientY - p.py;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist <= (p.currentRadius || p.radius) * 1.4) {
-          enterFocus(i);
-          break;
-        }
-      }
+      exitFocus();
       return;
-    }
-
-    // Space station click (orbits planet 0) takes priority over the planet itself
-    const stationPlanet = planets[0];
-    if (stationPlanet && stationPlanet.station && stationPlanet.station.screenX !== undefined) {
-      const sdx = e.clientX - stationPlanet.station.screenX;
-      const sdy = e.clientY - stationPlanet.station.screenY;
-      if (Math.hypot(sdx, sdy) <= (stationPlanet.station.hitRadius || 14)) {
-        window.dispatchEvent(new CustomEvent('open-station-lightbox'));
-        return;
-      }
     }
 
     for (let i = 0; i < planets.length; i++) {
@@ -801,6 +806,7 @@ export function initUniverseBg() {
       const dist = Math.sqrt(dx * dx + dy * dy);
 
       if (dist <= (p.currentRadius || p.radius) * 1.4) {
+        enterFocus(i);
         triggerPlanetEasterEgg(i, p);
         break;
       }
@@ -974,6 +980,9 @@ export function initUniverseBg() {
         ctx.restore();
       }
 
+      drawStationOrbitPath(p, sizeScale, width, height);
+      drawStationIcon(p, sizeScale, width, height, 'back');
+
       // Planet Sphere Gradient
       const planetGrad = ctx.createRadialGradient(
         -effRadius * 0.3,
@@ -1018,7 +1027,7 @@ export function initUniverseBg() {
         ctx.restore();
       }
 
-      drawStation(p, sizeScale, width, height);
+      drawStationIcon(p, sizeScale, width, height, 'front');
 
       // Satellite click-egg: a tiny moon orbiting a couple times, then fading
       if (p.burst && p.burst.type === 'satellite') {

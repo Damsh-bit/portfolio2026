@@ -75,12 +75,14 @@
         <a href="" class="cta-btn ghost mono" id="heroCtaSecondary" target="_blank" rel="noopener noreferrer"></a>
       </div>
 
-      <div class="hero-links mono" id="heroLinks"></div>
+      <div class="hero-links-row">
+        <div class="hero-links mono" id="heroLinks"></div>
 
-      <a href="" id="heroRating" class="hero-rating mono" target="_blank" rel="noopener noreferrer">
-        <span class="stars" aria-hidden="true">★★★★★</span>
-        <span id="heroRatingText"></span>
-      </a>
+        <a href="" id="heroRating" class="hero-rating mono" target="_blank" rel="noopener noreferrer">
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          <span id="heroRatingText"></span>
+        </a>
+      </div>
 
       <div class="scroll-cue">
         <div class="rocket-track">
@@ -225,16 +227,19 @@
 </div><!-- /.page -->
 
 <!-- Toggle Button: Hide interface to appreciate the universe background -->
-<button type="button" id="uiToggle" class="ui-toggle-btn" aria-label="Ocultar interfaz" aria-pressed="false">
-  <svg class="icon-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-    <circle cx="12" cy="12" r="3"/>
-  </svg>
-  <svg class="icon-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
-    <line x1="1" y1="1" x2="23" y2="23"/>
-  </svg>
-</button>
+<div class="ui-toggle-wrap">
+  <button type="button" id="uiToggle" class="ui-toggle-btn" aria-label="Ocultar interfaz" aria-pressed="false">
+    <svg class="icon-eye" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+    <svg class="icon-eye-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 20c-7 0-11-8-11-8a20.29 20.29 0 0 1 5.06-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 8 11 8a20.29 20.29 0 0 1-3.22 4.44M14.12 14.12a3 3 0 1 1-4.24-4.24"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  </button>
+  <span class="ui-toggle-hint mono" id="uiToggleHint">Clic para interactuar con el fondo</span>
+</div>
 
 <!-- Alpha Muscae Hover Tooltip -->
 <div class="star-tooltip mono" id="starTooltip">Alfa Muscae</div>
@@ -283,6 +288,28 @@
       Puesto de observación autónomo en órbita estable alrededor del gigante gaseoso. Sus sensores registran
       tormentas magnéticas y el lento vaivén de los anillos. Nadie reclama su construcción — algunos dicen que
       se ensambló sola, línea por línea, en algún commit olvidado.
+    </p>
+  </div>
+</div>
+
+<!-- Wandering Planet Lightbox (planet click easter egg) -->
+<div class="star-lightbox" id="wandererLightbox">
+  <div class="star-lightbox-backdrop" id="wandererLightboxBackdrop"></div>
+  <div class="star-card">
+    <button type="button" class="star-close" id="wandererLightboxClose" aria-label="Cerrar">×</button>
+    <span class="star-eyebrow mono">EASTER EGG · CUERPO ERRANTE</span>
+    <h3 class="star-name">El Errante</h3>
+    <span class="star-designation mono">Planeta interestelar · Sin sistema conocido</span>
+    <div class="star-stats mono">
+      <div><span>Tipo</span><strong>Planeta errante</strong></div>
+      <div><span>Superficie</span><strong>Hielo profundo</strong></div>
+      <div><span>Señal</span><strong>Débil, constante</strong></div>
+      <div><span>Órbita</span><strong>Sin trazar</strong></div>
+    </div>
+    <p class="star-desc">
+      No orbita ninguna estrella conocida — vaga a la deriva por el espacio profundo, con su superficie helada
+      sumida en oscuridad. Sus instrumentos captan una señal débil y constante, de origen desconocido, y su
+      trayectoria real sigue siendo un misterio sin trazar.
     </p>
   </div>
 </div>
