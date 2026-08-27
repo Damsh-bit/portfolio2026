@@ -1621,10 +1621,11 @@ body.ui-hidden .ui-toggle-btn .icon-eye-off {
   display: block;
 }
 
-/* Nudges first-time visitors toward the one place planets are clickable */
+/* Subtle hover-only nudge toward the one place planets are clickable —
+   silent unless the visitor is already looking at the eye button. */
 .ui-toggle-hint {
-  padding: 8px 14px;
-  font-size: 11px;
+  padding: 7px 13px;
+  font-size: 10.5px;
   letter-spacing: 0.03em;
   color: var(--ink-dim);
   background: rgba(16, 16, 16, 0.85);
@@ -1633,22 +1634,20 @@ body.ui-hidden .ui-toggle-btn .icon-eye-off {
   white-space: nowrap;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  opacity: 1;
-  transform: translateX(0);
-  transition: opacity 0.4s var(--ease), transform 0.4s var(--ease);
-  animation: hint-pulse 2.4s ease-in-out infinite;
-}
-
-@keyframes hint-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
-}
-
-body.ui-hidden .ui-toggle-hint,
-body.ui-toggle-hint-dismissed .ui-toggle-hint {
   opacity: 0;
   transform: translateX(-6px);
   pointer-events: none;
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.ui-toggle-wrap:hover .ui-toggle-hint,
+.ui-toggle-btn:focus-visible ~ .ui-toggle-hint {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+body.ui-hidden .ui-toggle-hint {
+  opacity: 0 !important;
 }
 
 @media (max-width: 600px) {
@@ -1662,12 +1661,6 @@ body.ui-toggle-hint-dismissed .ui-toggle-hint {
   }
   .ui-toggle-hint {
     display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ui-toggle-hint {
-    animation: none;
   }
 }
 
@@ -1692,7 +1685,7 @@ body.ui-toggle-hint-dismissed .ui-toggle-hint {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* ---------- Alpha Muscae Star Lightbox (easter egg) ---------- */
+/* ---------- Planet Info Card (docked, doesn't cover the zoomed planet) ---------- */
 .star-lightbox {
   position: fixed;
   inset: 0;
@@ -1700,7 +1693,7 @@ body.ui-toggle-hint-dismissed .ui-toggle-hint {
   visibility: hidden;
   opacity: 0;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   padding: 24px;
 }
@@ -1708,9 +1701,6 @@ body.ui-toggle-hint-dismissed .ui-toggle-hint {
 .star-lightbox-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(7, 7, 7, 0.82);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
 .star-card {

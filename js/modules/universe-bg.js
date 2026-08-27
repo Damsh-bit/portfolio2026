@@ -126,7 +126,8 @@ export function initUniverseBg() {
           { angle: -Math.PI / 2, text: 'Gigante gaseoso: hidrógeno y helio en capas turbulentas.' },
           { angle: -Math.PI / 8, text: 'El anillo son fragmentos de hielo en órbita perfecta.' },
           { angle: Math.PI * 0.7, text: 'Un día dura apenas 9 horas — gira muy rápido.' },
-          { angle: Math.PI * 0.15, text: 'Hogar de la Estación Deriva-9, en órbita permanente.' }
+          { angle: Math.PI * 0.15, text: 'Hogar de la Estación Deriva-9, en órbita permanente.' },
+          { angle: Math.PI / 2, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       },
@@ -149,7 +150,8 @@ export function initUniverseBg() {
           { angle: -Math.PI / 2, text: 'Pulsa cada 2.17 horas — variable Beta Cephei.' },
           { angle: -Math.PI / 6, text: 'A ~315 años luz, en el hemisferio sur celeste.' },
           { angle: Math.PI * 0.6, text: '8.8 masas solares: candidata a supernova.' },
-          { angle: Math.PI * 0.15, text: 'Ancla la constelación de Musca, la Mosca.' }
+          { angle: Math.PI * 0.15, text: 'Ancla la constelación de Musca, la Mosca.' },
+          { angle: Math.PI / 2, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       },
@@ -171,7 +173,8 @@ export function initUniverseBg() {
           { angle: -Math.PI / 2, text: 'Planeta errante — no orbita ninguna estrella conocida.' },
           { angle: -Math.PI / 8, text: 'Superficie helada, sumida en oscuridad profunda.' },
           { angle: Math.PI * 0.65, text: 'Emite una señal débil y constante, de origen desconocido.' },
-          { angle: Math.PI * 0.15, text: 'Su órbita real es un misterio sin trazar.' }
+          { angle: Math.PI * 0.15, text: 'Su órbita real es un misterio sin trazar.' },
+          { angle: Math.PI / 2, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       }
@@ -378,7 +381,7 @@ export function initUniverseBg() {
   // around the focused planet, each expanding into a short fact.
   // ------------------------------------------------------------------
 
-  function drawInfoPoints(p, effRadius, focusProgress) {
+  function drawInfoPoints(p, effRadius, focusProgress, time) {
     if (!p.infoPoints) return;
 
     const alpha = Math.max(0, (focusProgress - 0.45) / 0.55);
@@ -407,6 +410,45 @@ export function initUniverseBg() {
       ctx.moveTo(p.px + Math.cos(pt.angle) * effRadius, p.py + Math.sin(pt.angle) * effRadius);
       ctx.lineTo(mx, my);
       ctx.stroke();
+
+      // The card marker stands out from the curiosity markers — a glowing,
+      // pulsing accent point that opens the planet's info Card.
+      if (pt.isCard) {
+        const cardR = 11;
+        pt.hitRadius = cardR + 5;
+        const pulse = 0.5 + 0.5 * Math.sin(time * 1.6);
+        const glowR = cardR * (2.4 + pulse * 1.2);
+        const glow = ctx.createRadialGradient(mx, my, 0, mx, my, glowR);
+        glow.addColorStop(0, `rgba(255, 201, 74, ${0.4 + pulse * 0.25})`);
+        glow.addColorStop(1, 'rgba(255, 201, 74, 0)');
+        ctx.beginPath();
+        ctx.fillStyle = glow;
+        ctx.arc(mx, my, glowR, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.arc(mx, my, cardR, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 201, 74, 0.95)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+
+        // Small "card" glyph: two horizontal lines
+        ctx.strokeStyle = 'rgba(16, 16, 16, 0.85)';
+        ctx.lineWidth = 1.3;
+        ctx.beginPath();
+        ctx.moveTo(mx - 4, my - 2);
+        ctx.lineTo(mx + 4, my - 2);
+        ctx.moveTo(mx - 4, my + 2);
+        ctx.lineTo(mx + 4, my + 2);
+        ctx.stroke();
+
+        ctx.restore();
+        continue;
+      }
+
+      pt.hitRadius = markerR + 4;
 
       // Marker circle
       ctx.beginPath();
@@ -760,8 +802,8 @@ export function initUniverseBg() {
 
   // Hit-test clicks against each planet's last-rendered screen position.
   // Planets are only interactive in observe mode (UI hidden via the eye
-  // button) — clicking one there zooms in, opens its info Card, and
-  // reveals its curiosity markers, all at once.
+  // button). Clicking one there just zooms in; the info Card only opens
+  // from the standout marker among the scattered curiosity points.
   window.addEventListener('click', (e) => {
     const observeMode = document.body.classList.contains('ui-hidden');
     if (!observeMode) return;
@@ -769,25 +811,17 @@ export function initUniverseBg() {
     if (focusIndex >= 0) {
       const fp = planets[focusIndex];
 
-      // Station click (bigger, easier target while zoomed in)
-      if (fp.station && fp.station.screenX !== undefined) {
-        const sdx = e.clientX - fp.station.screenX;
-        const sdy = e.clientY - fp.station.screenY;
-        if (Math.hypot(sdx, sdy) <= fp.station.hitRadius) {
-          window.dispatchEvent(new CustomEvent('open-station-lightbox'));
-          return;
-        }
-      }
-
-      // Info marker click: toggle its expanded caption, stay zoomed in
+      // Marker click: the standout "card" marker opens the info Card,
+      // any other marker just toggles its expanded caption
       if (fp.infoPoints) {
         for (let j = 0; j < fp.infoPoints.length; j++) {
           const pt = fp.infoPoints[j];
           if (pt.screenX === undefined) continue;
           const mdx = e.clientX - pt.screenX;
           const mdy = e.clientY - pt.screenY;
-          if (Math.hypot(mdx, mdy) <= 13) {
-            pt.expanded = !pt.expanded;
+          if (Math.hypot(mdx, mdy) <= (pt.hitRadius || 13)) {
+            if (pt.isCard) triggerPlanetEasterEgg(focusIndex, fp);
+            else pt.expanded = !pt.expanded;
             return;
           }
         }
@@ -807,7 +841,6 @@ export function initUniverseBg() {
 
       if (dist <= (p.currentRadius || p.radius) * 1.4) {
         enterFocus(i);
-        triggerPlanetEasterEgg(i, p);
         break;
       }
     }
@@ -1050,7 +1083,7 @@ export function initUniverseBg() {
 
       ctx.restore();
 
-      if (i === focusIndex) drawInfoPoints(p, effRadius, focusProgress);
+      if (i === focusIndex) drawInfoPoints(p, effRadius, focusProgress, time);
       else if (p.infoPoints) p.infoPoints.forEach((pt) => { pt.screenX = undefined; pt.screenY = undefined; });
     }
 

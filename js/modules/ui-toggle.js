@@ -20,7 +20,6 @@ export function initUiToggle() {
 
   btn.addEventListener('click', () => {
     setHidden(!body.classList.contains('ui-hidden'));
-    body.classList.add('ui-toggle-hint-dismissed');
   });
 
   window.addEventListener('keydown', (e) => {
