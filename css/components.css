@@ -419,27 +419,6 @@ header nav a:hover {
   color: var(--accent-bright);
 }
 
-.hero-foot {
-  margin-top: 36px;
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-  font-size: 12.5px;
-  color: var(--ink-dim);
-}
-
-.hero-foot > div {
-  padding-left: 14px;
-  border-left: 2px solid var(--accent-dark);
-}
-
-.hero-foot strong {
-  color: var(--ink);
-  font-weight: 500;
-  display: block;
-  margin-bottom: 4px;
-}
-
 @media (max-width: 600px) {
   .hero {
     padding-top: 64px;
@@ -450,19 +429,13 @@ header nav a:hover {
   .hero-rating {
     margin-top: 14px;
   }
-  .hero-foot {
-    margin-top: 26px;
-    gap: 16px 24px;
-  }
   .scroll-cue {
     display: none;
   }
 }
 
 .scroll-cue {
-  position: absolute;
-  bottom: 36px;
-  left: 40px;
+  margin-top: 36px;
   font-size: 11px;
   color: var(--ink-dim);
   display: flex;
@@ -470,29 +443,27 @@ header nav a:hover {
   gap: 10px;
 }
 
-.scroll-cue .stick {
-  width: 1px;
-  height: 34px;
-  background: var(--line-strong);
+.scroll-cue .rocket-track {
   position: relative;
+  width: 16px;
+  height: 40px;
   overflow: hidden;
 }
 
-.scroll-cue .stick i {
+.scroll-cue .rocket {
   position: absolute;
-  top: -100%;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--accent-light);
-  box-shadow: 0 0 8px var(--accent-primary);
-  animation: cue 2.2s ease-in-out infinite;
+  top: 0;
+  color: var(--accent-light);
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+  animation: rocket-descend 1.8s ease-in-out infinite;
 }
 
-@keyframes cue {
-  0% { top: -100%; }
-  50% { top: 0; }
-  100% { top: 100%; }
+@keyframes rocket-descend {
+  0% { transform: translateY(-6px) rotate(180deg); opacity: 0; }
+  18% { opacity: 1; }
+  75% { opacity: 1; }
+  100% { transform: translateY(30px) rotate(180deg); opacity: 0; }
 }
 
 /* ---------- Section Shell ---------- */
@@ -770,6 +741,74 @@ section {
   transform: rotate(45deg);
 }
 
+/* ---------- Industries / Rubros Grid ---------- */
+.industries-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 980px) {
+  .industries-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .industries-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.industry-card {
+  background: var(--bg-card);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 28px 26px;
+  transition: transform 0.4s var(--ease), border-color 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.industry-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent-primary);
+  box-shadow: 0 12px 30px -10px var(--accent-glow-soft);
+}
+
+.industry-card .index {
+  font-size: 12px;
+  color: var(--accent-light);
+  display: block;
+  margin-bottom: 14px;
+}
+
+.industry-card h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.18rem;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.industry-card p {
+  font-size: 14px;
+  color: var(--ink-dim);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.industry-card .stack {
+  font-size: 12px;
+  color: var(--ink-muted);
+  line-height: 1.8;
+}
+
+.industry-card .stack .plus {
+  color: var(--accent-dark);
+  margin: 0 3px;
+}
+
 /* ---------- Project Modal ---------- */
 .modal {
   position: fixed;
@@ -842,6 +881,16 @@ section {
   max-width: 820px;
   margin: 0 auto;
   will-change: transform;
+}
+
+@media (min-width: 900px) {
+  .modal-body .inner {
+    max-width: 1180px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    align-items: start;
+    gap: 56px;
+  }
 }
 
 /* ---------- Project Modal — Slide Navigation ---------- */
@@ -992,6 +1041,14 @@ section {
   letter-spacing: 0.05em;
 }
 
+@media (min-width: 900px) {
+  .m-gallery-wrap {
+    margin-top: 0;
+    position: sticky;
+    top: 0;
+  }
+}
+
 .justified-gallery {
   display: flex;
   flex-wrap: wrap;
@@ -1020,6 +1077,7 @@ section {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top center;
   transition: transform 0.6s var(--ease);
 }
 

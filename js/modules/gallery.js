@@ -10,6 +10,7 @@
  */
 
 const GAP = 8;
+const MIN_ASPECT = 0.5; // clamp very tall full-page screenshots so they don't collapse into slivers
 
 let lightboxEl = null;
 let currentImages = [];
@@ -57,7 +58,7 @@ export function renderGallery(container, images) {
   items.forEach((item) => {
     const onReady = () => {
       if (item.img.naturalWidth && item.img.naturalHeight) {
-        item.aspect = item.img.naturalWidth / item.img.naturalHeight;
+        item.aspect = Math.max(item.img.naturalWidth / item.img.naturalHeight, MIN_ASPECT);
       }
       relayout();
     };

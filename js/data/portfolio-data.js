@@ -57,7 +57,7 @@ export const portfolioData = {
       summary: "Plataforma de soluciones de producción y fabricación con galería de casos de éxito.",
       description: "Reconocer es una plataforma que conecta empresas con soluciones de producción y fabricación, transformando ideas en realidad. La propuesta: mostrar un portfolio de casos de éxito demostrando capacidad para ejecutar proyectos complejos. Desarrollé un sitio responsivo con componentes interactivos para visualizar casos, navegación fluida con smooth scroll y parallax effects. Implementé lazy loading de imágenes, transiciones CSS3 suaves, y formulario de contacto con validación frontend/backend. Optimizado para SEO con meta tags dinámicos y estructura HTML5 semántica. Performance en Lighthouse 90+.",
       image: "assets/projects/reconocer.png",
-      gallery: ["assets/projects/reconocer.png"],
+      gallery: ["assets/projects/reconocer.png", "assets/projects/reconocer-1.png", "assets/projects/reconocer-2.png"],
       link: "#",
       type: "trabajo",
       featured: true
@@ -85,7 +85,7 @@ export const portfolioData = {
       summary: "Grupo de restaurantes tradicionales que reinventan la cocina del sur con toque contemporáneo.",
       description: "Macarena es un grupo de restaurantes con raíces en gastronomía tradicional, que moderniza la cocina clásica manteniendo su esencia. Necesitaban presentar múltiples locales con identidad única. Desarrollé plataforma multi-página con arquitectura escalable. Implementé galería de imágenes con filtros dinámicos (por restaurante/categoría), lightbox modal y lazy loading optimizado. Navegación con tabs interactivos, acordeones expandibles y rutas dinámicas por restaurante. Integración con API REST para integridad de datos. Responsive con breakpoints optimizados. Analytics con GTM y tracking de eventos.",
       image: "assets/projects/macarena.png",
-      gallery: ["assets/projects/macarena.png"],
+      gallery: ["assets/projects/macarena.png", "assets/projects/macarena-2.png", "assets/projects/macarena-3.png", "assets/projects/macarena-4.png"],
       link: "#",
       type: "trabajo",
       featured: true
@@ -99,7 +99,7 @@ export const portfolioData = {
       summary: "Servicios financieros y contables personalizados para empresas en Valencia.",
       description: "Bonded Finance es un despacho de servicios financieros especializados en asesoría tributaria, fiscal y financiera. Ofrecen soluciones personalizadas que impulsan eficiencia, control y crecimiento empresarial. Creé una landing corporativa con estructura clara y CTAs estratégicos. Implementé formulario de contacto con validación HTML5, backend API y almacenamiento de leads en database. Secciones con icons SVG animados, slider de servicios interactivo con JavaScript vanilla, y schema.org structured data para SEO. Testing de accesibilidad (WCAG 2.1). Integración con email service para notificaciones automáticas. Performance optimizado.",
       image: "assets/projects/bonded-finance.png",
-      gallery: ["assets/projects/bonded-finance.png"],
+      gallery: ["assets/projects/bonded-finance.png", "assets/projects/bonded-finance-2.png", "assets/projects/bonded-finance-3.png", "assets/projects/bonded-finance--4.png", "assets/projects/bonded-finance-5.png", "assets/projects/bonded-finance-6.png"],
       link: "#",
       type: "trabajo",
       featured: true
@@ -113,7 +113,7 @@ export const portfolioData = {
       summary: "Empresa constructora que transforma conceptos arquitectónicos en espacios habitables de diseño moderno.",
       description: "Nova Carlaria es una constructora especializada en proyectos residenciales de diseño moderno, aplicando métodos innovadores para garantizar control, calidad y cumplimiento en cada fase. Necesitaban mostrar su portafolio y generar consultas. Desarrollé sitio web con galería masiva de proyectos inmobiliarios. Sistema de filtrado en tiempo real (zona/estilo/estado), toggle de vista grid/lista, e imagen principal con zoom on hover. Lazy loading para optimizar performance, modal detallado por proyecto con galería lightbox. Integración Google Maps para ubicaciones. PWA features (offline capability), responsive mobile-first y analytics para tracking de proyectos visitados.",
       image: "assets/projects/nova-carlaria.png",
-      gallery: ["assets/projects/nova-carlaria.png"],
+      gallery: ["assets/projects/nova-carlaria.png", "assets/projects/nova-carlaria-2.png", "assets/projects/nova-carlaria-3.png", "assets/projects/nova-carlaria-4.png"],
       link: "#",
       type: "trabajo",
       featured: true
@@ -229,6 +229,49 @@ export const portfolioData = {
       link: "#",
       type: "trabajo",
       featured: true
+    }
+  ],
+
+  industries: [
+    {
+      name: "Inmobiliarias & Construcción",
+      summary: "Portfolios de propiedades y obras con fichas técnicas y contacto directo con el equipo comercial.",
+      stack: ["JetEngine", "Filtros por zona/precio/tipo", "Google Maps", "Captación de leads"]
+    },
+    {
+      name: "Abogados & Estudios Jurídicos",
+      summary: "Sitios corporativos que transmiten seriedad y facilitan agendar una consulta.",
+      stack: ["Calendly", "Formularios por tipo de consulta", "Blog legal (CMS)", "Cumplimiento GDPR"]
+    },
+    {
+      name: "Finanzas & Contabilidad",
+      summary: "Landings de asesoría fiscal y financiera enfocadas en generar consultas calificadas.",
+      stack: ["Formularios validados", "Leads a base de datos", "Schema.org", "Icons SVG animados"]
+    },
+    {
+      name: "Gastronomía & Hotelería",
+      summary: "Restaurantes y locales con menú, reservas y galería de ambiente para atraer comensales.",
+      stack: ["Reservas online", "Menú interactivo", "Galería lightbox", "Stripe / PayPal"]
+    },
+    {
+      name: "Salud & Bienestar",
+      summary: "Sitios para profesionales de la salud con foco en confianza, accesibilidad y turnos.",
+      stack: ["Turnos online", "Formularios de consulta", "SEO local", "Accesibilidad WCAG"]
+    },
+    {
+      name: "Ecommerce & Retail",
+      summary: "Tiendas online completas, del catálogo al checkout, listas para escalar en ventas.",
+      stack: ["WooCommerce", "Carrito persistente", "Checkout optimizado", "Inventario en tiempo real"]
+    },
+    {
+      name: "B2B & Industrial",
+      summary: "Sitios corporativos con cotizadores y catálogos técnicos para procesos de compra complejos.",
+      stack: ["Cotizador dinámico", "PDF automático", "Login de clientes", "Catálogo técnico"]
+    },
+    {
+      name: "Estudios Creativos & Arquitectura",
+      summary: "Portfolios visuales de alto impacto para estudios de diseño, 3D y arquitectura.",
+      stack: ["Galerías 3D interactivas", "Swiper.js", "Antes/Después", "Animaciones on scroll"]
     }
   ],
 

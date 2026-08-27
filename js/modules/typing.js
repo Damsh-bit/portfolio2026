@@ -4,10 +4,12 @@
  * =========================================================================
  * HTML-aware character-by-character typing effect for important titles.
  * Tags (e.g. <em>, <br>) are inserted atomically so inline markup embedded
- * in the source text is never broken mid-type.
+ * in the source text is never broken mid-type. Once a title finishes typing
+ * it pauses, erases itself, and types back in — looping indefinitely.
  */
 
 const TYPE_SPEED_MS = 32;
+const LOOP_PAUSE_MS = 3000;
 
 function parseIntoSteps(html) {
   const steps = [];
@@ -32,6 +34,11 @@ function parseIntoSteps(html) {
   return steps;
 }
 
+function renderStep(el, steps, count, caret) {
+  el.innerHTML = steps.slice(0, count).map((s) => s.value).join('');
+  el.appendChild(caret);
+}
+
 function typeInto(el, html, onDone) {
   const steps = parseIntoSteps(html);
   const caret = document.createElement('span');
@@ -41,7 +48,6 @@ function typeInto(el, html, onDone) {
   el.innerHTML = '';
   el.appendChild(caret);
 
-  let buffer = '';
   let index = 0;
 
   function tick() {
@@ -50,16 +56,46 @@ function typeInto(el, html, onDone) {
       if (onDone) onDone();
       return;
     }
-
-    buffer += steps[index].value;
     index++;
-    el.innerHTML = buffer;
-    el.appendChild(caret);
-
+    renderStep(el, steps, index, caret);
     setTimeout(tick, TYPE_SPEED_MS);
   }
 
   tick();
+}
+
+function eraseFrom(el, html, onDone) {
+  const steps = parseIntoSteps(html);
+  const caret = document.createElement('span');
+  caret.className = 'type-caret';
+  caret.textContent = '|';
+
+  let index = steps.length;
+  renderStep(el, steps, index, caret);
+
+  function tick() {
+    if (index <= 0) {
+      el.innerHTML = '';
+      caret.remove();
+      if (onDone) onDone();
+      return;
+    }
+    index--;
+    renderStep(el, steps, index, caret);
+    setTimeout(tick, TYPE_SPEED_MS);
+  }
+
+  setTimeout(tick, TYPE_SPEED_MS);
+}
+
+/** Types the given title in, waits, erases it, then repeats forever. */
+function loopTitle(el, html) {
+  function cycle() {
+    typeInto(el, html, () => {
+      setTimeout(() => eraseFrom(el, html, cycle), LOOP_PAUSE_MS);
+    });
+  }
+  cycle();
 }
 
 function typeHeroTitle(titleEl) {
@@ -69,12 +105,29 @@ function typeHeroTitle(titleEl) {
   const originals = lineSpans.map((span) => span.innerHTML);
   lineSpans.forEach((span) => { span.innerHTML = ''; });
 
-  function typeLine(idx) {
-    if (idx >= lineSpans.length) return;
-    typeInto(lineSpans[idx], originals[idx], () => typeLine(idx + 1));
+  function typeAll(onDone) {
+    function step(idx) {
+      if (idx >= lineSpans.length) { onDone(); return; }
+      typeInto(lineSpans[idx], originals[idx], () => step(idx + 1));
+    }
+    step(0);
   }
 
-  typeLine(0);
+  function eraseAll(onDone) {
+    function step(idx) {
+      if (idx < 0) { onDone(); return; }
+      eraseFrom(lineSpans[idx], originals[idx], () => step(idx - 1));
+    }
+    step(lineSpans.length - 1);
+  }
+
+  function cycle() {
+    typeAll(() => {
+      setTimeout(() => eraseAll(cycle), LOOP_PAUSE_MS);
+    });
+  }
+
+  cycle();
 }
 
 function initSectionTypewriters() {
@@ -97,7 +150,7 @@ function initSectionTypewriters() {
       trigger: el,
       start: 'top 88%',
       once: true,
-      onEnter: () => typeInto(el, original)
+      onEnter: () => loopTitle(el, original)
     });
   });
 }

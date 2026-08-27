@@ -42,13 +42,6 @@ export function initAnimations() {
       duration: 0.6,
       ease: 'power2.out'
     }, '-=0.3')
-    .from('.hero-foot > div', {
-      opacity: 0,
-      y: 16,
-      duration: 0.8,
-      stagger: 0.1,
-      ease: 'power2.out'
-    }, '-=0.3')
     .from('.scroll-cue', {
       opacity: 0,
       duration: 0.8
@@ -105,6 +98,20 @@ export function initAnimations() {
           }
         }
       );
+    });
+
+    gsap.utils.toArray('.industry-card').forEach((card, i) => {
+      gsap.to(card, {
+        opacity: 1,
+        y: 0,
+        duration: 0.85,
+        ease: 'power3.out',
+        delay: i * 0.06,
+        scrollTrigger: {
+          trigger: card,
+          start: 'top 92%'
+        }
+      });
     });
 
     gsap.utils.toArray('.exp-row').forEach((row, i) => {

@@ -12,6 +12,7 @@ export function renderPortfolio() {
   renderHeader();
   renderHero();
   renderProjects();
+  renderIndustries();
   renderExperience();
   renderAbout();
   renderContact();
@@ -113,15 +114,6 @@ function renderHero() {
       .join('');
   }
 
-  const footEl = document.getElementById('heroFoot');
-  if (footEl) {
-    footEl.innerHTML = `
-      <div><strong>Base</strong><span class="mono">${personal.baseLocation}</span></div>
-      <div><strong>Actualmente</strong><span class="mono">${personal.currentCompany}</span></div>
-      <div><strong>Foco</strong><span class="mono">${personal.focus}</span></div>
-    `;
-  }
-
   const linkedin = personal.socials.find(s => s.name === 'LinkedIn');
 
   const ctaPrimaryEl = document.getElementById('heroCtaPrimary');
@@ -168,6 +160,27 @@ function renderProjects() {
           </div>
           <span class="arrow">↗</span>
         </div>
+      </div>
+    `).join('');
+  }
+}
+
+/** Industries / Rubros Grid */
+function renderIndustries() {
+  const gridEl = document.getElementById('industriesGrid');
+  const countEl = document.getElementById('industriesCount');
+
+  if (countEl) {
+    countEl.textContent = `(${String(portfolioData.industries.length).padStart(2, '0')})`;
+  }
+
+  if (gridEl) {
+    gridEl.innerHTML = portfolioData.industries.map((item, idx) => `
+      <div class="industry-card reveal">
+        <span class="index mono">${String(idx + 1).padStart(2, '0')}</span>
+        <h3>${item.name}</h3>
+        <p>${item.summary}</p>
+        <div class="stack mono">${item.stack.join(' <span class="plus">+</span> ')}</div>
       </div>
     `).join('');
   }
