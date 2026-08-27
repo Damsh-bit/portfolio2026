@@ -41,6 +41,9 @@ export function initUniverseBg() {
 
   function exitFocus() {
     focusTarget = 0;
+    if (focusIndex >= 0 && planets[focusIndex] && planets[focusIndex].infoPoints) {
+      planets[focusIndex].infoPoints.forEach((pt) => { pt.expanded = false; });
+    }
   }
 
   // Responsive setup
@@ -97,7 +100,8 @@ export function initUniverseBg() {
   function createPlanets() {
     planets = [
       {
-        // Pale Gas Giant with subtle ring
+        // Pale Gas Giant with subtle ring. Click egg: an orbiting space
+        // station wakes up and loops the ring plane forever.
         relX: 0.85,
         relY: 0.22,
         radius: 42,
@@ -110,6 +114,20 @@ export function initUniverseBg() {
         ringColor: 'rgba(180, 180, 190, 0.4)',
         floatOffset: 0,
         floatSpeed: 0.001,
+        station: {
+          active: false,
+          progress: 0,
+          angle: Math.random() * Math.PI * 2,
+          speed: reducedMotion ? 0.0006 : 0.0016,
+          screenX: undefined,
+          screenY: undefined
+        },
+        infoPoints: [
+          { angle: -Math.PI / 2, text: 'Gigante gaseoso: hidrógeno y helio en capas turbulentas.' },
+          { angle: -Math.PI / 8, text: 'El anillo son fragmentos de hielo en órbita perfecta.' },
+          { angle: Math.PI * 0.7, text: 'Un día dura apenas 9 horas — gira muy rápido.' },
+          { angle: Math.PI * 0.15, text: 'Hogar de la Estación Deriva-9, en órbita permanente.' }
+        ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       },
       {
@@ -127,6 +145,12 @@ export function initUniverseBg() {
         ringColor: 'transparent',
         floatOffset: Math.PI,
         floatSpeed: 0.0012,
+        infoPoints: [
+          { angle: -Math.PI / 2, text: 'Pulsa cada 2.17 horas — variable Beta Cephei.' },
+          { angle: -Math.PI / 6, text: 'A ~315 años luz, en el hemisferio sur celeste.' },
+          { angle: Math.PI * 0.6, text: '8.8 masas solares: candidata a supernova.' },
+          { angle: Math.PI * 0.15, text: 'Ancla la constelación de Musca, la Mosca.' }
+        ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       },
       {
@@ -143,6 +167,12 @@ export function initUniverseBg() {
         ringColor: 'rgba(212, 212, 216, 0.3)',
         floatOffset: Math.PI * 0.5,
         floatSpeed: 0.0008,
+        infoPoints: [
+          { angle: -Math.PI / 2, text: 'Planeta errante — no orbita ninguna estrella conocida.' },
+          { angle: -Math.PI / 8, text: 'Superficie helada, sumida en oscuridad profunda.' },
+          { angle: Math.PI * 0.65, text: 'Emite una señal débil y constante, de origen desconocido.' },
+          { angle: Math.PI * 0.15, text: 'Su órbita real es un misterio sin trazar.' }
+        ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       }
     ];
@@ -165,7 +195,9 @@ export function initUniverseBg() {
     ['α', 'β'], ['β', 'δ'], ['δ', 'γ'], ['γ', 'α'], ['α', 'ε'], ['ε', 'λ']
   ];
 
-  function drawMuscaConstellation(p) {
+  // β Muscae is the nearest companion to Alpha and — fittingly — a real
+  // binary star system, so it shares Alpha's attention-grabbing twinkle.
+  function drawMuscaConstellation(p, time) {
     const nodes = { 'α': { dx: 0, dy: 0 } };
     MUSCA_STARS.forEach((s) => { nodes[s.name] = s; });
 
@@ -182,13 +214,29 @@ export function initUniverseBg() {
       ctx.stroke();
     }
 
+    const twinkle = 0.5 + 0.5 * Math.sin(time * 0.5);
+
     ctx.font = '10px "IBM Plex Mono", monospace';
     for (let i = 0; i < MUSCA_STARS.length; i++) {
       const s = MUSCA_STARS[i];
-      const r = Math.max(0.7, 2.6 - s.mag * 0.35);
-      const alpha = Math.max(0.35, 1 - s.mag * 0.13);
+      let r = Math.max(0.7, 2.6 - s.mag * 0.35);
+      let alpha = Math.max(0.35, 1 - s.mag * 0.13);
       const sx = p.px + s.dx;
       const sy = p.py + s.dy;
+
+      if (s.name === 'β') {
+        r *= 1 + twinkle * 0.7;
+        alpha = Math.min(1, alpha + twinkle * 0.35);
+
+        const glowR = r * 6;
+        const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
+        glow.addColorStop(0, `rgba(245, 245, 247, ${0.14 + twinkle * 0.22})`);
+        glow.addColorStop(1, 'rgba(245, 245, 247, 0)');
+        ctx.beginPath();
+        ctx.fillStyle = glow;
+        ctx.arc(sx, sy, glowR, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       ctx.beginPath();
       ctx.fillStyle = `rgba(245, 245, 247, ${alpha})`;
@@ -202,6 +250,187 @@ export function initUniverseBg() {
     ctx.fillStyle = 'rgba(212, 212, 216, 0.4)';
     ctx.fillText('α', p.px + p.radius + 6, p.py + 4);
     ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Orbiting space station: click egg for the top-right gas giant. Loops
+  // the ring plane forever once woken up; clicking it opens its info card.
+  // ------------------------------------------------------------------
+
+  // Orbit distance grows with the planet's zoom scale, but is capped so it
+  // never drifts past the visible viewport once the planet fills the screen.
+  function stationOrbitScale(p, sizeScale, width, height) {
+    const baseOrbitR = p.ringRadiusX * 1.45;
+    const maxOrbitR = Math.min(width, height) * 0.4;
+    return Math.min(sizeScale, maxOrbitR / baseOrbitR);
+  }
+
+  function updateStation(p, sizeScale, width, height) {
+    const st = p.station;
+    if (!st) return;
+
+    if (st.active) st.angle += st.speed;
+    st.progress += ((st.active ? 1 : 0) - st.progress) * 0.06;
+
+    if (st.progress < 0.001) {
+      st.screenX = undefined;
+      st.screenY = undefined;
+      return;
+    }
+
+    const orbitScale = stationOrbitScale(p, sizeScale, width, height);
+    const orbitRx = p.ringRadiusX * 1.45 * orbitScale;
+    const orbitRy = p.ringRadiusY * 1.45 * orbitScale;
+    const ex = Math.cos(st.angle) * orbitRx;
+    const ey = Math.sin(st.angle) * orbitRy;
+    const tiltCos = Math.cos(p.tilt);
+    const tiltSin = Math.sin(p.tilt);
+    const localX = ex * tiltCos - ey * tiltSin;
+    const localY = ex * tiltSin + ey * tiltCos;
+
+    // Tangent to the tilted ellipse at this angle, so the station's own
+    // orientation follows its travel direction instead of cutting across
+    // the ring plane.
+    const dEx = -Math.sin(st.angle) * orbitRx;
+    const dEy = Math.cos(st.angle) * orbitRy;
+    const tangentX = dEx * tiltCos - dEy * tiltSin;
+    const tangentY = dEx * tiltSin + dEy * tiltCos;
+
+    st.localX = localX;
+    st.localY = localY;
+    st.travelAngle = Math.atan2(tangentY, tangentX);
+    st.screenX = p.px + localX;
+    st.screenY = p.py + localY;
+    st.hitRadius = 14 * Math.max(1, orbitScale * 0.7);
+  }
+
+  function drawStation(p, sizeScale, width, height) {
+    const st = p.station;
+    if (!st || st.progress < 0.001) return;
+
+    const orbitScale = stationOrbitScale(p, sizeScale, width, height);
+    const orbitRx = p.ringRadiusX * 1.45 * orbitScale;
+    const orbitRy = p.ringRadiusY * 1.45 * orbitScale;
+
+    // Faint dashed orbit path
+    ctx.save();
+    ctx.globalAlpha *= st.progress;
+    ctx.rotate(p.tilt);
+    ctx.setLineDash([3, 6]);
+    ctx.strokeStyle = 'rgba(212, 212, 216, 0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, orbitRx, orbitRy, 0, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.restore();
+
+    // Station icon: hub + truss + two solar-panel wings, oriented along
+    // its direction of travel around the ring plane
+    const scale = 1.3 * orbitScale * (0.6 + st.progress * 0.4);
+    ctx.save();
+    ctx.globalAlpha *= st.progress;
+    ctx.translate(st.localX, st.localY);
+    ctx.rotate(st.travelAngle);
+    ctx.strokeStyle = 'rgba(245, 245, 247, 0.85)';
+    ctx.fillStyle = 'rgba(245, 245, 247, 0.92)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(-9 * scale, -2.5 * scale, 6 * scale, 5 * scale);
+    ctx.strokeRect(3 * scale, -2.5 * scale, 6 * scale, 5 * scale);
+    ctx.beginPath();
+    ctx.moveTo(-3 * scale, 0);
+    ctx.lineTo(3 * scale, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(0, 0, 2 * scale, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Observe-mode info markers: small clickable "+" points scattered
+  // around the focused planet, each expanding into a short fact.
+  // ------------------------------------------------------------------
+
+  function drawInfoPoints(p, effRadius, focusProgress) {
+    if (!p.infoPoints) return;
+
+    const alpha = Math.max(0, (focusProgress - 0.45) / 0.55);
+    if (alpha <= 0.001) {
+      p.infoPoints.forEach((pt) => { pt.screenX = undefined; pt.screenY = undefined; });
+      return;
+    }
+
+    const markerDist = effRadius + 34;
+    const markerR = 9;
+
+    for (let i = 0; i < p.infoPoints.length; i++) {
+      const pt = p.infoPoints[i];
+      const mx = p.px + Math.cos(pt.angle) * markerDist;
+      const my = p.py + Math.sin(pt.angle) * markerDist;
+      pt.screenX = mx;
+      pt.screenY = my;
+
+      ctx.save();
+      ctx.globalAlpha *= alpha;
+
+      // Connector line from the planet's edge to the marker
+      ctx.strokeStyle = 'rgba(212, 212, 216, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(p.px + Math.cos(pt.angle) * effRadius, p.py + Math.sin(pt.angle) * effRadius);
+      ctx.lineTo(mx, my);
+      ctx.stroke();
+
+      // Marker circle
+      ctx.beginPath();
+      ctx.arc(mx, my, markerR, 0, Math.PI * 2);
+      ctx.fillStyle = pt.expanded ? 'rgba(245, 245, 247, 0.95)' : 'rgba(16, 16, 16, 0.8)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(212, 212, 216, 0.55)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Plus / minus glyph
+      ctx.strokeStyle = pt.expanded ? 'rgba(16, 16, 16, 0.9)' : 'rgba(245, 245, 247, 0.9)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(mx - 3.5, my);
+      ctx.lineTo(mx + 3.5, my);
+      if (!pt.expanded) {
+        ctx.moveTo(mx, my - 3.5);
+        ctx.lineTo(mx, my + 3.5);
+      }
+      ctx.stroke();
+
+      // Expanded caption popover
+      if (pt.expanded) {
+        ctx.font = '11px "IBM Plex Mono", monospace';
+        const paddingX = 10;
+        const paddingY = 8;
+        const textW = ctx.measureText(pt.text).width;
+        const boxW = textW + paddingX * 2;
+        const boxH = 14 + paddingY * 2;
+        const dirX = Math.cos(pt.angle);
+        const offset = markerR + 10;
+        const boxX = mx + (dirX >= 0 ? offset : -offset - boxW);
+        const boxY = my - boxH / 2;
+
+        ctx.fillStyle = 'rgba(12, 12, 14, 0.92)';
+        ctx.strokeStyle = 'rgba(212, 212, 216, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(boxX, boxY, boxW, boxH, 8);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(245, 245, 247, 0.92)';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(pt.text, boxX + paddingX, boxY + boxH / 2 + 0.5);
+      }
+
+      ctx.restore();
+    }
   }
 
   // ------------------------------------------------------------------
@@ -303,7 +532,7 @@ export function initUniverseBg() {
   function spawnShootingStar() {
     const dir = Math.random() > 0.5 ? 1 : -1;
     const angle = Math.PI * 0.22 + Math.random() * 0.2; // shallow downward diagonal
-    const speed = 4 + Math.random() * 2.5;
+    const speed = 1.6 + Math.random() * 1.1;
 
     shootingStars.push({
       x: Math.random() * width * 1.2 - width * 0.1,
@@ -312,7 +541,7 @@ export function initUniverseBg() {
       vy: Math.sin(angle) * speed,
       length: 220 + Math.random() * 140,
       life: 0,
-      maxLife: 170 + Math.random() * 70
+      maxLife: 340 + Math.random() * 140
     });
   }
 
@@ -436,7 +665,10 @@ export function initUniverseBg() {
   // ------------------------------------------------------------------
 
   function triggerPlanetEasterEgg(index, p) {
-    if (index === 0) spawnSupernovaBurst(p);
+    if (index === 0) {
+      spawnSupernovaBurst(p);
+      if (p.station) p.station.active = true;
+    }
     else if (index === 1) {
       spawnSatellite(p);
       window.dispatchEvent(new CustomEvent('open-star-lightbox'));
@@ -504,6 +736,32 @@ export function initUniverseBg() {
 
     if (observeMode) {
       if (focusIndex >= 0) {
+        const fp = planets[focusIndex];
+
+        // Station click (bigger, easier target while zoomed in)
+        if (fp.station && fp.station.screenX !== undefined) {
+          const sdx = e.clientX - fp.station.screenX;
+          const sdy = e.clientY - fp.station.screenY;
+          if (Math.hypot(sdx, sdy) <= fp.station.hitRadius) {
+            window.dispatchEvent(new CustomEvent('open-station-lightbox'));
+            return;
+          }
+        }
+
+        // Info marker click: toggle its expanded caption, stay zoomed in
+        if (fp.infoPoints) {
+          for (let j = 0; j < fp.infoPoints.length; j++) {
+            const pt = fp.infoPoints[j];
+            if (pt.screenX === undefined) continue;
+            const mdx = e.clientX - pt.screenX;
+            const mdy = e.clientY - pt.screenY;
+            if (Math.hypot(mdx, mdy) <= 13) {
+              pt.expanded = !pt.expanded;
+              return;
+            }
+          }
+        }
+
         exitFocus();
         return;
       }
@@ -521,6 +779,17 @@ export function initUniverseBg() {
         }
       }
       return;
+    }
+
+    // Space station click (orbits planet 0) takes priority over the planet itself
+    const stationPlanet = planets[0];
+    if (stationPlanet && stationPlanet.station && stationPlanet.station.screenX !== undefined) {
+      const sdx = e.clientX - stationPlanet.station.screenX;
+      const sdy = e.clientY - stationPlanet.station.screenY;
+      if (Math.hypot(sdx, sdy) <= (stationPlanet.station.hitRadius || 14)) {
+        window.dispatchEvent(new CustomEvent('open-station-lightbox'));
+        return;
+      }
     }
 
     for (let i = 0; i < planets.length; i++) {
@@ -629,7 +898,7 @@ export function initUniverseBg() {
     const bigRadius = Math.min(width, height) * 0.32;
     for (let i = 0; i < planets.length; i++) {
       const p = planets[i];
-      const floatY = Math.sin(time * 0.8 + p.floatOffset) * 12;
+      const floatY = Math.sin(time * 0.25 + p.floatOffset) * 12;
       const naturalPx = p.relX * width;
       const naturalPy = p.relY * height + floatY;
 
@@ -649,10 +918,11 @@ export function initUniverseBg() {
       if (i === 1) {
         ctx.save();
         ctx.globalAlpha = 1 - dim * 0.85;
-        drawMuscaConstellation(p);
+        drawMuscaConstellation(p, time);
         ctx.restore();
       }
 
+      updateStation(p, sizeScale, width, height);
       updatePlanetGlitch(p);
 
       // Supernova click-egg: brief radius pulse that eases back to normal
@@ -678,6 +948,19 @@ export function initUniverseBg() {
       ctx.fillStyle = glowGrad;
       ctx.arc(0, 0, effRadius * 2.5, 0, Math.PI * 2);
       ctx.fill();
+
+      // Alpha Muscae attention-grabbing twinkle: a slow pulsing halo loop
+      if (i === 1) {
+        const twinkle = 0.5 + 0.5 * Math.sin(time * 0.5);
+        const twinkleRadius = effRadius * (2.2 + twinkle * 1.4);
+        const twinkleGrad = ctx.createRadialGradient(0, 0, effRadius * 0.8, 0, 0, twinkleRadius);
+        twinkleGrad.addColorStop(0, `rgba(245, 245, 247, ${0.16 + twinkle * 0.24})`);
+        twinkleGrad.addColorStop(1, 'rgba(245, 245, 247, 0)');
+        ctx.beginPath();
+        ctx.fillStyle = twinkleGrad;
+        ctx.arc(0, 0, twinkleRadius, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       // Planet Ring (Back part if tilted ring exists)
       if (p.ringRadiusX > 0) {
@@ -735,6 +1018,8 @@ export function initUniverseBg() {
         ctx.restore();
       }
 
+      drawStation(p, sizeScale, width, height);
+
       // Satellite click-egg: a tiny moon orbiting a couple times, then fading
       if (p.burst && p.burst.type === 'satellite') {
         const b = p.burst;
@@ -755,6 +1040,9 @@ export function initUniverseBg() {
       }
 
       ctx.restore();
+
+      if (i === focusIndex) drawInfoPoints(p, effRadius, focusProgress);
+      else if (p.infoPoints) p.infoPoints.forEach((pt) => { pt.screenX = undefined; pt.screenY = undefined; });
     }
 
     // 3. Draw Floating Stardust & Constellations

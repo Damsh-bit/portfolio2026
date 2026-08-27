@@ -15,6 +15,7 @@ import { initTyping } from './modules/typing.js';
 import { initProjectFilters } from './modules/project-filters.js';
 import { initUiToggle } from './modules/ui-toggle.js';
 import { initStarLightbox } from './modules/star-lightbox.js';
+import { initStationLightbox } from './modules/station-lightbox.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Render all dynamic content from portfolio-data.js
@@ -46,4 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 10. Initialize Alpha Muscae Star Lightbox (planet click easter egg)
   initStarLightbox();
+
+  // 11. Initialize Orbital Station Lightbox (planet click easter egg)
+  initStationLightbox();
 });

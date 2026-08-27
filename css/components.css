@@ -1730,6 +1730,21 @@ body.ui-hidden .ui-toggle-btn .icon-eye-off {
   margin: 0;
 }
 
+.star-tribute {
+  font-size: 13px;
+  line-height: 1.6;
+  font-style: italic;
+  color: var(--ink-dim);
+  margin: 16px 0 0;
+  padding-top: 16px;
+  border-top: 1px dashed var(--line);
+}
+
+.star-tribute strong {
+  font-style: normal;
+  color: var(--ink);
+}
+
 @media (max-width: 460px) {
   .star-card {
     padding: 26px 20px 22px;
