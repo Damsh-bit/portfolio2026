@@ -37,6 +37,7 @@ export function initUniverseBg() {
   function enterFocus(index) {
     focusIndex = index;
     focusTarget = 1;
+    document.body.classList.add('planet-focused');
   }
 
   function exitFocus() {
@@ -44,6 +45,7 @@ export function initUniverseBg() {
     if (focusIndex >= 0 && planets[focusIndex] && planets[focusIndex].infoPoints) {
       planets[focusIndex].infoPoints.forEach((pt) => { pt.expanded = false; });
     }
+    document.body.classList.remove('planet-focused');
   }
 
   // Responsive setup
@@ -127,7 +129,7 @@ export function initUniverseBg() {
           { angle: -Math.PI / 8, text: 'El anillo son fragmentos de hielo en órbita perfecta.' },
           { angle: Math.PI * 0.7, text: 'Un día dura apenas 9 horas — gira muy rápido.' },
           { angle: Math.PI * 0.15, text: 'Hogar de la Estación Deriva-9, en órbita permanente.' },
-          { angle: Math.PI / 2, isCard: true }
+          { angle: Math.PI, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       },
@@ -151,7 +153,7 @@ export function initUniverseBg() {
           { angle: -Math.PI / 6, text: 'A ~315 años luz, en el hemisferio sur celeste.' },
           { angle: Math.PI * 0.6, text: '8.8 masas solares: candidata a supernova.' },
           { angle: Math.PI * 0.15, text: 'Ancla la constelación de Musca, la Mosca.' },
-          { angle: Math.PI / 2, isCard: true }
+          { angle: -Math.PI / 4, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       },
@@ -174,7 +176,7 @@ export function initUniverseBg() {
           { angle: -Math.PI / 8, text: 'Superficie helada, sumida en oscuridad profunda.' },
           { angle: Math.PI * 0.65, text: 'Emite una señal débil y constante, de origen desconocido.' },
           { angle: Math.PI * 0.15, text: 'Su órbita real es un misterio sin trazar.' },
-          { angle: Math.PI / 2, isCard: true }
+          { angle: Math.PI * 0.75, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
       }
@@ -804,6 +806,9 @@ export function initUniverseBg() {
   // Planets are only interactive in observe mode (UI hidden via the eye
   // button). Clicking one there just zooms in; the info Card only opens
   // from the standout marker among the scattered curiosity points.
+  // Zoomed view is exited only via the dedicated back button, never by
+  // clicking elsewhere — that used to also fire on clicks inside the
+  // Card itself (e.g. its close button), zooming back out unintentionally.
   window.addEventListener('click', (e) => {
     const observeMode = document.body.classList.contains('ui-hidden');
     if (!observeMode) return;
@@ -826,8 +831,6 @@ export function initUniverseBg() {
           }
         }
       }
-
-      exitFocus();
       return;
     }
 
@@ -845,6 +848,14 @@ export function initUniverseBg() {
       }
     }
   });
+
+  // Dedicated back button: the only way to exit a zoomed/focused planet.
+  const backBtn = document.getElementById('planetBackBtn');
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      if (focusIndex >= 0) exitFocus();
+    });
+  }
 
   window.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && focusIndex >= 0) exitFocus();

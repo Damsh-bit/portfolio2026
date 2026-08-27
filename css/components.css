@@ -1664,6 +1664,52 @@ body.ui-hidden .ui-toggle-hint {
   }
 }
 
+/* ---------- Planet Back Button (exit a zoomed/focused planet) ---------- */
+.planet-back-btn {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 240;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(16, 16, 16, 0.75);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(-8px);
+  pointer-events: none;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.planet-back-btn:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+}
+
+body.planet-focused .planet-back-btn {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+@media (max-width: 600px) {
+  .planet-back-btn {
+    top: 18px;
+    left: 18px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
 /* ---------- Alpha Muscae Hover Tooltip ---------- */
 .star-tooltip {
   position: fixed;
@@ -1693,9 +1739,9 @@ body.ui-hidden .ui-toggle-hint {
   visibility: hidden;
   opacity: 0;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 24px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 96px 24px 24px;
 }
 
 .star-lightbox-backdrop {
@@ -1812,6 +1858,10 @@ body.ui-hidden .ui-toggle-hint {
 }
 
 @media (max-width: 460px) {
+  .star-lightbox {
+    padding: 80px 16px 16px;
+  }
+
   .star-card {
     padding: 26px 20px 22px;
   }
