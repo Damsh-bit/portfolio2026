@@ -161,8 +161,8 @@ export function initUniverseBg() {
         ...createPlanetInteractionState()
       },
       {
-        // Deep Space Celestial Sphere
-        name: 'El Errante',
+        // Deep Space Celestial Sphere — "El Lucero", dedicated to Hannah.
+        name: 'El Lucero',
         relX: 0.78,
         relY: 0.85,
         radius: 14,
