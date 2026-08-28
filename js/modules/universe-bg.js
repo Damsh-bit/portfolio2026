@@ -25,6 +25,7 @@ export function initUniverseBg() {
   const mouse = { x: -9999, y: -9999, targetX: -9999, targetY: -9999 };
   let parallaxX = 0;
   let parallaxY = 0;
+  let cancerBounds = null;
   let asteroidTimer = 1500 + Math.random() * 1800; // ~25-55s at 60fps
   let shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
   const starTooltip = document.getElementById('starTooltip');
@@ -104,6 +105,7 @@ export function initUniverseBg() {
       {
         // Pale Gas Giant with subtle ring. Click egg: an orbiting space
         // station wakes up and loops the ring plane forever.
+        name: 'Gigante Gaseoso',
         relX: 0.85,
         relY: 0.22,
         radius: 42,
@@ -136,6 +138,7 @@ export function initUniverseBg() {
       {
         // Alpha Muscae (α Mus) — brightest star of Musca, the Fly.
         // Click easter egg reveals its real astronomical data.
+        name: 'Alfa Muscae',
         relX: 0.12,
         relY: 0.72,
         radius: 22,
@@ -159,6 +162,7 @@ export function initUniverseBg() {
       },
       {
         // Deep Space Celestial Sphere
+        name: 'El Errante',
         relX: 0.78,
         relY: 0.85,
         radius: 14,
@@ -172,10 +176,10 @@ export function initUniverseBg() {
         floatOffset: Math.PI * 0.5,
         floatSpeed: 0.0008,
         infoPoints: [
-          { angle: -Math.PI / 2, text: 'Planeta errante — no orbita ninguna estrella conocida.' },
-          { angle: -Math.PI / 8, text: 'Superficie helada, sumida en oscuridad profunda.' },
-          { angle: Math.PI * 0.65, text: 'Emite una señal débil y constante, de origen desconocido.' },
-          { angle: Math.PI * 0.15, text: 'Su órbita real es un misterio sin trazar.' },
+          { angle: -Math.PI / 2, text: 'Vagó a la deriva durante 36 semanas y 4 días.' },
+          { angle: -Math.PI / 8, text: 'Superficie helada; brilló por primera vez el 5 de mayo de 2026.' },
+          { angle: Math.PI * 0.65, text: 'Emite una señal cálida y constante desde las 20:57 hs.' },
+          { angle: Math.PI * 0.15, text: 'Su alineación coincide con Tauro.' },
           { angle: Math.PI * 0.75, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
@@ -255,6 +259,86 @@ export function initUniverseBg() {
     ctx.fillStyle = 'rgba(212, 212, 216, 0.4)';
     ctx.fillText('α', p.px + p.radius + 6, p.py + 4);
     ctx.restore();
+  }
+
+  // ------------------------------------------------------------------
+  // Cancer constellation — free-floating decoration, only drawn in
+  // observe mode. Every star gets its own gentle twinkle (rather than
+  // one standout star like Musca) so the whole shape reads as alive.
+  // Anchored on δ Cancri; screen-space bounds are recomputed each frame
+  // for the hover tooltip hit-test.
+  // ------------------------------------------------------------------
+
+  const CANCER_ANCHOR = { relX: 0.42, relY: 0.16 };
+  const CANCER_STARS = [
+    { name: 'δ', dx: 0, dy: 0, mag: 3.94 },
+    { name: 'γ', dx: -71, dy: -127, mag: 4.66 },
+    { name: 'η', dx: -34, dy: -53, mag: 5.33 },
+    { name: 'θ', dx: -68, dy: 105, mag: 5.33 },
+    { name: 'β', dx: 100, dy: 101, mag: 3.53 }
+  ];
+  const CANCER_LINES = [
+    ['γ', 'η'], ['η', 'δ'], ['δ', 'θ'], ['δ', 'β']
+  ];
+
+  function drawCancerConstellation(time) {
+    const anchorX = CANCER_ANCHOR.relX * width;
+    const anchorY = CANCER_ANCHOR.relY * height;
+    const nodes = {};
+    CANCER_STARS.forEach((s) => { nodes[s.name] = s; });
+
+    ctx.save();
+    ctx.strokeStyle = 'rgba(212, 212, 216, 0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < CANCER_LINES.length; i++) {
+      const [a, b] = CANCER_LINES[i];
+      const na = nodes[a];
+      const nb = nodes[b];
+      ctx.beginPath();
+      ctx.moveTo(anchorX + na.dx, anchorY + na.dy);
+      ctx.lineTo(anchorX + nb.dx, anchorY + nb.dy);
+      ctx.stroke();
+    }
+
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+    for (let i = 0; i < CANCER_STARS.length; i++) {
+      const s = CANCER_STARS[i];
+      const sx = anchorX + s.dx;
+      const sy = anchorY + s.dy;
+      minX = Math.min(minX, sx);
+      minY = Math.min(minY, sy);
+      maxX = Math.max(maxX, sx);
+      maxY = Math.max(maxY, sy);
+
+      const twinkle = 0.5 + 0.5 * Math.sin(time * 0.6 + i * 1.7);
+      const r = Math.max(0.8, 2.4 - s.mag * 0.3) * (1 + twinkle * 0.35);
+      const alpha = Math.max(0.4, 1 - s.mag * 0.12) * (0.75 + twinkle * 0.25);
+
+      const glowR = r * 4;
+      const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
+      glow.addColorStop(0, `rgba(245, 245, 247, ${0.1 + twinkle * 0.14})`);
+      glow.addColorStop(1, 'rgba(245, 245, 247, 0)');
+      ctx.beginPath();
+      ctx.fillStyle = glow;
+      ctx.arc(sx, sy, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(245, 245, 247, ${alpha})`;
+      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
+
+    const pad = 22;
+    cancerBounds = {
+      x: minX - pad,
+      y: minY - pad,
+      w: (maxX - minX) + pad * 2,
+      h: (maxY - minY) + pad * 2
+    };
   }
 
   // ------------------------------------------------------------------
@@ -861,32 +945,57 @@ export function initUniverseBg() {
     if (e.key === 'Escape' && focusIndex >= 0) exitFocus();
   });
 
+  // Hover tooltip + pointer cursor: only meaningful in observe mode, since
+  // that's the only state where planets are actually clickable.
+  function updateHoverState(mx, my) {
+    const observeMode = document.body.classList.contains('ui-hidden');
+    let hoverName = null;
+    let showPointer = false;
+
+    if (observeMode && focusIndex < 0) {
+      for (let i = 0; i < planets.length; i++) {
+        const p = planets[i];
+        if (p.px === undefined) continue;
+        const dx = mx - p.px;
+        const dy = my - p.py;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist <= (p.currentRadius || p.radius) * 1.4) {
+          hoverName = p.name;
+          showPointer = true;
+          break;
+        }
+      }
+
+      if (!hoverName && cancerBounds &&
+        mx >= cancerBounds.x && mx <= cancerBounds.x + cancerBounds.w &&
+        my >= cancerBounds.y && my <= cancerBounds.y + cancerBounds.h) {
+        hoverName = 'Constelación de Cáncer';
+      }
+    }
+
+    canvas.style.cursor = showPointer ? 'pointer' : 'default';
+
+    if (!starTooltip) return;
+    if (hoverName) {
+      starTooltip.textContent = hoverName;
+      starTooltip.style.opacity = '1';
+      starTooltip.style.transform = `translate(${mx + 16}px, ${my - 12}px)`;
+    } else {
+      starTooltip.style.opacity = '0';
+    }
+  }
+
   // Mouse movement handlers
   window.addEventListener('mousemove', (e) => {
     mouse.targetX = e.clientX;
     mouse.targetY = e.clientY;
-
-    // Alpha Muscae hover tooltip
-    if (starTooltip) {
-      const alphaPlanet = planets[1];
-      if (alphaPlanet && alphaPlanet.px !== undefined) {
-        const dx = e.clientX - alphaPlanet.px;
-        const dy = e.clientY - alphaPlanet.py;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist <= (alphaPlanet.currentRadius || alphaPlanet.radius) * 1.5) {
-          starTooltip.style.opacity = '1';
-          starTooltip.style.transform = `translate(${e.clientX + 16}px, ${e.clientY - 12}px)`;
-        } else {
-          starTooltip.style.opacity = '0';
-        }
-      }
-    }
+    updateHoverState(e.clientX, e.clientY);
   });
 
   window.addEventListener('mouseleave', () => {
     mouse.targetX = -9999;
     mouse.targetY = -9999;
+    canvas.style.cursor = 'default';
     if (starTooltip) starTooltip.style.opacity = '0';
   });
 
@@ -943,6 +1052,17 @@ export function initUniverseBg() {
       ctx.fill();
     }
     ctx.restore();
+
+    // 1.5 Draw Cancer Constellation (observe mode only)
+    const observeModeActive = document.body.classList.contains('ui-hidden');
+    if (observeModeActive) {
+      ctx.save();
+      ctx.globalAlpha = 1 - dim * 0.85;
+      drawCancerConstellation(time);
+      ctx.restore();
+    } else {
+      cancerBounds = null;
+    }
 
     // 2. Draw Minimalist Planets
     const bigRadius = Math.min(width, height) * 0.32;
