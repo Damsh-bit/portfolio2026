@@ -217,12 +217,41 @@
     <button type="button" class="modal-nav next" id="mNext" aria-label="Proyecto siguiente">›</button>
   </div>
 
-  <!-- Floating LinkedIn Button -->
-  <a href="#" id="linkedinFab" class="linkedin-fab" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Damián Coronel">
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
-      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/>
-    </svg>
-  </a>
+  <!-- Floating Action Buttons: chat assistant + LinkedIn -->
+  <div class="fab-stack">
+    <button type="button" id="chatFab" class="chat-fab" aria-label="Abrir chat con el asistente" aria-expanded="false" aria-controls="chatPanel">
+      <svg class="chat-fab-icon-open" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 11.5a8.38 8.38 0 0 1-4.4 7.37 8.5 8.5 0 0 1-9.2-.9L3 19l1.03-3.4a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 8.5-8.5H12a8.5 8.5 0 0 1 9 8.2z"/>
+      </svg>
+      <svg class="chat-fab-icon-close" viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <line x1="18" y1="6" x2="6" y2="18"/>
+        <line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+      <span class="chat-fab-dot" aria-hidden="true"></span>
+    </button>
+
+    <a href="#" id="linkedinFab" class="linkedin-fab" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Damián Coronel">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+        <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.03-1.85-3.03-1.85 0-2.14 1.45-2.14 2.94v5.66H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Chatbot Widget: automated menu (about / projects / contact / quote form) -->
+  <div class="chat-panel" id="chatPanel" role="dialog" aria-modal="false" aria-labelledby="chatPanelTitle" aria-hidden="true">
+    <div class="chat-panel-header">
+      <div class="chat-panel-avatar" aria-hidden="true">DC</div>
+      <div class="chat-panel-heading">
+        <span class="chat-panel-title mono" id="chatPanelTitle">Asistente de Damián</span>
+        <span class="chat-panel-status mono"><span class="chat-status-dot" aria-hidden="true"></span>Respuestas automáticas</span>
+      </div>
+      <button type="button" class="chat-panel-close" id="chatPanelClose" aria-label="Cerrar chat">×</button>
+    </div>
+
+    <div class="chat-panel-body" id="chatPanelBody" aria-live="polite"></div>
+
+    <div class="chat-panel-footer" id="chatPanelFooter"></div>
+  </div>
 
 </div><!-- /.page -->
 

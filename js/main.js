@@ -17,6 +17,7 @@ import { initUiToggle } from './modules/ui-toggle.js';
 import { initStarLightbox } from './modules/star-lightbox.js';
 import { initStationLightbox } from './modules/station-lightbox.js';
 import { initWandererLightbox } from './modules/wanderer-lightbox.js';
+import { initChatbot } from './modules/chatbot.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Render all dynamic content from portfolio-data.js
@@ -54,4 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 12. Initialize Wandering Planet Lightbox (planet click easter egg)
   initWandererLightbox();
+
+  // 13. Initialize Chatbot Widget (automated menu + quote form)
+  initChatbot();
 });
