@@ -384,5 +384,30 @@ export const portfolioData = {
         { name: "GTmetrix", icon: null }
       ]
     }
+  ],
+  // Click-to-open easter eggs on the surface of the 3D Earth (space-scene.js).
+  // lat/lon in degrees; edit freely — no code changes needed.
+  earthHotspots: [
+    {
+      name: "Buenos Aires",
+      lat: -34.6,
+      lon: -58.4,
+      title: "Base de operaciones",
+      text: "Acá nací y acá programo. Argentina, GMT-3 — el punto de partida de cada proyecto."
+    },
+    {
+      name: "Madrid",
+      lat: 40.4,
+      lon: -3.7,
+      title: "Puente remoto",
+      text: "A 10.000 km, el equipo actual en DigitalYA. El trabajo remoto no conoce husos horarios."
+    },
+    {
+      name: "Atlántico Sur",
+      lat: 5,
+      lon: -35,
+      title: "Señal en tránsito",
+      text: "En algún punto de este océano viajan los commits, los deploys y algún que otro café virtual."
+    }
   ]
 };

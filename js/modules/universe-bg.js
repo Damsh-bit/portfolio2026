@@ -26,6 +26,12 @@ export function initUniverseBg() {
   let parallaxX = 0;
   let parallaxY = 0;
   let cancerBounds = null;
+
+  // Scroll-driven starfield drift: scrolling the page pans the deep-space
+  // star layer, as if flying past it toward whatever section is next,
+  // instead of the background sitting frozen behind the content.
+  let scrollTarget = window.scrollY || 0;
+  let scrollEased = scrollTarget;
   let asteroidTimer = 1500 + Math.random() * 1800; // ~25-55s at 60fps
   let shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
   const starTooltip = document.getElementById('starTooltip');
@@ -43,6 +49,9 @@ export function initUniverseBg() {
     focusIndex = index;
     focusTarget = 1;
     document.body.classList.add('planet-focused');
+    window.dispatchEvent(new CustomEvent('planet-focus-changed', {
+      detail: { system: '2d', index, name: planets[index] ? planets[index].name : null }
+    }));
   }
 
   function exitFocus() {
@@ -51,6 +60,7 @@ export function initUniverseBg() {
       planets[focusIndex].infoPoints.forEach((pt) => { pt.expanded = false; });
     }
     document.body.classList.remove('planet-focused');
+    window.dispatchEvent(new CustomEvent('planet-focus-changed', { detail: null }));
   }
 
   // Responsive setup
@@ -103,46 +113,22 @@ export function initUniverseBg() {
     }
   }
 
-  // Create minimalist celestial planets
+  // Create minimalist celestial planets — each anchored to a page section
+  // (relX/relY are fractions of THAT section's box, not the viewport), so
+  // they hold their place on the page instead of sitting glued to the same
+  // screen spot forever. The first group (Tierra/Saturno/Alfa Muscae) sits
+  // at its original hero-viewport position (relY 0-1); the second group
+  // (El Lucero/Kepler-186f/TRAPPIST-1e) is anchored to that SAME hero box
+  // but with relY > 1 — i.e. "one screen further down" — so scrolling past
+  // hero tucks the first three away and brings the second three into view,
+  // regardless of how tall the sections in between actually are.
   function createPlanets() {
     planets = [
-      {
-        // Pale Gas Giant with subtle ring. Click egg: an orbiting space
-        // station wakes up and loops the ring plane forever.
-        name: 'Gigante Gaseoso',
-        relX: 0.85,
-        relY: 0.22,
-        radius: 42,
-        ringRadiusX: 75,
-        ringRadiusY: 18,
-        tilt: -0.25,
-        colorCore: '#e4e4e7',
-        colorEdge: '#27272a',
-        glowColor: 'rgba(228, 228, 231, 0.22)',
-        ringColor: 'rgba(180, 180, 190, 0.4)',
-        floatOffset: 0,
-        floatSpeed: 0.001,
-        station: {
-          active: true,
-          progress: 0,
-          angle: Math.random() * Math.PI * 2,
-          speed: reducedMotion ? 0.0006 : 0.0016,
-          screenX: undefined,
-          screenY: undefined
-        },
-        infoPoints: [
-          { angle: -Math.PI / 2, text: 'Gigante gaseoso: hidrógeno y helio en capas turbulentas.' },
-          { angle: -Math.PI / 8, text: 'El anillo son fragmentos de hielo en órbita perfecta.' },
-          { angle: Math.PI * 0.7, text: 'Un día dura apenas 9 horas — gira muy rápido.' },
-          { angle: Math.PI * 0.15, text: 'Hogar de la Estación Deriva-9, en órbita permanente.' },
-          { angle: Math.PI, isCard: true }
-        ].map((pt) => ({ ...pt, expanded: false })),
-        ...createPlanetInteractionState()
-      },
       {
         // Alpha Muscae (α Mus) — brightest star of Musca, the Fly.
         // Click easter egg reveals its real astronomical data.
         name: 'Alfa Muscae',
+        sectionId: 'hero',
         relX: 0.12,
         relY: 0.72,
         radius: 22,
@@ -167,8 +153,9 @@ export function initUniverseBg() {
       {
         // Deep Space Celestial Sphere — "El Lucero", dedicated to Hannah.
         name: 'El Lucero',
-        relX: 0.78,
-        relY: 0.85,
+        sectionId: 'hero',
+        relX: 0.5,
+        relY: 1.28,
         radius: 14,
         ringRadiusX: 28,
         ringRadiusY: 7,
@@ -187,12 +174,92 @@ export function initUniverseBg() {
           { angle: Math.PI * 0.75, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
         ...createPlanetInteractionState()
+      },
+      {
+        // Kepler-186f — first Earth-sized exoplanet found in a star's
+        // habitable zone (Kepler mission, 2014). Fits "experience": a
+        // milestone reached after a long search.
+        name: 'Kepler-186f',
+        sectionId: 'hero',
+        relX: 0.12,
+        relY: 1.12,
+        radius: 17,
+        ringRadiusX: 0,
+        ringRadiusY: 0,
+        tilt: 0,
+        colorCore: '#c9a98a',
+        colorEdge: '#4a3b2e',
+        glowColor: 'rgba(201, 169, 138, 0.16)',
+        ringColor: 'transparent',
+        floatOffset: Math.PI * 1.3,
+        floatSpeed: 0.0009,
+        infoPoints: [
+          { angle: -Math.PI / 2, text: 'Primer exoplaneta del tamaño de la Tierra en zona habitable.' },
+          { angle: -Math.PI / 6, text: 'Orbita una enana roja a ~500 años luz, en Cygnus.' },
+          { angle: Math.PI * 0.6, text: 'Recibe solo ~1/3 de la luz que recibe la Tierra del Sol.' },
+          { angle: Math.PI * 0.15, text: 'Descubierto por la misión Kepler en 2014.' },
+          { angle: Math.PI, isCard: true }
+        ].map((pt) => ({ ...pt, expanded: false })),
+        lightbox: {
+          eyebrow: 'EASTER EGG · EXOPLANETA',
+          name: 'Kepler-186f',
+          designation: 'Sistema Kepler-186 · Constelación Cygnus',
+          stats: [
+            ['Tipo', 'Rocoso, tamaño Tierra'],
+            ['Distancia', '~500 años luz'],
+            ['Radio', '~1.11 R⊕'],
+            ['Período orbital', '~130 días']
+          ],
+          desc: 'El primer exoplaneta de tamaño similar a la Tierra descubierto dentro de la zona habitable de su estrella. Orbita una enana roja mucho más tenue que el Sol, así que su "mediodía" se ve como un atardecer terrestre. Confirmado por la misión Kepler en abril de 2014.'
+        },
+        ...createPlanetInteractionState()
+      },
+      {
+        // TRAPPIST-1e — one of seven roughly Earth-sized worlds around an
+        // ultra-cool dwarf star, among the best current bets for finding
+        // a habitable world. Fits "contact": still listening for a signal.
+        name: 'TRAPPIST-1e',
+        sectionId: 'hero',
+        relX: 0.85,
+        relY: 1.1,
+        radius: 16,
+        ringRadiusX: 0,
+        ringRadiusY: 0,
+        tilt: 0,
+        colorCore: '#8fb3c9',
+        colorEdge: '#2e3f4a',
+        glowColor: 'rgba(143, 179, 201, 0.16)',
+        ringColor: 'transparent',
+        floatOffset: Math.PI * 0.2,
+        floatSpeed: 0.0011,
+        infoPoints: [
+          { angle: -Math.PI / 2, text: 'Uno de los 7 planetas de TRAPPIST-1, a ~40 años luz.' },
+          { angle: -Math.PI / 6, text: 'El más prometedor del sistema para albergar agua líquida.' },
+          { angle: Math.PI * 0.6, text: 'Su estrella es una enana ultra-fría, mucho más tenue que el Sol.' },
+          { angle: Math.PI * 0.15, text: 'Descubierto en 2017 con el telescopio TRAPPIST.' },
+          { angle: Math.PI * 0.75, isCard: true }
+        ].map((pt) => ({ ...pt, expanded: false })),
+        lightbox: {
+          eyebrow: 'EASTER EGG · EXOPLANETA',
+          name: 'TRAPPIST-1e',
+          designation: 'Sistema TRAPPIST-1 · Constelación Acuario',
+          stats: [
+            ['Tipo', 'Rocoso, tamaño Tierra'],
+            ['Distancia', '~40 años luz'],
+            ['Radio', '~0.92 R⊕'],
+            ['Período orbital', '~6.1 días']
+          ],
+          desc: 'Uno de los siete planetas rocosos que orbitan TRAPPIST-1, una enana ultra-fría muy compacta. De los siete, es uno de los mejores candidatos para tener agua líquida en superficie — y por eso, uno de los blancos favoritos en la búsqueda de señales de vida.'
+        },
+        ...createPlanetInteractionState()
       }
     ];
+
+    planets.forEach((p) => { p.sectionEl = document.getElementById(p.sectionId) || null; });
   }
 
   // ------------------------------------------------------------------
-  // Musca constellation, anchored on the "Alpha Muscae" planet (index 1).
+  // Musca constellation, anchored on the "Alpha Muscae" planet (index 0).
   // Companion star offsets (px) reproduce the traditional Musca stick
   // figure: a β–δ–γ–α kite with an ε–λ tail trailing off toward the edge.
   // ------------------------------------------------------------------
@@ -513,127 +580,6 @@ export function initUniverseBg() {
       ctx.fill();
     }
 
-    ctx.restore();
-  }
-
-  // ------------------------------------------------------------------
-  // Orbiting space station: click egg for the top-right gas giant. Loops
-  // the ring plane forever once woken up; clicking it opens its info card.
-  // ------------------------------------------------------------------
-
-  // Orbit distance grows with the planet's zoom scale, but is capped so it
-  // never drifts past the visible viewport once the planet fills the screen.
-  function stationOrbitScale(p, sizeScale, width, height) {
-    const baseOrbitR = p.ringRadiusX * 1.45;
-    const maxOrbitR = Math.min(width, height) * 0.4;
-    return Math.min(sizeScale, maxOrbitR / baseOrbitR);
-  }
-
-  // The station's orbit plane is rotated 90° from the ring's plane, so it
-  // crosses transversally over the ring instead of tracing alongside it.
-  function stationTilt(p) {
-    return p.tilt + Math.PI / 2;
-  }
-
-  function updateStation(p, sizeScale, width, height) {
-    const st = p.station;
-    if (!st) return;
-
-    if (st.active) st.angle += st.speed;
-    st.progress += ((st.active ? 1 : 0) - st.progress) * 0.06;
-
-    if (st.progress < 0.001) {
-      st.screenX = undefined;
-      st.screenY = undefined;
-      return;
-    }
-
-    const orbitScale = stationOrbitScale(p, sizeScale, width, height);
-    const orbitRx = p.ringRadiusX * 1.45 * orbitScale;
-    const orbitRy = p.ringRadiusY * 1.45 * orbitScale;
-    const ex = Math.cos(st.angle) * orbitRx;
-    const ey = Math.sin(st.angle) * orbitRy;
-    const tilt = stationTilt(p);
-    const tiltCos = Math.cos(tilt);
-    const tiltSin = Math.sin(tilt);
-    const localX = ex * tiltCos - ey * tiltSin;
-    const localY = ex * tiltSin + ey * tiltCos;
-
-    // Tangent to the tilted ellipse at this angle, so the station's own
-    // orientation follows its travel direction instead of cutting across
-    // its orbit plane.
-    const dEx = -Math.sin(st.angle) * orbitRx;
-    const dEy = Math.cos(st.angle) * orbitRy;
-    const tangentX = dEx * tiltCos - dEy * tiltSin;
-    const tangentY = dEx * tiltSin + dEy * tiltCos;
-
-    // Normalized parametric angle decides which half of the loop the
-    // station is on — the same front/back split used for the ring's own
-    // near/far halves, so the opaque sphere naturally paints over it
-    // when it swings behind the planet.
-    const normAngle = ((st.angle % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
-
-    st.localX = localX;
-    st.localY = localY;
-    st.travelAngle = Math.atan2(tangentY, tangentX);
-    st.isBack = normAngle >= Math.PI;
-    st.screenX = p.px + localX;
-    st.screenY = p.py + localY;
-    st.hitRadius = 14 * Math.max(1, orbitScale * 0.7);
-  }
-
-  function drawStationOrbitPath(p, sizeScale, width, height) {
-    const st = p.station;
-    if (!st || st.progress < 0.001) return;
-
-    const orbitScale = stationOrbitScale(p, sizeScale, width, height);
-    const orbitRx = p.ringRadiusX * 1.45 * orbitScale;
-    const orbitRy = p.ringRadiusY * 1.45 * orbitScale;
-
-    // Faint dashed orbit path
-    ctx.save();
-    ctx.globalAlpha *= st.progress;
-    ctx.rotate(stationTilt(p));
-    ctx.setLineDash([3, 6]);
-    ctx.strokeStyle = 'rgba(212, 212, 216, 0.18)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, orbitRx, orbitRy, 0, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.restore();
-  }
-
-  // Drawn twice per frame — once for 'back' (before the sphere fill) and
-  // once for 'front' (after it) — so only the half matching the station's
-  // current position actually renders, giving it real occlusion as it
-  // swings behind the planet.
-  function drawStationIcon(p, sizeScale, width, height, pass) {
-    const st = p.station;
-    if (!st || st.progress < 0.001) return;
-    if (st.isBack !== (pass === 'back')) return;
-
-    const orbitScale = stationOrbitScale(p, sizeScale, width, height);
-
-    // Station icon: hub + truss + two solar-panel wings, oriented along
-    // its direction of travel around its orbit plane
-    const scale = 1.3 * orbitScale * (0.6 + st.progress * 0.4);
-    ctx.save();
-    ctx.globalAlpha *= st.progress;
-    ctx.translate(st.localX, st.localY);
-    ctx.rotate(st.travelAngle);
-    ctx.strokeStyle = 'rgba(245, 245, 247, 0.85)';
-    ctx.fillStyle = 'rgba(245, 245, 247, 0.92)';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(-9 * scale, -2.5 * scale, 6 * scale, 5 * scale);
-    ctx.strokeRect(3 * scale, -2.5 * scale, 6 * scale, 5 * scale);
-    ctx.beginPath();
-    ctx.moveTo(-3 * scale, 0);
-    ctx.lineTo(3 * scale, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.arc(0, 0, 2 * scale, 0, Math.PI * 2);
-    ctx.fill();
     ctx.restore();
   }
 
@@ -995,43 +941,20 @@ export function initUniverseBg() {
 
   function triggerPlanetEasterEgg(index, p) {
     if (index === 0) {
-      spawnSupernovaBurst(p);
-      if (p.station) p.station.active = true;
-      window.dispatchEvent(new CustomEvent('open-station-lightbox'));
-    }
-    else if (index === 1) {
       spawnSatellite(p);
       window.dispatchEvent(new CustomEvent('open-star-lightbox'));
     }
-    else {
+    else if (index === 1) {
       spawnGlitchPulse(p);
       window.dispatchEvent(new CustomEvent('open-wanderer-lightbox'));
     }
-  }
-
-  // Planet 1: supernova-style particle burst + brief size pulse
-  function spawnSupernovaBurst(p) {
-    const rmFactor = reducedMotion ? 0.33 : 1;
-    const count = Math.max(6, Math.round(24 * rmFactor));
-
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 3;
-      burstParticles.push({
-        x: p.px,
-        y: p.py,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        radius: 1.5 + Math.random() * 1.5,
-        alpha: 1,
-        color: Math.random() > 0.5 ? '#f5f5f7' : '#d4d4d8'
-      });
+    else {
+      spawnGlitchPulse(p);
+      window.dispatchEvent(new CustomEvent('open-exoplanet-lightbox', { detail: p.lightbox }));
     }
-
-    p.burst = { type: 'pulse', frame: 0, frames: Math.max(4, Math.round(8 * rmFactor)) };
   }
 
-  // Planet 2: a tiny satellite wakes up, orbits briefly, then fades
+  // Planet 1: a tiny satellite wakes up, orbits briefly, then fades
   function spawnSatellite(p) {
     const rmFactor = reducedMotion ? 0.25 : 1;
     const life = Math.max(60, Math.round(240 * rmFactor));
@@ -1045,7 +968,7 @@ export function initUniverseBg() {
     };
   }
 
-  // Planet 3: a longer, inverted-color glitch pulse
+  // Planet 2: a longer, inverted-color glitch pulse
   function spawnGlitchPulse(p) {
     const rmFactor = reducedMotion ? 0.35 : 1;
     if (!p.origCore) {
@@ -1129,9 +1052,16 @@ export function initUniverseBg() {
     return Math.hypot(mx - blackHole.x, my - blackHole.y) <= BLACK_HOLE_RADIUS * 1.3;
   }
 
-  function updateAndDrawBlackHole() {
+  // The actual rendering is a real WebGL shader (event horizon + lensing +
+  // accretion disk) owned by space-scene-blackhole.js — this just keeps
+  // driving the phase/position/stardust-pull state machine, same as
+  // always, and broadcasts it each frame for that module to draw.
+  function updateBlackHole() {
     const bh = blackHole;
-    if (!bh) return;
+    if (!bh) {
+      window.dispatchEvent(new CustomEvent('blackhole-state', { detail: null }));
+      return;
+    }
 
     bh.t++;
     bh.ringAngle += 0.05;
@@ -1165,52 +1095,14 @@ export function initUniverseBg() {
         spawnBlackHoleFlash(bh.x, bh.y);
         blackHole = null;
         syncBlackHoleBtn();
+        window.dispatchEvent(new CustomEvent('blackhole-state', { detail: null }));
         return;
       }
     }
 
-    ctx.save();
-
-    const glowR = radius * 3.2;
-    if (glowR > 0) {
-      const glow = ctx.createRadialGradient(bh.x, bh.y, radius * 0.5, bh.x, bh.y, glowR);
-      glow.addColorStop(0, `rgba(245, 245, 247, ${0.5 * ringAlpha})`);
-      glow.addColorStop(0.4, `rgba(180, 180, 190, ${0.18 * ringAlpha})`);
-      glow.addColorStop(1, 'rgba(180, 180, 190, 0)');
-      ctx.beginPath();
-      ctx.fillStyle = glow;
-      ctx.arc(bh.x, bh.y, glowR, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // Outer accretion ring, drifting one way
-    ctx.save();
-    ctx.translate(bh.x, bh.y);
-    ctx.rotate(bh.ringAngle);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, radius * 1.9, radius * 0.62, 0, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(245, 245, 247, ${0.55 * ringAlpha})`;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-    ctx.restore();
-
-    // Inner accretion ring, drifting the other way — reads as a denser disk
-    ctx.save();
-    ctx.translate(bh.x, bh.y);
-    ctx.rotate(-bh.ringAngle * 1.6 + Math.PI / 3);
-    ctx.beginPath();
-    ctx.ellipse(0, 0, radius * 1.35, radius * 0.4, 0, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(245, 245, 247, ${0.75 * ringAlpha})`;
-    ctx.lineWidth = 2.4;
-    ctx.stroke();
-    ctx.restore();
-
-    ctx.beginPath();
-    ctx.fillStyle = '#000000';
-    ctx.arc(bh.x, bh.y, radius, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.restore();
+    window.dispatchEvent(new CustomEvent('blackhole-state', {
+      detail: { x: bh.x, y: bh.y, radius, ringAlpha, angle: bh.ringAngle }
+    }));
   }
 
   window.addEventListener('keydown', (e) => {
@@ -1291,6 +1183,21 @@ export function initUniverseBg() {
     if (e.key === 'Escape' && focusIndex >= 0) exitFocus();
   });
 
+  // Planet nav panel (planet-nav.js): jumps straight to a given 2D planet,
+  // or exits focus — same guard as a direct click (only one body focused at
+  // a time, only meaningful once observe mode is on).
+  window.addEventListener('nav-focus-planet', (e) => {
+    const d = e.detail;
+    if (!d || d.system !== '2d') return;
+    if (!document.body.classList.contains('ui-hidden')) return;
+    if (focusIndex < 0 && document.body.classList.contains('planet-focused')) return;
+    if (planets[d.index]) enterFocus(d.index);
+  });
+
+  window.addEventListener('nav-exit-focus', () => {
+    if (focusIndex >= 0) exitFocus();
+  });
+
   // Hover tooltip + pointer cursor: only meaningful in observe mode, since
   // that's the only state where planets are actually clickable.
   function updateHoverState(mx, my) {
@@ -1350,6 +1257,10 @@ export function initUniverseBg() {
     if (starTooltip) starTooltip.style.opacity = '0';
   });
 
+  window.addEventListener('scroll', () => {
+    scrollTarget = window.scrollY;
+  }, { passive: true });
+
   window.addEventListener('resize', resize);
 
   // Fade each section's constellation in while its section is in view
@@ -1396,6 +1307,14 @@ export function initUniverseBg() {
     parallaxX += (targetParallaxX - parallaxX) * 0.06;
     parallaxY += (targetParallaxY - parallaxY) * 0.06;
 
+    // Scroll drift: eased toward the real scroll position, then turned into
+    // a slow diagonal pan — a gentle sideways wander plus steady forward
+    // travel — so scrolling through the page reads as flying to a new
+    // patch of sky rather than the same frozen view sliding underneath it.
+    scrollEased += (scrollTarget - scrollEased) * 0.05;
+    const driftX = reducedMotion ? 0 : Math.sin(scrollEased * 0.0006) * 340;
+    const driftY = scrollEased * 0.45;
+
     ctx.clearRect(0, 0, width, height);
 
     // 1. Draw Starfield
@@ -1406,8 +1325,13 @@ export function initUniverseBg() {
       const star = stars[i];
       const twinkle = Math.sin(time * star.twinkleSpeed * 100 + star.phase);
       const alpha = Math.max(0.05, Math.min(1, star.baseAlpha + twinkle * 0.3));
-      const sx = star.x - parallaxX * parallaxStrength * star.parallax;
-      const sy = star.y - parallaxY * parallaxStrength * star.parallax;
+      const ox = star.x - parallaxX * parallaxStrength * star.parallax - driftX * star.parallax;
+      const oy = star.y - parallaxY * parallaxStrength * star.parallax - driftY * star.parallax;
+      // Wrapped (not clamped): the drift can travel many screens' worth
+      // over a long page, so stars recycle across the canvas edges instead
+      // of draining out of view, keeping the field always populated.
+      const sx = ((ox % width) + width) % width;
+      const sy = ((oy % height) + height) % height;
 
       ctx.beginPath();
       ctx.fillStyle = `${star.color}${alpha})`;
@@ -1441,8 +1365,12 @@ export function initUniverseBg() {
     for (let i = 0; i < planets.length; i++) {
       const p = planets[i];
       const floatY = Math.sin(time * 0.25 + p.floatOffset) * 12;
-      const naturalPx = p.relX * width;
-      const naturalPy = p.relY * height + floatY;
+      // relX/relY are fractions of the anchor section's own box (read fresh
+      // every frame, since it moves as the page scrolls) — falls back to
+      // the viewport itself if the section wasn't found.
+      const box = p.sectionEl ? p.sectionEl.getBoundingClientRect() : { left: 0, top: 0, width, height };
+      const naturalPx = box.left + p.relX * box.width;
+      const naturalPy = box.top + p.relY * box.height + floatY;
 
       let px = naturalPx;
       let py = naturalPy;
@@ -1457,25 +1385,16 @@ export function initUniverseBg() {
       p.px = px;
       p.py = py;
 
-      if (i === 1) {
+      if (i === 0) {
         ctx.save();
         ctx.globalAlpha = 1 - dim * 0.85;
         drawMuscaConstellation(p, time);
         ctx.restore();
       }
 
-      updateStation(p, sizeScale, width, height);
       updatePlanetGlitch(p);
 
-      // Supernova click-egg: brief radius pulse that eases back to normal
-      let radiusScale = 1;
-      if (p.burst && p.burst.type === 'pulse') {
-        p.burst.frame++;
-        const t = p.burst.frame / p.burst.frames;
-        radiusScale = 1 + 0.3 * Math.max(0, 1 - t);
-        if (p.burst.frame >= p.burst.frames) p.burst = null;
-      }
-      const effRadius = p.radius * radiusScale * sizeScale;
+      const effRadius = p.radius * sizeScale;
       p.currentRadius = effRadius;
 
       ctx.save();
@@ -1492,7 +1411,7 @@ export function initUniverseBg() {
       ctx.fill();
 
       // Alpha Muscae attention-grabbing twinkle: a slow pulsing halo loop
-      if (i === 1) {
+      if (i === 0) {
         const twinkle = 0.5 + 0.5 * Math.sin(time * 0.5);
         const twinkleRadius = effRadius * (2.2 + twinkle * 1.4);
         const twinkleGrad = ctx.createRadialGradient(0, 0, effRadius * 0.8, 0, 0, twinkleRadius);
@@ -1515,9 +1434,6 @@ export function initUniverseBg() {
         ctx.stroke();
         ctx.restore();
       }
-
-      drawStationOrbitPath(p, sizeScale, width, height);
-      drawStationIcon(p, sizeScale, width, height, 'back');
 
       // Planet Sphere Gradient
       const planetGrad = ctx.createRadialGradient(
@@ -1562,8 +1478,6 @@ export function initUniverseBg() {
         ctx.stroke();
         ctx.restore();
       }
-
-      drawStationIcon(p, sizeScale, width, height, 'front');
 
       // Satellite click-egg: a tiny moon orbiting a couple times, then fading
       if (p.burst && p.burst.type === 'satellite') {
@@ -1673,8 +1587,9 @@ export function initUniverseBg() {
       ctx.globalAlpha = 1.0;
     }
 
-    // 7. Draw Black Hole ("agujero" keyword easter egg)
-    updateAndDrawBlackHole();
+    // 7. Black Hole state ("agujero" keyword easter egg) — rendered by the
+    // WebGL shader in space-scene-blackhole.js, driven by this broadcast
+    updateBlackHole();
 
     requestAnimationFrame(render);
   }

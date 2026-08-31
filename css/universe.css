@@ -12,6 +12,55 @@
   height: 100vh;
 }
 
+/* Three.js layer: sits later in the DOM at the same z-index, so it paints
+   above the 2D starfield without a stacking-context bump. Transparent clear
+   color keeps everything except the loaded planet mesh see-through. */
+#space3d-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Saturn's own independent Three.js layer — see js/modules/space-scene-saturn.js
+   for why it doesn't share Earth's scene/camera. */
+#space3d-saturn-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* UFO fleet layer — see js/modules/space-scene-ufo.js. */
+#space3d-ufo-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Black hole shader layer — painted last (highest in DOM order among these
+   fixed z-index:0 siblings) so it can overlay/warp everything beneath it.
+   See js/modules/space-scene-blackhole.js. */
+#space3d-blackhole-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+
 /* Subtle ambient cosmic glow overlays */
 .space-ambient {
   position: fixed;

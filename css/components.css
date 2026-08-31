@@ -1703,6 +1703,58 @@ body.lightbox-open .chat-panel {
   }
 }
 
+/* Ship Dashboard: a quiet HUD readout, not a UI card — no box, no
+   interaction, just faint right-aligned telemetry hugging the corner. */
+.ship-dashboard {
+  position: fixed;
+  right: 28px;
+  bottom: 96px;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  padding-right: 2px;
+  border-right: 1px solid var(--line-strong);
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity var(--transition-normal);
+}
+
+.ship-dashboard-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding-right: 10px;
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.ship-dashboard-label {
+  color: var(--ink-muted);
+}
+
+.ship-dashboard-value {
+  min-width: 3.5em;
+  color: var(--ink-dim);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+body.chat-open .ship-dashboard,
+body.modal-open .ship-dashboard,
+body.lightbox-open .ship-dashboard,
+body.planet-focused .ship-dashboard {
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .ship-dashboard {
+    display: none;
+  }
+}
+
 /* ---------- Chatbot Widget ---------- */
 .chat-panel {
   position: fixed;
@@ -2231,6 +2283,151 @@ body.ui-hidden.planet-focused .black-hole-btn {
   }
 }
 
+/* ---------- Planet Navigation Panel (observe mode only) ---------- */
+.planet-nav {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 130;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 8px 10px;
+  border-radius: 100px;
+  color: var(--ink);
+  background: rgba(16, 16, 16, 0.75);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  opacity: 0;
+  transform: translate(-50%, 12px);
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+
+body.ui-hidden .planet-nav {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  pointer-events: auto;
+}
+
+.planet-nav-btn {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  font-size: 17px;
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.planet-nav-btn:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+}
+
+.planet-nav-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  min-width: 108px;
+}
+
+.planet-nav-name {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.planet-nav-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.planet-nav-dot {
+  width: 6px;
+  height: 6px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--line-strong);
+  cursor: pointer;
+  transition: background 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.planet-nav-dot:hover {
+  background: var(--ink-dim);
+}
+
+.planet-nav-dot.active {
+  background: var(--accent-bright);
+  transform: scale(1.35);
+}
+
+.planet-nav-extra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-width 0.3s var(--ease), opacity 0.2s var(--ease);
+}
+
+.planet-nav-extra.visible {
+  max-width: 200px;
+  opacity: 1;
+  padding-left: 10px;
+  border-left: 1px solid var(--line-strong);
+}
+
+.planet-nav-mini {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line-strong);
+  font-size: 13px;
+  cursor: pointer;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.planet-nav-mini:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+}
+
+@media (max-width: 760px) {
+  .planet-nav {
+    gap: 8px;
+    padding: 6px 8px;
+  }
+  .planet-nav-info {
+    min-width: 72px;
+  }
+  .planet-nav-name {
+    display: none;
+  }
+  .planet-nav-extra.visible {
+    max-width: 160px;
+  }
+}
+
 /* ---------- Alpha Muscae Hover Tooltip ---------- */
 .star-tooltip {
   position: fixed;
@@ -2250,6 +2447,45 @@ body.ui-hidden.planet-focused .black-hole-btn {
   transition: opacity 0.2s var(--ease);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---------- Earth (3D) Surface Hotspot Markers ---------- */
+.earth-hotspots {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.earth-hotspot-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: rgba(16, 16, 16, 0.8);
+  border: 1px solid rgba(212, 212, 216, 0.55);
+  box-shadow: 0 0 0 0 rgba(245, 245, 247, 0);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+
+.earth-hotspot-marker::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: rgba(245, 245, 247, 0.9);
+}
+
+.earth-hotspot-marker:hover {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+  transform: scale(1.2);
 }
 
 /* ---------- Planet Info Card (docked, doesn't cover the zoomed planet) ---------- */
