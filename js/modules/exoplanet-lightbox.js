@@ -2,8 +2,8 @@
  * =========================================================================
  * EXOPLANET LIGHTBOX
  * =========================================================================
- * Shared info card for the Kepler-186f / TRAPPIST-1e click easter eggs —
- * one HTML block, content swapped per planet. Opens on the
+ * Shared info card for exoplanet click easter eggs (currently just
+ * TRAPPIST-1e) — one HTML block, content swapped per planet. Opens on the
  * 'open-exoplanet-lightbox' event dispatched by the universe canvas, with
  * the planet's { eyebrow, name, designation, stats, desc } as detail (see
  * the `lightbox` field on those two entries in universe-bg.js).

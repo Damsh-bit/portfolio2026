@@ -9,6 +9,7 @@ import { renderPortfolio } from './modules/renderer.js';
 import { initUniverseBg } from './modules/universe-bg.js';
 import { initSpaceScene } from './modules/space-scene.js';
 import { initSaturnScene } from './modules/space-scene-saturn.js';
+import { initCoruscantScene } from './modules/space-scene-coruscant.js';
 import { initBlackHoleScene } from './modules/space-scene-blackhole.js';
 import { initPlanetNav } from './modules/planet-nav.js';
 import { initSpacePan } from './modules/space-pan.js';
@@ -38,7 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // 2c. Initialize 3D Space Scene (Three.js Saturn — replaces the 2D gas giant)
   initSaturnScene();
 
-  // 2d. Initialize 3D Space Scene (WebGL black hole shader — "agujero" easter egg)
+  // 2d. Initialize 3D Space Scene (Three.js Coruscant — replaces Kepler-186f)
+  initCoruscantScene();
+
+  // 2e. Initialize 3D Space Scene (WebGL black hole shader — "agujero" easter egg)
   initBlackHoleScene();
 
   // 3. Initialize Monochrome Glow Cursor
@@ -68,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 11. Initialize Wandering Planet Lightbox (planet click easter egg)
   initWandererLightbox();
 
-  // 11b. Initialize Exoplanet Lightbox (Kepler-186f / TRAPPIST-1e easter eggs)
+  // 11b. Initialize Exoplanet Lightbox (TRAPPIST-1e easter egg)
   initExoplanetLightbox();
 
   // 12. Initialize Chatbot Widget (automated menu + quote form)

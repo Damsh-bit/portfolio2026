@@ -37,6 +37,18 @@
   height: 100vh;
 }
 
+/* Coruscant's own independent Three.js layer — see
+   js/modules/space-scene-coruscant.js. */
+#space3d-coruscant-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  pointer-events: none;
+  width: 100vw;
+  height: 100vh;
+}
+
 /* Black hole shader layer — painted last (highest in DOM order among these
    fixed z-index:0 siblings) so it can overlay/warp everything beneath it.
    See js/modules/space-scene-blackhole.js. */

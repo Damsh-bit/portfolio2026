@@ -13,15 +13,16 @@
 
 // Ordered to match the page's own scroll order — one body per section, each
 // anchored to that section's own box (see universe-bg.js / space-scene.js /
-// space-scene-saturn.js): Tierra in hero, Saturno in work, then the 4
-// decorative 2D bodies each own one more section going down the page.
+// space-scene-saturn.js / space-scene-coruscant.js): Tierra in hero,
+// Saturno in work, Coruscant in experience, then the 3 remaining decorative
+// 2D bodies each own one more section going down the page.
 const TARGETS = [
   { system: '3d', name: 'Tierra', sectionId: 'hero' },
   { system: 'saturn', name: 'Gigante Gaseoso', sectionId: 'work' },
   { system: '2d', index: 0, name: 'Alfa Muscae', sectionId: 'industries' },
-  { system: '2d', index: 2, name: 'Kepler-186f', sectionId: 'experience' },
+  { system: 'coruscant', name: 'Coruscant', sectionId: 'experience' },
   { system: '2d', index: 1, name: 'El Lucero', sectionId: 'about' },
-  { system: '2d', index: 3, name: 'TRAPPIST-1e', sectionId: 'contact' }
+  { system: '2d', index: 2, name: 'TRAPPIST-1e', sectionId: 'contact' }
 ];
 
 export function initPlanetNav() {
@@ -54,7 +55,7 @@ export function initPlanetNav() {
     const t = TARGETS[selected];
     nameEl.textContent = t.name;
     dotEls.forEach((d, i) => d.classList.toggle('active', i === selected));
-    extraEl.classList.toggle('visible', t.system === '3d' || t.system === 'saturn');
+    extraEl.classList.toggle('visible', t.system === '3d' || t.system === 'saturn' || t.system === 'coruscant');
   }
   updateUI();
 

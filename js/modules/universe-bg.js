@@ -118,12 +118,13 @@ export function initUniverseBg() {
   // Create minimalist celestial planets — each anchored to its OWN page
   // section (relX/relY are fractions of THAT section's box, not the
   // viewport), one body per section, in scroll order: Earth (hero, 3D —
-  // see space-scene.js) and Saturn (work, 3D — see space-scene-saturn.js)
-  // aren't in this array, but everything below follows the same
-  // one-per-section rule, picking up where those two leave off. Living on
-  // their own section's box (rather than all crammed into hero's) is what
-  // lets each one hold its place as its section scrolls through, instead of
-  // staying encapsulated near the top of the page.
+  // see space-scene.js), Saturn (work, 3D — see space-scene-saturn.js) and
+  // Coruscant (experience, 3D — see space-scene-coruscant.js) aren't in
+  // this array, but everything below follows the same one-per-section
+  // rule, picking up where those three leave off. Living on their own
+  // section's box (rather than all crammed into hero's) is what lets each
+  // one hold its place as its section scrolls through, instead of staying
+  // encapsulated near the top of the page.
   function createPlanets() {
     planets = [
       {
@@ -176,45 +177,6 @@ export function initUniverseBg() {
           { angle: Math.PI * 0.15, text: 'Su alineación coincide con Tauro.' },
           { angle: Math.PI * 0.75, isCard: true }
         ].map((pt) => ({ ...pt, expanded: false })),
-        ...createPlanetInteractionState()
-      },
-      {
-        // Kepler-186f — first Earth-sized exoplanet found in a star's
-        // habitable zone (Kepler mission, 2014). Fits "experience": a
-        // milestone reached after a long search.
-        name: 'Kepler-186f',
-        sectionId: 'experience',
-        relX: 0.1,
-        relY: 0.06,
-        radius: 27,
-        ringRadiusX: 0,
-        ringRadiusY: 0,
-        tilt: 0,
-        colorCore: '#c9a98a',
-        colorEdge: '#4a3b2e',
-        glowColor: 'rgba(201, 169, 138, 0.16)',
-        ringColor: 'transparent',
-        floatOffset: Math.PI * 1.3,
-        floatSpeed: 0.0009,
-        infoPoints: [
-          { angle: -Math.PI / 2, text: 'Primer exoplaneta del tamaño de la Tierra en zona habitable.' },
-          { angle: -Math.PI / 6, text: 'Orbita una enana roja a ~500 años luz, en Cygnus.' },
-          { angle: Math.PI * 0.6, text: 'Recibe solo ~1/3 de la luz que recibe la Tierra del Sol.' },
-          { angle: Math.PI * 0.15, text: 'Descubierto por la misión Kepler en 2014.' },
-          { angle: Math.PI, isCard: true }
-        ].map((pt) => ({ ...pt, expanded: false })),
-        lightbox: {
-          eyebrow: 'EASTER EGG · EXOPLANETA',
-          name: 'Kepler-186f',
-          designation: 'Sistema Kepler-186 · Constelación Cygnus',
-          stats: [
-            ['Tipo', 'Rocoso, tamaño Tierra'],
-            ['Distancia', '~500 años luz'],
-            ['Radio', '~1.11 R⊕'],
-            ['Período orbital', '~130 días']
-          ],
-          desc: 'El primer exoplaneta de tamaño similar a la Tierra descubierto dentro de la zona habitable de su estrella. Orbita una enana roja mucho más tenue que el Sol, así que su "mediodía" se ve como un atardecer terrestre. Confirmado por la misión Kepler en abril de 2014.'
-        },
         ...createPlanetInteractionState()
       },
       {
