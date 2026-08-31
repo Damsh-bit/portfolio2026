@@ -41,7 +41,6 @@
 <canvas id="bg-canvas"></canvas>
 <canvas id="space3d-canvas"></canvas>
 <canvas id="space3d-saturn-canvas"></canvas>
-<canvas id="space3d-ufo-canvas"></canvas>
 <canvas id="space3d-blackhole-canvas"></canvas>
 
 <!-- Custom Monochrome Glowing Cursor -->
@@ -333,6 +332,11 @@
     <button type="button" class="planet-nav-mini" id="planetNavZoomIn" aria-label="Acercar">+</button>
   </div>
 </div>
+
+<!-- Space Pan Hint: observe mode only, hidden while a planet is focused —
+     arrow keys / WASD pan the whole background freely (see space-pan.js).
+     No on-screen buttons — just a quiet label, kept out of the way. -->
+<span class="space-pan-hint mono" id="spacePanHint">Flechas / WASD para moverte</span>
 
 <!-- Alpha Muscae Hover Tooltip -->
 <div class="star-tooltip mono" id="starTooltip">Alfa Muscae</div>

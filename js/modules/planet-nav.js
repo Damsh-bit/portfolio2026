@@ -11,21 +11,17 @@
  * already use for their own cross-module signals (e.g. 'open-star-lightbox').
  */
 
-// Ordered to match the page's own scroll order: the first group (Tierra,
-// Saturno, Alfa Muscae) sits at the hero viewport's original layout; the
-// second group (Kepler-186f, El Lucero, TRAPPIST-1e) is anchored to that
-// same hero box but one screen further down (see universe-bg.js), so it
-// only comes into view once you scroll past the first three. sectionId
-// here is only the scrollIntoView target for the nav panel's jump-to —
-// 'work' is used for the second group since it starts right where hero
-// ends, close enough to bring those into frame.
+// Ordered to match the page's own scroll order — one body per section, each
+// anchored to that section's own box (see universe-bg.js / space-scene.js /
+// space-scene-saturn.js): Tierra in hero, Saturno in work, then the 4
+// decorative 2D bodies each own one more section going down the page.
 const TARGETS = [
   { system: '3d', name: 'Tierra', sectionId: 'hero' },
-  { system: 'saturn', name: 'Gigante Gaseoso', sectionId: 'hero' },
-  { system: '2d', index: 0, name: 'Alfa Muscae', sectionId: 'hero' },
-  { system: '2d', index: 2, name: 'Kepler-186f', sectionId: 'work' },
-  { system: '2d', index: 1, name: 'El Lucero', sectionId: 'work' },
-  { system: '2d', index: 3, name: 'TRAPPIST-1e', sectionId: 'work' }
+  { system: 'saturn', name: 'Gigante Gaseoso', sectionId: 'work' },
+  { system: '2d', index: 0, name: 'Alfa Muscae', sectionId: 'industries' },
+  { system: '2d', index: 2, name: 'Kepler-186f', sectionId: 'experience' },
+  { system: '2d', index: 1, name: 'El Lucero', sectionId: 'about' },
+  { system: '2d', index: 3, name: 'TRAPPIST-1e', sectionId: 'contact' }
 ];
 
 export function initPlanetNav() {

@@ -5,26 +5,30 @@
  * Same treatment as space-scene.js's Earth: a real textured model,
  * camera-navigable in observe mode (click to focus, drag to spin, scroll to
  * zoom once focused). Runs on its own canvas/scene/camera/renderer, fully
- * independent from Earth's — this is what lets Saturn sit idle in the
- * screen corner (the old 2D "Gigante Gaseoso" slot) via an off-axis camera
- * projection, tweening back to dead-center on focus, without that idle
- * offset also dragging Earth's own framing around since they don't share a
- * camera.
+ * independent from Earth's — this is what lets Saturn sit idle in its own
+ * section via an off-axis camera projection, tweening back to dead-center
+ * on focus, without that idle offset also dragging Earth's own framing
+ * around since they don't share a camera.
  */
 
 import * as THREE from 'three';
 import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { panOffset } from './space-pan.js';
 
 const MODEL_URL = 'assets/models/saturn.obj';
 
-// Anchor point (fraction of the "hero" section's own box, not the
-// viewport) Saturn idles at — the same top-right-ish slot the old 2D gas
-// giant used to occupy, tied to a section so Saturn holds its place on the
-// page and scrolls away with hero like a real body instead of sitting
+// Anchor point (fraction of the "work" section's own box, not the
+// viewport) Saturn idles at — the second stop in the one-planet-per-section
+// scroll (see planet-nav.js), tied to its own section so Saturn holds its
+// place on the page and scrolls away like a real body instead of sitting
 // glued to the screen forever.
-const ANCHOR_SECTION_ID = 'hero';
-const ANCHOR_REL_X = 0.85;
-const ANCHOR_REL_Y = 0.22;
+const ANCHOR_SECTION_ID = 'work';
+const ANCHOR_REL_X = 0.87;
+// Near the very top of "work" (its own section-head sits around rel 0.06-0.09,
+// well before the grid of project cards starts) — the grid itself fills the
+// section's full width, so this is the one spot on the way down that isn't
+// behind opaque cards.
+const ANCHOR_REL_Y = 0.05;
 
 function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
@@ -156,7 +160,7 @@ export function initSaturnScene() {
 
       saturnGroup.add(model);
 
-      distWide = fullRadius * 3.3;
+      distWide = fullRadius * 2.5; // closer idle framing — Saturn is the one dedicated body for the work section, so it can read bigger
       distFocusMax = sphereRadius * 2.6; // click-to-focus: close on the planet, rings still framing it
       distFocusMin = sphereRadius * 1.5; // as far as scroll-zoom can push in past that
       cameraDist = distWide;
@@ -255,7 +259,7 @@ export function initSaturnScene() {
   let pitch = 0.2;
   let yawVelocity = 0;
   let pitchVelocity = 0;
-  const IDLE_SPEED = reducedMotion ? 0 : 0.0007;
+  const IDLE_SPEED = reducedMotion ? 0 : 0.0006;
 
   // ------------------------------------------------------------------
   // Focus state — camera dollies + un-shifts to center; the planet itself
@@ -456,8 +460,11 @@ export function initSaturnScene() {
     // scrolls, instead of sitting glued to the same screen spot forever.
     if (!focused) {
       computeIdleOffset();
-      viewOffsetXTarget = idleOffsetX;
-      viewOffsetYTarget = idleOffsetY;
+      // panOffset (space-pan.js) is the observe-mode free-roam input —
+      // added on top of the section anchor, not replacing it, so panning
+      // away and toggling observe mode off/on snaps cleanly back.
+      viewOffsetXTarget = idleOffsetX + panOffset.x;
+      viewOffsetYTarget = idleOffsetY + panOffset.y;
     }
 
     if (!(dragStartedOnSaturn && dragging)) {

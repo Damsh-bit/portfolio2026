@@ -2428,6 +2428,39 @@ body.ui-hidden .planet-nav {
   }
 }
 
+/* ---------- Space Pan Hint (observe mode only, unfocused only) ---------- */
+.space-pan-hint {
+  position: fixed;
+  left: 28px;
+  bottom: 28px;
+  z-index: 130;
+  padding: 7px 13px;
+  font-size: 10.5px;
+  letter-spacing: 0.03em;
+  color: var(--ink-dim);
+  background: rgba(16, 16, 16, 0.6);
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
+
+body.ui-hidden .space-pan-hint {
+  opacity: 1;
+}
+
+body.ui-hidden.planet-focused .space-pan-hint {
+  opacity: 0;
+}
+
+@media (max-width: 600px) {
+  .space-pan-hint {
+    display: none;
+  }
+}
+
 /* ---------- Alpha Muscae Hover Tooltip ---------- */
 .star-tooltip {
   position: fixed;

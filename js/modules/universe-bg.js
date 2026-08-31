@@ -7,6 +7,8 @@
  * ambient digital-glitch bursts, and click-triggered planet easter eggs.
  */
 
+import { panOffset } from './space-pan.js';
+
 export function initUniverseBg() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
@@ -113,25 +115,25 @@ export function initUniverseBg() {
     }
   }
 
-  // Create minimalist celestial planets — each anchored to a page section
-  // (relX/relY are fractions of THAT section's box, not the viewport), so
-  // they hold their place on the page instead of sitting glued to the same
-  // screen spot forever. The first group (Tierra/Saturno/Alfa Muscae) sits
-  // at its original hero-viewport position (relY 0-1); the second group
-  // (El Lucero/Kepler-186f/TRAPPIST-1e) is anchored to that SAME hero box
-  // but with relY > 1 — i.e. "one screen further down" — so scrolling past
-  // hero tucks the first three away and brings the second three into view,
-  // regardless of how tall the sections in between actually are.
+  // Create minimalist celestial planets — each anchored to its OWN page
+  // section (relX/relY are fractions of THAT section's box, not the
+  // viewport), one body per section, in scroll order: Earth (hero, 3D —
+  // see space-scene.js) and Saturn (work, 3D — see space-scene-saturn.js)
+  // aren't in this array, but everything below follows the same
+  // one-per-section rule, picking up where those two leave off. Living on
+  // their own section's box (rather than all crammed into hero's) is what
+  // lets each one hold its place as its section scrolls through, instead of
+  // staying encapsulated near the top of the page.
   function createPlanets() {
     planets = [
       {
         // Alpha Muscae (α Mus) — brightest star of Musca, the Fly.
         // Click easter egg reveals its real astronomical data.
         name: 'Alfa Muscae',
-        sectionId: 'hero',
-        relX: 0.12,
-        relY: 0.72,
-        radius: 22,
+        sectionId: 'industries',
+        relX: 0.88,
+        relY: 0.09,
+        radius: 34,
         ringRadiusX: 0,
         ringRadiusY: 0,
         tilt: 0,
@@ -152,13 +154,14 @@ export function initUniverseBg() {
       },
       {
         // Deep Space Celestial Sphere — "El Lucero", dedicated to Hannah.
+        // Fits "about": the personal, dedicated body in the personal section.
         name: 'El Lucero',
-        sectionId: 'hero',
-        relX: 0.5,
-        relY: 1.28,
-        radius: 14,
-        ringRadiusX: 28,
-        ringRadiusY: 7,
+        sectionId: 'about',
+        relX: 0.9,
+        relY: 0.15,
+        radius: 22,
+        ringRadiusX: 44,
+        ringRadiusY: 11,
         tilt: 0.4,
         colorCore: '#f5f5f7',
         colorEdge: '#52525b',
@@ -180,10 +183,10 @@ export function initUniverseBg() {
         // habitable zone (Kepler mission, 2014). Fits "experience": a
         // milestone reached after a long search.
         name: 'Kepler-186f',
-        sectionId: 'hero',
-        relX: 0.12,
-        relY: 1.12,
-        radius: 17,
+        sectionId: 'experience',
+        relX: 0.1,
+        relY: 0.06,
+        radius: 27,
         ringRadiusX: 0,
         ringRadiusY: 0,
         tilt: 0,
@@ -219,10 +222,10 @@ export function initUniverseBg() {
         // ultra-cool dwarf star, among the best current bets for finding
         // a habitable world. Fits "contact": still listening for a signal.
         name: 'TRAPPIST-1e',
-        sectionId: 'hero',
+        sectionId: 'contact',
         relX: 0.85,
-        relY: 1.1,
-        radius: 16,
+        relY: 0.22,
+        radius: 25,
         ringRadiusX: 0,
         ringRadiusY: 0,
         tilt: 0,
@@ -353,8 +356,8 @@ export function initUniverseBg() {
   ];
 
   function drawCancerConstellation(time) {
-    const anchorX = CANCER_ANCHOR.relX * width;
-    const anchorY = CANCER_ANCHOR.relY * height;
+    const anchorX = CANCER_ANCHOR.relX * width - panOffset.x;
+    const anchorY = CANCER_ANCHOR.relY * height - panOffset.y;
     const nodes = {};
     CANCER_STARS.forEach((s) => { nodes[s.name] = s; });
 
@@ -537,8 +540,8 @@ export function initUniverseBg() {
   function drawSectionConstellation(c, alpha, time) {
     if (alpha <= 0.01) return;
 
-    const anchorX = c.anchor.relX * width;
-    const anchorY = c.anchor.relY * height;
+    const anchorX = c.anchor.relX * width - panOffset.x;
+    const anchorY = c.anchor.relY * height - panOffset.y;
     const nodes = {};
     c.stars.forEach((s) => { nodes[s.name] = s; });
 
@@ -1325,8 +1328,8 @@ export function initUniverseBg() {
       const star = stars[i];
       const twinkle = Math.sin(time * star.twinkleSpeed * 100 + star.phase);
       const alpha = Math.max(0.05, Math.min(1, star.baseAlpha + twinkle * 0.3));
-      const ox = star.x - parallaxX * parallaxStrength * star.parallax - driftX * star.parallax;
-      const oy = star.y - parallaxY * parallaxStrength * star.parallax - driftY * star.parallax;
+      const ox = star.x - parallaxX * parallaxStrength * star.parallax - driftX * star.parallax - panOffset.x * star.parallax;
+      const oy = star.y - parallaxY * parallaxStrength * star.parallax - driftY * star.parallax - panOffset.y * star.parallax;
       // Wrapped (not clamped): the drift can travel many screens' worth
       // over a long page, so stars recycle across the canvas edges instead
       // of draining out of view, keeping the field always populated.
@@ -1369,8 +1372,11 @@ export function initUniverseBg() {
       // every frame, since it moves as the page scrolls) — falls back to
       // the viewport itself if the section wasn't found.
       const box = p.sectionEl ? p.sectionEl.getBoundingClientRect() : { left: 0, top: 0, width, height };
-      const naturalPx = box.left + p.relX * box.width;
-      const naturalPy = box.top + p.relY * box.height + floatY;
+      // panOffset (space-pan.js, observe-mode free-roam controls) shifts
+      // everything the opposite way from the direction held, same as a
+      // camera pan — see that module's sign-convention note.
+      const naturalPx = box.left + p.relX * box.width - panOffset.x;
+      const naturalPy = box.top + p.relY * box.height + floatY - panOffset.y;
 
       let px = naturalPx;
       let py = naturalPy;
@@ -1401,21 +1407,22 @@ export function initUniverseBg() {
       if (i !== focusIndex && dim > 0) ctx.globalAlpha = 1 - dim * 0.9;
       ctx.translate(px, py);
 
-      // Planet Glow Aura
-      const glowGrad = ctx.createRadialGradient(0, 0, effRadius * 0.5, 0, 0, effRadius * 2.5);
+      // Planet Glow Aura — kept tight rather than a big diffuse bloom, for a
+      // calmer, more minimal read now that these bodies are bigger.
+      const glowGrad = ctx.createRadialGradient(0, 0, effRadius * 0.5, 0, 0, effRadius * 1.9);
       glowGrad.addColorStop(0, p.glowColor);
       glowGrad.addColorStop(1, 'rgba(7, 7, 7, 0)');
       ctx.beginPath();
       ctx.fillStyle = glowGrad;
-      ctx.arc(0, 0, effRadius * 2.5, 0, Math.PI * 2);
+      ctx.arc(0, 0, effRadius * 1.9, 0, Math.PI * 2);
       ctx.fill();
 
       // Alpha Muscae attention-grabbing twinkle: a slow pulsing halo loop
       if (i === 0) {
         const twinkle = 0.5 + 0.5 * Math.sin(time * 0.5);
-        const twinkleRadius = effRadius * (2.2 + twinkle * 1.4);
+        const twinkleRadius = effRadius * (1.8 + twinkle * 0.9);
         const twinkleGrad = ctx.createRadialGradient(0, 0, effRadius * 0.8, 0, 0, twinkleRadius);
-        twinkleGrad.addColorStop(0, `rgba(245, 245, 247, ${0.16 + twinkle * 0.24})`);
+        twinkleGrad.addColorStop(0, `rgba(245, 245, 247, ${0.12 + twinkle * 0.18})`);
         twinkleGrad.addColorStop(1, 'rgba(245, 245, 247, 0)');
         ctx.beginPath();
         ctx.fillStyle = twinkleGrad;
@@ -1430,7 +1437,7 @@ export function initUniverseBg() {
         ctx.beginPath();
         ctx.ellipse(0, 0, p.ringRadiusX * sizeScale, p.ringRadiusY * sizeScale, 0, Math.PI, Math.PI * 2);
         ctx.strokeStyle = p.ringColor;
-        ctx.lineWidth = 1.8;
+        ctx.lineWidth = 1.3;
         ctx.stroke();
         ctx.restore();
       }
@@ -1474,7 +1481,7 @@ export function initUniverseBg() {
         ctx.beginPath();
         ctx.ellipse(0, 0, p.ringRadiusX * sizeScale, p.ringRadiusY * sizeScale, 0, 0, Math.PI);
         ctx.strokeStyle = p.ringColor;
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 1.6;
         ctx.stroke();
         ctx.restore();
       }

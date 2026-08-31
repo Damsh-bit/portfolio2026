@@ -15,6 +15,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { portfolioData } from '../data/portfolio-data.js';
+import { panOffset } from './space-pan.js';
 
 const MODEL_URL = 'assets/models/earth.glb';
 const DRAG_LOCK = 10;
@@ -22,10 +23,13 @@ const DRAG_LOCK = 10;
 // Anchor point (fraction of the "hero" section's own box, not the
 // viewport) Earth idles at — this is what makes it hold its place on the
 // page and scroll away like a real body instead of sitting glued to the
-// screen forever. See computeIdleOffset() below.
+// screen forever. See computeIdleOffset() below. Earth is the hero
+// section's own body (first stop in the one-planet-per-section scroll —
+// see planet-nav.js), parked top-right so it never sits over the
+// left-aligned, vertically-centered hero copy.
 const ANCHOR_SECTION_ID = 'hero';
-const ANCHOR_REL_X = 0.5;
-const ANCHOR_REL_Y = 0.5;
+const ANCHOR_REL_X = 0.86;
+const ANCHOR_REL_Y = 0.24;
 
 function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
@@ -181,7 +185,7 @@ export function initSpaceScene() {
 
       earthGroup.add(model);
 
-      distWide = radius * 8.5;
+      distWide = radius * 6.5; // closer idle framing — Earth is the one dedicated body for the hero section, so it can read bigger
       distFocusMax = radius * 1.9; // click-to-focus: a real close-up, not a modest zoom
       distFocusMin = radius * 1.15; // as far as scroll-zoom can push in past that
       cameraDist = distWide;
@@ -273,7 +277,7 @@ export function initSpaceScene() {
   let pitch = 0.15;
   let yawVelocity = 0;
   let pitchVelocity = 0;
-  const IDLE_SPEED = reducedMotion ? 0 : 0.0009;
+  const IDLE_SPEED = reducedMotion ? 0 : 0.0018;
 
   // ------------------------------------------------------------------
   // Focus state — camera flies to the planet; the planet stays put
@@ -574,8 +578,11 @@ export function initSpaceScene() {
     // scrolls, instead of sitting glued to the same screen spot forever.
     if (!focused) {
       computeIdleOffset();
-      viewOffsetXTarget = idleOffsetX;
-      viewOffsetYTarget = idleOffsetY;
+      // panOffset (space-pan.js) is the observe-mode free-roam input —
+      // added on top of the section anchor, not replacing it, so panning
+      // away and toggling observe mode off/on snaps cleanly back.
+      viewOffsetXTarget = idleOffsetX + panOffset.x;
+      viewOffsetYTarget = idleOffsetY + panOffset.y;
     }
 
     if (!(dragStartedOnEarth && dragging)) {

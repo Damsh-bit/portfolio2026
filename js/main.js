@@ -10,8 +10,8 @@ import { initUniverseBg } from './modules/universe-bg.js';
 import { initSpaceScene } from './modules/space-scene.js';
 import { initSaturnScene } from './modules/space-scene-saturn.js';
 import { initBlackHoleScene } from './modules/space-scene-blackhole.js';
-import { initUfoFleetScene } from './modules/space-scene-ufo.js';
 import { initPlanetNav } from './modules/planet-nav.js';
+import { initSpacePan } from './modules/space-pan.js';
 import { initCursor } from './modules/cursor.js';
 import { initModal } from './modules/modal.js';
 import { initNav } from './modules/nav.js';
@@ -40,9 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 2d. Initialize 3D Space Scene (WebGL black hole shader — "agujero" easter egg)
   initBlackHoleScene();
-
-  // 2e. Initialize 3D Space Scene (UFO fleet — occasional ambient flyby)
-  initUfoFleetScene();
 
   // 3. Initialize Monochrome Glow Cursor
   initCursor();
@@ -79,6 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 13. Initialize Planet Navigation Panel (observe mode: cycle + rotate/zoom)
   initPlanetNav();
+
+  // 13b. Initialize Space Pan Controls (observe mode: free-roam the background)
+  initSpacePan();
 
   // 14. Initialize Ship Dashboard (minimalist HUD: weather, time, last update)
   initShipDashboard();
