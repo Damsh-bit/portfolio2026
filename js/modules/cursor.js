@@ -9,8 +9,8 @@ export function initCursor() {
   const cursor = document.getElementById('cursor');
   if (!cursor || 'ontouchstart' in window) return;
 
-  const setX = gsap.quickTo(cursor, "x", { duration: 0.35, ease: "power3" });
-  const setY = gsap.quickTo(cursor, "y", { duration: 0.35, ease: "power3" });
+  const setX = gsap.quickTo(cursor, "x", { duration: 0.12, ease: "power3" });
+  const setY = gsap.quickTo(cursor, "y", { duration: 0.12, ease: "power3" });
 
   window.addEventListener('mousemove', (e) => {
     setX(e.clientX);

@@ -852,12 +852,27 @@ section {
 }
 
 .modal .modal-top {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 24px 40px;
   border-bottom: 1px solid var(--line);
   background: rgba(14, 11, 29, 0.6);
+  overflow: hidden;
+}
+
+.modal-scan-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, var(--accent-bright, #f5f5f7), transparent);
+  box-shadow: 0 0 14px 2px var(--accent-primary);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 7;
 }
 
 @media (max-width: 600px) {
@@ -896,6 +911,64 @@ section {
 .modal .close-btn .x {
   font-size: 18px;
   line-height: 1;
+}
+
+.modal .modal-station-id {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.modal .station-status {
+  font-size: 11px;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+  opacity: 0.75;
+}
+
+.modal-dock-corner {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border: 1.5px solid var(--accent-primary);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 6;
+}
+
+.modal-dock-corner.tl {
+  top: 14px;
+  left: 14px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.modal-dock-corner.tr {
+  top: 14px;
+  right: 14px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.modal-dock-corner.bl {
+  bottom: 14px;
+  left: 14px;
+  border-right: none;
+  border-top: none;
+}
+
+.modal-dock-corner.br {
+  bottom: 14px;
+  right: 14px;
+  border-left: none;
+  border-top: none;
+}
+
+@media (max-width: 600px) {
+  .modal-dock-corner {
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .modal-body {
@@ -2096,6 +2169,63 @@ body.planet-focused .planet-back-btn {
   .planet-back-btn {
     top: 18px;
     left: 18px;
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ---------- Black Hole Toggle (observe mode only) ---------- */
+.black-hole-btn {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 240;
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(16, 16, 16, 0.75);
+  border: 1px solid var(--line-strong);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateX(8px);
+  pointer-events: none;
+  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease), transform 0.3s var(--ease), opacity 0.3s var(--ease);
+}
+
+.black-hole-btn:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+}
+
+.black-hole-btn.is-active {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+}
+
+body.ui-hidden .black-hole-btn {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+body.ui-hidden.planet-focused .black-hole-btn {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .black-hole-btn {
+    top: 18px;
+    right: 18px;
     width: 48px;
     height: 48px;
   }

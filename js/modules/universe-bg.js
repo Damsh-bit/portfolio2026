@@ -30,6 +30,10 @@ export function initUniverseBg() {
   let shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
   const starTooltip = document.getElementById('starTooltip');
 
+  // "agujero negro" keyword easter egg
+  let blackHole = null;
+  let keyBuffer = '';
+
   // Observe-mode planet focus/zoom state
   let focusIndex = -1;
   let focusTarget = 0;
@@ -339,6 +343,177 @@ export function initUniverseBg() {
       w: (maxX - minX) + pad * 2,
       h: (maxY - minY) + pad * 2
     };
+  }
+
+  // ------------------------------------------------------------------
+  // Section constellations — one per page section, cross-fading in and
+  // out as it scrolls through view (each tracks its own eased alpha).
+  // Shapes are simplified real asterisms, same spirit as Musca/Cancer
+  // above but picked to echo what each section is about.
+  // ------------------------------------------------------------------
+
+  const SECTION_CONSTELLATIONS = [
+    {
+      // Orion — the Hunter. Bold, unmistakable: opens the page.
+      id: 'hero',
+      anchor: { relX: 0.18, relY: 0.32 },
+      alpha: 0,
+      target: 0,
+      stars: [
+        { name: 'Alnilam', dx: 0, dy: 0, mag: 1.69 },
+        { name: 'Alnitak', dx: 34, dy: 6, mag: 1.88 },
+        { name: 'Mintaka', dx: -34, dy: -6, mag: 2.23 },
+        { name: 'Betelgeuse', dx: -70, dy: -110, mag: 0.42 },
+        { name: 'Bellatrix', dx: 60, dy: -100, mag: 1.64 },
+        { name: 'Saiph', dx: 55, dy: 130, mag: 2.09 },
+        { name: 'Rigel', dx: -75, dy: 140, mag: 0.13 }
+      ],
+      lines: [
+        ['Mintaka', 'Alnilam'], ['Alnilam', 'Alnitak'],
+        ['Betelgeuse', 'Mintaka'], ['Bellatrix', 'Alnitak'],
+        ['Rigel', 'Mintaka'], ['Saiph', 'Alnitak']
+      ]
+    },
+    {
+      // Lyra — the Harp, hanging off brilliant Vega: craft and work.
+      id: 'work',
+      anchor: { relX: 0.58, relY: 0.32 },
+      alpha: 0,
+      target: 0,
+      stars: [
+        { name: 'Vega', dx: 0, dy: 0, mag: 0.03 },
+        { name: 'ζ¹', dx: 25, dy: 30, mag: 4.36 },
+        { name: 'Sheliak', dx: 20, dy: 85, mag: 3.52 },
+        { name: 'Sulafat', dx: -25, dy: 100, mag: 3.24 },
+        { name: 'δ', dx: -35, dy: 45, mag: 4.3 }
+      ],
+      lines: [
+        ['Vega', 'ζ¹'], ['ζ¹', 'Sheliak'], ['Sheliak', 'Sulafat'],
+        ['Sulafat', 'δ'], ['δ', 'ζ¹']
+      ]
+    },
+    {
+      // Corona Borealis — the Northern Crown: a shallow arc of many facets.
+      id: 'industries',
+      anchor: { relX: 0.14, relY: 0.4 },
+      alpha: 0,
+      target: 0,
+      stars: [
+        { name: 'ε', dx: 0, dy: 0, mag: 4.15 },
+        { name: 'δ', dx: 34, dy: -18, mag: 4.63 },
+        { name: 'Alphecca', dx: 66, dy: -28, mag: 2.23 },
+        { name: 'β', dx: 98, dy: -18, mag: 3.68 },
+        { name: 'θ', dx: 128, dy: 6, mag: 4.14 },
+        { name: 'γ', dx: 150, dy: 34, mag: 3.84 }
+      ],
+      lines: [
+        ['ε', 'δ'], ['δ', 'Alphecca'], ['Alphecca', 'β'], ['β', 'θ'], ['θ', 'γ']
+      ]
+    },
+    {
+      // Ursa Major's Big Dipper — a guide, fitting a career path.
+      id: 'experience',
+      anchor: { relX: 0.6, relY: 0.16 },
+      alpha: 0,
+      target: 0,
+      stars: [
+        { name: 'Dubhe', dx: 0, dy: 0, mag: 1.79 },
+        { name: 'Merak', dx: 7, dy: 38, mag: 2.37 },
+        { name: 'Phecda', dx: 49, dy: 48, mag: 2.44 },
+        { name: 'Megrez', dx: 55, dy: 7, mag: 3.31 },
+        { name: 'Alioth', dx: 91, dy: -3, mag: 1.77 },
+        { name: 'Mizar', dx: 125, dy: -15, mag: 2.23 },
+        { name: 'Alkaid', dx: 157, dy: -35, mag: 1.86 }
+      ],
+      lines: [
+        ['Dubhe', 'Merak'], ['Merak', 'Phecda'], ['Phecda', 'Megrez'], ['Megrez', 'Dubhe'],
+        ['Megrez', 'Alioth'], ['Alioth', 'Mizar'], ['Mizar', 'Alkaid']
+      ]
+    },
+    {
+      // Cassiopeia — the queen, the site's "about me" W.
+      id: 'about',
+      anchor: { relX: 0.28, relY: 0.16 },
+      alpha: 0,
+      target: 0,
+      stars: [
+        { name: 'ε', dx: -110, dy: 40, mag: 3.35 },
+        { name: 'δ', dx: -55, dy: -10, mag: 2.68 },
+        { name: 'γ', dx: 0, dy: 0, mag: 2.47 },
+        { name: 'α', dx: 60, dy: 25, mag: 2.24 },
+        { name: 'β', dx: 115, dy: -15, mag: 2.27 }
+      ],
+      lines: [
+        ['ε', 'δ'], ['δ', 'γ'], ['γ', 'α'], ['α', 'β']
+      ]
+    },
+    {
+      // Aquarius — the water-bearer: "reaching out" for contact.
+      id: 'contact',
+      anchor: { relX: 0.82, relY: 0.58 },
+      alpha: 0,
+      target: 0,
+      stars: [
+        { name: 'η', dx: 0, dy: 0, mag: 4.02 },
+        { name: 'γ', dx: -42, dy: -28, mag: 3.84 },
+        { name: 'π', dx: 8, dy: -46, mag: 4.66 },
+        { name: 'ζ', dx: 48, dy: -12, mag: 3.65 },
+        { name: 'δ', dx: 70, dy: 68, mag: 3.27 },
+        { name: 'τ²', dx: 44, dy: 128, mag: 4.05 }
+      ],
+      lines: [
+        ['γ', 'η'], ['η', 'π'], ['η', 'ζ'], ['ζ', 'δ'], ['δ', 'τ²']
+      ]
+    }
+  ];
+
+  function drawSectionConstellation(c, alpha, time) {
+    if (alpha <= 0.01) return;
+
+    const anchorX = c.anchor.relX * width;
+    const anchorY = c.anchor.relY * height;
+    const nodes = {};
+    c.stars.forEach((s) => { nodes[s.name] = s; });
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = 'rgba(212, 212, 216, 0.2)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < c.lines.length; i++) {
+      const [a, b] = c.lines[i];
+      const na = nodes[a];
+      const nb = nodes[b];
+      ctx.beginPath();
+      ctx.moveTo(anchorX + na.dx, anchorY + na.dy);
+      ctx.lineTo(anchorX + nb.dx, anchorY + nb.dy);
+      ctx.stroke();
+    }
+
+    for (let i = 0; i < c.stars.length; i++) {
+      const s = c.stars[i];
+      const sx = anchorX + s.dx;
+      const sy = anchorY + s.dy;
+
+      const twinkle = 0.5 + 0.5 * Math.sin(time * 0.55 + i * 1.4);
+      const r = Math.max(0.8, 2.5 - s.mag * 0.32) * (1 + twinkle * 0.3);
+      const starAlpha = Math.max(0.4, 1 - s.mag * 0.12) * (0.75 + twinkle * 0.25);
+
+      const glowR = r * 4;
+      const glow = ctx.createRadialGradient(sx, sy, 0, sx, sy, glowR);
+      glow.addColorStop(0, `rgba(245, 245, 247, ${0.1 + twinkle * 0.14})`);
+      glow.addColorStop(1, 'rgba(245, 245, 247, 0)');
+      ctx.beginPath();
+      ctx.fillStyle = glow;
+      ctx.arc(sx, sy, glowR, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(245, 245, 247, ${starAlpha})`;
+      ctx.arc(sx, sy, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
   }
 
   // ------------------------------------------------------------------
@@ -886,6 +1061,171 @@ export function initUniverseBg() {
     p.pendingRestore = true;
   }
 
+  // ------------------------------------------------------------------
+  // Black hole easter egg: typing "agujero" anywhere on the page, or
+  // clicking #blackHoleBtn (only visible in observe mode), spawns a
+  // black hole that pulls in nearby stardust and stays put — no timer.
+  // It only goes away when the same trigger is used again to collapse
+  // it, or (in observe mode) it's clicked directly on the canvas.
+  // ------------------------------------------------------------------
+
+  const BLACK_HOLE_RADIUS = 85;
+  const blackHoleBtn = document.getElementById('blackHoleBtn');
+
+  function syncBlackHoleBtn() {
+    if (!blackHoleBtn) return;
+    const active = !!blackHole;
+    blackHoleBtn.classList.toggle('is-active', active);
+    blackHoleBtn.setAttribute('aria-pressed', String(active));
+    blackHoleBtn.setAttribute('aria-label', active ? 'Colapsar agujero negro' : 'Invocar agujero negro');
+  }
+
+  function spawnBlackHole() {
+    if (blackHole) return;
+    const margin = 180;
+    blackHole = {
+      x: margin + Math.random() * Math.max(1, width - margin * 2),
+      y: margin + Math.random() * Math.max(1, height - margin * 2),
+      phase: 'forming',
+      t: 0,
+      ringAngle: 0,
+      formDuration: reducedMotion ? 20 : 40,
+      collapseDuration: reducedMotion ? 12 : 26
+    };
+    syncBlackHoleBtn();
+  }
+
+  function collapseBlackHole() {
+    if (!blackHole || blackHole.phase === 'collapsing') return;
+    blackHole.phase = 'collapsing';
+    blackHole.t = 0;
+  }
+
+  function toggleBlackHole() {
+    if (blackHole) collapseBlackHole();
+    else spawnBlackHole();
+  }
+
+  function spawnBlackHoleFlash(x, y) {
+    const rmFactor = reducedMotion ? 0.35 : 1;
+    const count = Math.max(10, Math.round(40 * rmFactor));
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2.5 + Math.random() * 4.5;
+      burstParticles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: 1.5 + Math.random() * 1.8,
+        alpha: 1,
+        color: Math.random() > 0.5 ? '#ffffff' : '#e4e4e7'
+      });
+    }
+  }
+
+  // Hit-test the black hole against a screen point (observe mode only)
+  function isPointOnBlackHole(mx, my) {
+    if (!blackHole || blackHole.phase !== 'active') return false;
+    return Math.hypot(mx - blackHole.x, my - blackHole.y) <= BLACK_HOLE_RADIUS * 1.3;
+  }
+
+  function updateAndDrawBlackHole() {
+    const bh = blackHole;
+    if (!bh) return;
+
+    bh.t++;
+    bh.ringAngle += 0.05;
+
+    let radius = BLACK_HOLE_RADIUS;
+    let ringAlpha = 1;
+
+    if (bh.phase === 'forming') {
+      const p = Math.min(1, bh.t / bh.formDuration);
+      radius = BLACK_HOLE_RADIUS * p;
+      ringAlpha = p;
+      if (p >= 1) { bh.phase = 'active'; bh.t = 0; }
+    } else if (bh.phase === 'active') {
+      const pullRadius = BLACK_HOLE_RADIUS * 4;
+      for (let i = 0; i < stardust.length; i++) {
+        const sd = stardust[i];
+        const dx = bh.x - sd.x;
+        const dy = bh.y - sd.y;
+        const dist = Math.hypot(dx, dy) || 1;
+        if (dist < pullRadius) {
+          const force = (1 - dist / pullRadius) * 0.6;
+          sd.x += (dx / dist) * force;
+          sd.y += (dy / dist) * force;
+        }
+      }
+    } else {
+      const p = Math.min(1, bh.t / bh.collapseDuration);
+      radius = BLACK_HOLE_RADIUS * (1 - p);
+      ringAlpha = 1 - p;
+      if (p >= 1) {
+        spawnBlackHoleFlash(bh.x, bh.y);
+        blackHole = null;
+        syncBlackHoleBtn();
+        return;
+      }
+    }
+
+    ctx.save();
+
+    const glowR = radius * 3.2;
+    if (glowR > 0) {
+      const glow = ctx.createRadialGradient(bh.x, bh.y, radius * 0.5, bh.x, bh.y, glowR);
+      glow.addColorStop(0, `rgba(245, 245, 247, ${0.5 * ringAlpha})`);
+      glow.addColorStop(0.4, `rgba(180, 180, 190, ${0.18 * ringAlpha})`);
+      glow.addColorStop(1, 'rgba(180, 180, 190, 0)');
+      ctx.beginPath();
+      ctx.fillStyle = glow;
+      ctx.arc(bh.x, bh.y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Outer accretion ring, drifting one way
+    ctx.save();
+    ctx.translate(bh.x, bh.y);
+    ctx.rotate(bh.ringAngle);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, radius * 1.9, radius * 0.62, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(245, 245, 247, ${0.55 * ringAlpha})`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    ctx.restore();
+
+    // Inner accretion ring, drifting the other way — reads as a denser disk
+    ctx.save();
+    ctx.translate(bh.x, bh.y);
+    ctx.rotate(-bh.ringAngle * 1.6 + Math.PI / 3);
+    ctx.beginPath();
+    ctx.ellipse(0, 0, radius * 1.35, radius * 0.4, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(245, 245, 247, ${0.75 * ringAlpha})`;
+    ctx.lineWidth = 2.4;
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.fillStyle = '#000000';
+    ctx.arc(bh.x, bh.y, radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key.length !== 1 || !/[a-zA-Z]/.test(e.key)) return;
+    keyBuffer = (keyBuffer + e.key.toLowerCase()).slice(-12);
+    if (keyBuffer.includes('agujero')) {
+      toggleBlackHole();
+      keyBuffer = '';
+    }
+  });
+
+  if (blackHoleBtn) {
+    blackHoleBtn.addEventListener('click', toggleBlackHole);
+  }
+
   // Hit-test clicks against each planet's last-rendered screen position.
   // Planets are only interactive in observe mode (UI hidden via the eye
   // button). Clicking one there just zooms in; the info Card only opens
@@ -915,6 +1255,12 @@ export function initUniverseBg() {
           }
         }
       }
+      return;
+    }
+
+    // The black hole is only clickable (to collapse it) in observe mode
+    if (isPointOnBlackHole(e.clientX, e.clientY)) {
+      collapseBlackHole();
       return;
     }
 
@@ -953,7 +1299,12 @@ export function initUniverseBg() {
     let showPointer = false;
 
     if (observeMode && focusIndex < 0) {
-      for (let i = 0; i < planets.length; i++) {
+      if (isPointOnBlackHole(mx, my)) {
+        hoverName = 'Agujero negro — clic para colapsar';
+        showPointer = true;
+      }
+
+      for (let i = 0; i < planets.length && !hoverName; i++) {
         const p = planets[i];
         if (p.px === undefined) continue;
         const dx = mx - p.px;
@@ -1000,6 +1351,18 @@ export function initUniverseBg() {
   });
 
   window.addEventListener('resize', resize);
+
+  // Fade each section's constellation in while its section is in view
+  if ('IntersectionObserver' in window) {
+    SECTION_CONSTELLATIONS.forEach((c) => {
+      const el = document.getElementById(c.id);
+      if (!el) return;
+      const observer = new IntersectionObserver((entries) => {
+        c.target = entries[0].isIntersecting ? 1 : 0;
+      }, { threshold: 0.15 });
+      observer.observe(el);
+    });
+  }
 
   // Main Render Loop
   let time = 0;
@@ -1062,6 +1425,15 @@ export function initUniverseBg() {
       ctx.restore();
     } else {
       cancerBounds = null;
+    }
+
+    // 1.6 Draw per-section constellations (cross-fade as sections scroll by)
+    for (let i = 0; i < SECTION_CONSTELLATIONS.length; i++) {
+      const c = SECTION_CONSTELLATIONS[i];
+      c.alpha += (c.target - c.alpha) * 0.05;
+      if (c.alpha > 0.01) {
+        drawSectionConstellation(c, c.alpha * (1 - dim * 0.85), time);
+      }
     }
 
     // 2. Draw Minimalist Planets
@@ -1300,6 +1672,9 @@ export function initUniverseBg() {
       ctx.fill();
       ctx.globalAlpha = 1.0;
     }
+
+    // 7. Draw Black Hole ("agujero" keyword easter egg)
+    updateAndDrawBlackHole();
 
     requestAnimationFrame(render);
   }

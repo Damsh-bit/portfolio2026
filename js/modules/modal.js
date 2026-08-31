@@ -28,11 +28,83 @@ export function initModal() {
   const mDesc = document.getElementById('mDesc');
   const mLink = document.getElementById('mLink');
   const mGallery = document.getElementById('mGallery');
+  const mStationLabel = document.getElementById('mStationLabel');
+  const mStationStatus = document.getElementById('mStationStatus');
+  const mScanLine = document.getElementById('mScanLine');
+  const dockCorners = modal ? modal.querySelectorAll('.modal-dock-corner') : [];
+  const dockTimers = [];
 
   if (!modal || !inner) return;
 
   let currentIndex = 0;
   let isAnimating = false;
+
+  // Docking clamp offsets each corner snaps in from, keyed by its class
+  const DOCK_OFFSET = { tl: [-14, -14], tr: [14, -14], bl: [-14, 14], br: [14, 14] };
+
+  function dockCornerKey(corner) {
+    return ['tl', 'tr', 'bl', 'br'].find((k) => corner.classList.contains(k));
+  }
+
+  function clearDockTimers() {
+    dockTimers.forEach((t) => t.kill());
+    dockTimers.length = 0;
+  }
+
+  function setStatus(text, delay) {
+    dockTimers.push(gsap.delayedCall(delay, () => {
+      if (mStationStatus) mStationStatus.textContent = text;
+    }));
+  }
+
+  // A short "reading the dock" scan-line sweep, then the four clamps snap
+  // in one after another with a slight mechanical overshoot and a bright
+  // flash as each one locks — reads as a real docking sequence rather
+  // than a plain fade-in.
+  function animateDockingIn() {
+    clearDockTimers();
+    gsap.killTweensOf(dockCorners);
+
+    if (mScanLine) {
+      const topEl = modal.querySelector('.modal-top');
+      const w = topEl ? topEl.offsetWidth : 0;
+      gsap.fromTo(mScanLine, { x: 0, opacity: 0.9 }, { x: w, opacity: 0, duration: 0.55, ease: 'power1.inOut' });
+    }
+
+    setStatus('ESCANEANDO…', 0);
+    setStatus('ALINEANDO…', 0.3);
+    setStatus('ACOPLANDO…', 0.55);
+
+    const lockStart = 0.55;
+    const stagger = 0.06;
+    dockCorners.forEach((corner, i) => {
+      const [ox, oy] = DOCK_OFFSET[dockCornerKey(corner)];
+      const tl = gsap.timeline({ delay: lockStart + i * stagger });
+      tl.fromTo(corner,
+        { opacity: 0, x: ox, y: oy, scale: 1.5 },
+        { opacity: 1, x: 0, y: 0, scale: 1, duration: 0.38, ease: 'back.out(2.6)' }
+      ).to(corner, {
+        boxShadow: '0 0 12px 2px rgba(245, 245, 247, 0.95)',
+        duration: 0.1,
+        yoyo: true,
+        repeat: 1
+      }, '-=0.08');
+    });
+
+    setStatus('ACOPLADO ✓', lockStart + dockCorners.length * stagger + 0.3);
+  }
+
+  // Quick reverse: clamps snap back out toward their offset and vanish,
+  // instead of a flat fade — feels like the station physically releases.
+  function animateDockingOut() {
+    clearDockTimers();
+    gsap.killTweensOf(dockCorners);
+    if (mStationStatus) mStationStatus.textContent = 'DESACOPLANDO…';
+    dockCorners.forEach((corner) => {
+      const [ox, oy] = DOCK_OFFSET[dockCornerKey(corner)];
+      gsap.to(corner, { opacity: 0, x: ox * 0.7, y: oy * 0.7, scale: 0.8, duration: 0.22, ease: 'power2.in' });
+    });
+  }
 
   function getThumbImg() {
     return mThumb.querySelector('img');
@@ -44,6 +116,7 @@ export function initModal() {
 
     mTitle.textContent = project.title;
     mIndex.textContent = `${project.index || String(index + 1).padStart(2, '0')} / ${String(portfolioData.projects.length).padStart(2, '0')}`;
+    if (mStationLabel) mStationLabel.textContent = `ESTACIÓN ${project.index || String(index + 1).padStart(2, '0')}`;
 
     mTags.innerHTML = project.tags.map(t => `<span>${t}</span>`).join('');
 
@@ -90,9 +163,11 @@ export function initModal() {
       { y: 24, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.5, delay: 0.1, ease: 'power3.out' }
     );
+    animateDockingIn();
   }
 
   function closeModal() {
+    animateDockingOut();
     gsap.to(modal, {
       opacity: 0,
       duration: 0.35,

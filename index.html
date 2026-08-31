@@ -65,7 +65,7 @@
   <main class="wrap">
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" id="hero">
       <p class="eyebrow mono" id="heroEyebrow"></p>
       <span class="hero-role mono" id="heroRole"></span>
       <h1 class="hero-title" id="heroTitle"></h1>
@@ -191,11 +191,19 @@
   <!-- Project Details Modal Window -->
   <div class="modal" id="modal">
     <div class="modal-top">
-      <span class="label mono">VISTA DE PROYECTO</span>
+      <div class="modal-station-id">
+        <span class="label mono" id="mStationLabel">ESTACIÓN 01</span>
+        <span class="station-status mono" id="mStationStatus">ACOPLANDO…</span>
+      </div>
       <button type="button" class="close-btn mono" id="closeModal">
-        <span>CERRAR</span><span class="x">×</span>
+        <span>DESACOPLAR</span><span class="x">×</span>
       </button>
+      <div class="modal-scan-line" id="mScanLine" aria-hidden="true"></div>
     </div>
+    <div class="modal-dock-corner tl" aria-hidden="true"></div>
+    <div class="modal-dock-corner tr" aria-hidden="true"></div>
+    <div class="modal-dock-corner bl" aria-hidden="true"></div>
+    <div class="modal-dock-corner br" aria-hidden="true"></div>
     <div class="modal-body">
       <div class="inner">
         <div class="m-main">
@@ -275,6 +283,14 @@
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
     <line x1="19" y1="12" x2="5" y2="12"/>
     <polyline points="12 19 5 12 12 5"/>
+  </svg>
+</button>
+
+<!-- Black Hole Toggle: spawns/collapses the black hole easter egg, only shown in observe mode -->
+<button type="button" id="blackHoleBtn" class="black-hole-btn" aria-label="Invocar agujero negro" aria-pressed="false">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <ellipse cx="12" cy="12" rx="10" ry="4.2" transform="rotate(-20 12 12)"/>
+    <circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/>
   </svg>
 </button>
 
