@@ -974,7 +974,7 @@ section {
 .modal-body {
   flex: 1;
   overflow-y: auto;
-  padding: 60px 40px 100px;
+  padding: 28px 40px 50px;
   touch-action: pan-y;
 }
 
@@ -1045,29 +1045,29 @@ section {
 .modal-body .m-index {
   font-size: 12px;
   color: var(--accent-light);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .modal-body h2 {
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: clamp(2rem, 5vw, 3.2rem);
-  line-height: 1.04;
+  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
+  line-height: 1.08;
   letter-spacing: -0.02em;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   color: var(--ink);
 }
 
 .modal-body .m-thumb {
   width: 100%;
-  aspect-ratio: 2/1;
+  aspect-ratio: 2.3/1;
   background: radial-gradient(circle at 50% 50%, #15112b 0%, #0a0718 100%);
   border: 1px solid var(--line-accent);
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 36px;
+  margin-bottom: 16px;
   overflow: hidden;
   position: relative;
 }
@@ -1088,45 +1088,228 @@ section {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 32px;
+  margin-bottom: 18px;
 }
 
 .modal-body .m-tags span {
-  font-size: 11.5px;
+  font-size: 11px;
   color: var(--accent-bright);
   background: var(--accent-glow-soft);
   border: 1px solid var(--line-accent);
   border-radius: 100px;
-  padding: 6px 14px;
+  padding: 5px 12px;
 }
 
 .modal-body p {
   color: var(--ink-dim);
-  font-size: 16px;
-  max-width: 64ch;
-  margin-bottom: 20px;
-  line-height: 1.65;
+  font-size: 14px;
+  max-width: 68ch;
+  margin-bottom: 12px;
+  line-height: 1.55;
+}
+
+.modal-body p:first-of-type {
+  color: var(--ink);
+  font-size: 14.5px;
+}
+
+/* ---------- Project Modal — Feature Highlights Grid ---------- */
+.m-features {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin: 18px 0 16px;
+  max-width: 68ch;
+}
+
+@media (min-width: 620px) {
+  .m-features {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.m-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line-accent);
+  background: var(--accent-glow-soft);
+  border-radius: 10px;
+  transition: border-color 0.25s var(--ease), background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+
+.m-feature:hover {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.m-feature-ico {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #0a0718;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  margin-top: 1px;
+}
+
+.m-feature-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.m-feature-body strong {
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.m-feature-body span {
+  font-size: 12.5px;
+  color: var(--ink-dim);
+  line-height: 1.4;
+}
+
+/* ---------- Project Modal — Meta Row (visit link + likes/views) ---------- */
+.m-meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .modal-body .m-link {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  font-size: 13.5px;
-  color: var(--accent-bright);
-  border: 1px solid var(--accent-primary);
-  background: var(--accent-glow-soft);
-  padding: 10px 20px;
+  gap: 7px;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #0a0718;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 8px 16px;
   border-radius: 100px;
-  transition: transform 0.3s var(--ease), background 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  animation: m-link-pulse 2.8s ease-in-out infinite;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), animation-play-state 0.25s;
+}
+
+.modal-body .m-link .m-link-arrow {
+  transition: transform 0.25s var(--ease);
 }
 
 .modal-body .m-link:hover {
-  transform: translateY(-2px);
-  background: var(--accent-primary);
-  color: #ffffff;
-  box-shadow: 0 4px 20px var(--accent-glow);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  animation-play-state: paused;
+}
+
+.modal-body .m-link:hover .m-link-arrow {
+  transform: translateX(3px);
+}
+
+@keyframes m-link-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 245, 247, 0.4); }
+  50% { box-shadow: 0 0 0 5px rgba(245, 245, 247, 0); }
+}
+
+.m-stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12.5px;
+  color: var(--ink-dim);
+}
+
+.m-like {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-dim);
+  transition: color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+
+.m-like:hover {
+  color: var(--ink);
+}
+
+.m-like:active {
+  transform: scale(0.92);
+}
+
+.m-like-icon {
+  font-size: 15px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), color 0.2s var(--ease);
+}
+
+.m-like.is-liked {
+  color: #ff5c7f;
+}
+
+.m-like.is-liked .m-like-icon {
+  color: #ff5c7f;
+  transform: scale(1.15);
+}
+
+.m-views {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.m-views-icon {
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .modal-body .m-link {
+    animation: none;
+  }
+}
+
+/* ---------- Project Modal — Thumb Play Overlay (video) ---------- */
+.m-thumb-frame {
+  position: relative;
+}
+
+.m-thumb-play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+  background: rgba(10, 7, 24, 0.72);
+  border: 1px solid var(--line-strong);
+  padding: 10px 18px;
+  border-radius: 100px;
+  backdrop-filter: blur(4px);
+  transition: transform 0.25s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.m-thumb-play-ico {
+  font-size: 10px;
+}
+
+.m-thumb-play:hover {
+  transform: translate(-50%, -50%) scale(1.06);
+  background: rgba(10, 7, 24, 0.9);
+  border-color: var(--accent-primary);
 }
 
 /* ---------- Project Modal — Justified Gallery ---------- */
@@ -1242,6 +1425,15 @@ section {
   max-width: 88vw;
   max-height: 84vh;
   object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
+  border: 1px solid var(--line-accent);
+}
+
+.lightbox .lb-video {
+  max-width: 88vw;
+  max-height: 84vh;
+  background: #000;
   border-radius: 10px;
   box-shadow: 0 30px 80px -20px rgba(0, 0, 0, 0.6);
   border: 1px solid var(--line-accent);

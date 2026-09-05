@@ -229,6 +229,44 @@ export const portfolioData = {
       link: "#",
       type: "trabajo",
       featured: true
+    },
+    {
+      id: "alz-stats",
+      index: "14",
+      title: "ALZ Stats",
+      subtitle: "App de estadísticas — CS2 5v5",
+      tags: ["Dashboard de datos", "IA / OCR", "Algoritmo de balanceo"],
+      summary: "Plataforma de estadísticas para nuestras partidas semanales de CS2 con el grupo de amigos: carga por IA, rankings históricos y generador de equipos autobalanceado.",
+      description: "ALZ Stats (en la interfaz, '10v10 Stats') es la plataforma que armé para las partidas 5v5 de CS2 que jugamos hace años con mi grupo de amigos. Es un proyecto 100% personal, así que las capturas están llenas de apodos y chistes internos — pero por debajo corre una app con bastante ingeniería real, sobre todo en la lectura automática de resultados por IA y en el algoritmo de balanceo de equipos. Estas son todas las funcionalidades que le fui agregando:",
+      features: [
+        { title: "Carga de partidas por IA", text: "Subís el scoreboard final de CS2 y un modelo de visión extrae kills, muertes, asistencias y daño de cada jugador solo." },
+        { title: "Análisis dinámico de datos", text: "Ladder, perfiles, mapas y curiosidades se recalculan en tiempo real sobre el historial, sin valores hardcodeados." },
+        { title: "Winrate por mapa", text: "Gráficos de radar comparando el desempeño de cada equipo, mapa por mapa." },
+        { title: "Panel de curiosidades", text: "Datos random generados sobre la marcha ('Fulano rinde mejor los viernes', etc.)." },
+        { title: "Perfil individual", text: "Récord, apodo, KDA, historial de partidas y logros propios de cada jugador." },
+        { title: "Estadísticas globales", text: "Hall of Fame con los récords históricos del grupo: más kills, menos daño, mapa más jugado y más." },
+        { title: "Ladder histórico y por rango", text: "Ranking configurable por cantidad de partidas (últimas 20, 30, todo el historial)." },
+        { title: "Generador de equipos autobalanceado", text: "Reparte el rating de cada jugador para minimizar la diferencia entre planteles y sugiere el mapa recomendado." },
+        { title: "Panel de sugerencias", text: "Espacio para que el grupo proponga mejoras al sitio." },
+        { title: "Votación al peor de la fecha", text: "Nelson Vote semanal, con su propio ranking paralelo: la Nelson League." },
+        { title: "Contador de 'fakazos'", text: "Nuestro chiste interno: quién más se hace el picante sin banca atrás." },
+        { title: "Todo 100% dinámico", text: "Mapas, imágenes, récords y curiosidades se generan solos desde la base de datos de partidas." }
+      ],
+      image: "assets/projects/alz-stats.png",
+      video: "assets/projects/alz-stats-cover.mp4",
+      gallery: [
+        "assets/projects/alz-stats.png",
+        "assets/projects/alz-stats-2.png",
+        "assets/projects/alz-stats-3.png",
+        "assets/projects/alz-stats-4.png",
+        "assets/projects/alz-stats-5.png",
+        "assets/projects/alz-stats-6.png",
+        "assets/projects/alz-stats-7.png",
+        "assets/projects/alz-stats-8.png"
+      ],
+      link: "https://alzstats.pro/",
+      type: "personal",
+      featured: true
     }
   ],
 

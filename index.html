@@ -213,10 +213,23 @@
         <div class="m-main">
           <div class="m-index mono" id="mIndex">01 / 04</div>
           <h2 id="mTitle">Nombre del proyecto</h2>
-          <div class="m-thumb" id="mThumb"><span>Agregá tu captura</span></div>
+          <div class="m-meta-row">
+            <a href="#" class="m-link mono" id="mLink" target="_blank" rel="noopener noreferrer">Visitar sitio <span class="m-link-arrow">→</span></a>
+            <div class="m-stats mono">
+              <button type="button" class="m-like" id="mLikeBtn" aria-label="Me gusta este proyecto" aria-pressed="false">
+                <span class="m-like-icon" aria-hidden="true">♥</span><span id="mLikeCount">0</span>
+              </button>
+              <span class="m-views" id="mViewsCount" aria-label="Vistas del proyecto"><span class="m-views-icon" aria-hidden="true">◎</span> 0</span>
+            </div>
+          </div>
+          <div class="m-thumb-frame">
+            <div class="m-thumb" id="mThumb"><span>Agregá tu captura</span></div>
+            <button type="button" class="m-thumb-play" id="mThumbPlay" aria-label="Ver video del proyecto" hidden>
+              <span class="m-thumb-play-ico">▶</span> Ver video
+            </button>
+          </div>
           <div class="m-tags mono" id="mTags"></div>
           <div id="mDesc"></div>
-          <a href="#" class="m-link mono" id="mLink" target="_blank" rel="noopener noreferrer">Visitar sitio →</a>
         </div>
 
         <div class="m-gallery-wrap">

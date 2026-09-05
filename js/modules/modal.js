@@ -10,6 +10,8 @@
 
 import { portfolioData } from '../data/portfolio-data.js';
 import { renderGallery, isLightboxActive } from './gallery.js';
+import { openVideoLightbox } from './video-lightbox.js';
+import { isLiked, registerView, toggleLike } from './project-stats.js';
 
 const SWIPE_THRESHOLD = 80;
 const DRAG_LOCK = 10;
@@ -25,8 +27,12 @@ export function initModal() {
   const mTags = document.getElementById('mTags');
   const mIndex = document.getElementById('mIndex');
   const mThumb = document.getElementById('mThumb');
+  const mThumbPlay = document.getElementById('mThumbPlay');
   const mDesc = document.getElementById('mDesc');
   const mLink = document.getElementById('mLink');
+  const mLikeBtn = document.getElementById('mLikeBtn');
+  const mLikeCount = document.getElementById('mLikeCount');
+  const mViewsCount = document.getElementById('mViewsCount');
   const mGallery = document.getElementById('mGallery');
   const mStationLabel = document.getElementById('mStationLabel');
   const mStationStatus = document.getElementById('mStationStatus');
@@ -38,6 +44,7 @@ export function initModal() {
 
   let currentIndex = 0;
   let isAnimating = false;
+  let statsToken = 0;
 
   // Docking clamp offsets each corner snaps in from, keyed by its class
   const DOCK_OFFSET = { tl: [-14, -14], tr: [14, -14], bl: [-14, 14], br: [14, 14] };
@@ -106,13 +113,34 @@ export function initModal() {
     });
   }
 
+  let currentVideoSrc = null;
+  let currentProjectId = null;
+
   function getThumbImg() {
     return mThumb.querySelector('img');
+  }
+
+  function renderStats(projectId, token) {
+    mLikeBtn.classList.toggle('is-liked', isLiked(projectId));
+    mLikeBtn.setAttribute('aria-pressed', String(isLiked(projectId)));
+
+    registerView(projectId).then((stats) => {
+      if (token !== statsToken) return;
+      mViewsCount.innerHTML = `<span class="m-views-icon" aria-hidden="true">◎</span> ${stats.views}`;
+      mLikeCount.textContent = stats.likes;
+    }).catch(() => {
+      if (token !== statsToken) return;
+      mViewsCount.innerHTML = `<span class="m-views-icon" aria-hidden="true">◎</span> —`;
+    });
   }
 
   function fillContent(index) {
     const project = portfolioData.projects[index];
     if (!project) return;
+
+    currentProjectId = project.id;
+    currentVideoSrc = project.video || null;
+    statsToken += 1;
 
     mTitle.textContent = project.title;
     mIndex.textContent = `${project.index || String(index + 1).padStart(2, '0')} / ${String(portfolioData.projects.length).padStart(2, '0')}`;
@@ -126,15 +154,34 @@ export function initModal() {
       mThumb.innerHTML = `<span>${project.subtitle || 'Agregá tu captura'}</span>`;
     }
 
+    mThumbPlay.hidden = !currentVideoSrc;
+
+    mLikeCount.textContent = '0';
+    mViewsCount.innerHTML = `<span class="m-views-icon" aria-hidden="true">◎</span> …`;
+    renderStats(project.id, statsToken);
+
+    const featuresHtml = (project.features && project.features.length)
+      ? `<div class="m-features">${project.features.map(f => `
+          <div class="m-feature">
+            <span class="m-feature-ico">✓</span>
+            <div class="m-feature-body">
+              <strong>${f.title}</strong>
+              <span>${f.text}</span>
+            </div>
+          </div>
+        `).join('')}</div>`
+      : '';
+
     mDesc.innerHTML = `
       <p><strong>${project.summary}</strong></p>
       <p>${project.description}</p>
+      ${featuresHtml}
     `;
 
     if (project.link && project.link !== '#') {
       mLink.href = project.link;
       mLink.style.display = 'inline-flex';
-      mLink.innerHTML = `Visitar sitio <span class="arrow">→</span>`;
+      mLink.innerHTML = `Visitar sitio <span class="m-link-arrow">→</span>`;
     } else {
       mLink.style.display = 'none';
     }
@@ -236,6 +283,36 @@ export function initModal() {
   if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
   if (prevBtn) prevBtn.addEventListener('click', () => goToProject(-1));
   if (nextBtn) nextBtn.addEventListener('click', () => goToProject(1));
+
+  if (mThumbPlay) {
+    mThumbPlay.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (currentVideoSrc) openVideoLightbox(currentVideoSrc);
+    });
+  }
+
+  if (mLikeBtn) {
+    mLikeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!currentProjectId) return;
+      const projectId = currentProjectId;
+      const wasLiked = isLiked(projectId);
+
+      mLikeBtn.classList.toggle('is-liked', !wasLiked);
+      mLikeBtn.setAttribute('aria-pressed', String(!wasLiked));
+      mLikeCount.textContent = Math.max(0, parseInt(mLikeCount.textContent, 10) + (wasLiked ? -1 : 1));
+
+      toggleLike(projectId).then(({ likes }) => {
+        if (currentProjectId === projectId) mLikeCount.textContent = likes;
+      }).catch(() => {
+        mLikeBtn.classList.toggle('is-liked', wasLiked);
+        mLikeBtn.setAttribute('aria-pressed', String(wasLiked));
+        if (currentProjectId === projectId) {
+          mLikeCount.textContent = Math.max(0, parseInt(mLikeCount.textContent, 10) + (wasLiked ? 1 : -1));
+        }
+      });
+    });
+  }
 
   window.addEventListener('keydown', (e) => {
     if (modal.style.visibility !== 'visible') return;
