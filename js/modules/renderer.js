@@ -160,7 +160,7 @@ function renderProjects() {
   if (countEl) countEl.textContent = `(${pad(entries.length)})`;
 
   if (gridEl) {
-    gridEl.innerHTML = entries.map(({ project, idx }) => `
+    gridEl.innerHTML = entries.map(({ project, idx }, i) => `
       <div class="work-card reveal" data-project="${idx}" data-type="${project.type}">
         <div class="thumb">
           ${project.image
@@ -169,7 +169,7 @@ function renderProjects() {
         </div>
         <div class="meta">
           <div>
-            <span class="index mono">${project.index || pad(idx + 1)}</span>
+            <span class="index mono">${pad(i + 1)}</span>
             <h3>${escapeHtml(project.title)}<span class="underline"></span></h3>
             <div class="tags mono">${project.tags.map(escapeHtml).join(' · ')}</div>
           </div>

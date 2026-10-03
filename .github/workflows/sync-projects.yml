@@ -3,6 +3,7 @@
 # el JSON y el push dispara el deploy de Vercel.
 #
 # Se dispara:
+#  - cuando cambia la config de proyectos personales (p. ej. al guardar desde /admin),
 #  - cada 6 horas (cron),
 #  - a mano desde la pestaña Actions (opcionalmente un solo proyecto o reanálisis completo),
 #  - al instante cuando el repo de un proyecto manda un repository_dispatch
@@ -10,6 +11,10 @@
 name: Sync proyectos personales
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - content/personal-projects.config.json
   schedule:
     - cron: "17 */6 * * *"
   workflow_dispatch:

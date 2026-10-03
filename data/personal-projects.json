@@ -1,24 +1,9 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-03T19:32:51.867Z",
+  "generatedAt": "2026-10-03T23:26:44.499Z",
   "projects": [
     {
       "id": "alz-stats",
-      "title": "ALZ Stats",
-      "subtitle": "App de estadísticas — CS2 5v5",
-      "link": "https://alzstats.pro/",
-      "image": "assets/projects/alz-stats.png",
-      "video": "assets/projects/alz-stats-cover.mp4",
-      "gallery": [
-        "assets/projects/alz-stats.png",
-        "assets/projects/alz-stats-2.png",
-        "assets/projects/alz-stats-3.png",
-        "assets/projects/alz-stats-4.png",
-        "assets/projects/alz-stats-5.png",
-        "assets/projects/alz-stats-6.png",
-        "assets/projects/alz-stats-7.png",
-        "assets/projects/alz-stats-8.png"
-      ],
       "summary": "Plataforma de estadísticas para nuestras partidas semanales de CS2 con el grupo de amigos: carga por IA, rankings por temporada, ladder de FACEIT y generador de equipos autobalanceado.",
       "description": "ALZ Stats (en la interfaz, '10v10 Stats') es la plataforma que armé para las partidas 5v5 de CS2 que jugamos hace años con mi grupo de amigos. Es un proyecto 100% personal, así que las capturas están llenas de apodos y chistes internos — pero por debajo corre una app con bastante ingeniería real, sobre todo en la lectura automática de resultados por IA, el algoritmo de balanceo de equipos y las integraciones con FACEIT y Mercado Pago. Estas son todas las funcionalidades que le fui agregando:",
       "tags": [
@@ -249,8 +234,6 @@
         }
       ],
       "repo": {
-        "fullName": "Damsh-bit/10v10stats",
-        "url": "https://github.com/Damsh-bit/10v10stats",
         "branch": "main",
         "headSha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
         "createdAt": "2026-06-23T19:27:39Z",
@@ -280,15 +263,14 @@
       "lastCommit": {
         "sha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
         "date": "2026-10-01T22:35:03Z",
-        "message": "feat(novedades): pop-up de las apuestas encadenado con el del generador",
-        "url": "https://github.com/Damsh-bit/10v10stats/commit/621884b129fe7593307fb67494d26fb4b3cf16e6"
+        "message": "feat(novedades): pop-up de las apuestas encadenado con el del generador"
       },
       "analysis": {
         "mode": "heuristic",
         "sha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
         "at": "2026-10-03T19:32:51.867Z"
       },
-      "syncedAt": "2026-10-03T19:32:51.867Z"
+      "syncedAt": "2026-10-03T23:26:44.499Z"
     }
   ]
 }

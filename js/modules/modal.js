@@ -48,8 +48,8 @@ function renderChangelog(project) {
   if (!entries.length) return '';
 
   const aiNote = project.analysis && project.analysis.mode === 'ai'
-    ? 'Resumen generado con IA a partir del repositorio'
-    : 'Tomado de los commits del repositorio';
+    ? 'Resumen generado con IA a partir de cada actualización'
+    : 'Tomado del historial de cambios del proyecto';
   const hidden = entries.length - CHANGELOG_VISIBLE;
 
   return `
@@ -69,7 +69,7 @@ function renderChangelog(project) {
         `).join('')}
       </ol>
       ${hidden > 0 ? `<button type="button" class="m-changelog-more mono" data-changelog-more>Ver ${hidden} más ↓</button>` : ''}
-      <span class="m-sync-note mono">${aiNote} · sincronizado con GitHub</span>
+      <span class="m-sync-note mono">${aiNote} · se actualiza solo</span>
     </div>
   `;
 }
@@ -88,7 +88,6 @@ export function initModal() {
   const mThumbPlay = document.getElementById('mThumbPlay');
   const mDesc = document.getElementById('mDesc');
   const mLink = document.getElementById('mLink');
-  const mRepoLink = document.getElementById('mRepoLink');
   const mLikeBtn = document.getElementById('mLikeBtn');
   const mLikeCount = document.getElementById('mLikeCount');
   const mViewsCount = document.getElementById('mViewsCount');
@@ -203,8 +202,9 @@ export function initModal() {
     statsToken += 1;
 
     mTitle.textContent = project.title;
-    mIndex.textContent = `${project.index || String(index + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')}`;
-    if (mStationLabel) mStationLabel.textContent = `ESTACIÓN ${project.index || String(index + 1).padStart(2, '0')}`;
+    const position = String(index + 1).padStart(2, '0');
+    mIndex.textContent = `${position} / ${String(projects.length).padStart(2, '0')}`;
+    if (mStationLabel) mStationLabel.textContent = `ESTACIÓN ${position}`;
 
     mTags.innerHTML = project.tags.map(t => `<span>${escapeHtml(t)}</span>`).join('');
 
@@ -234,8 +234,8 @@ export function initModal() {
 
     mDesc.innerHTML = `
       ${project.repo ? renderRepoStrip(project) : ''}
-      <p><strong>${escapeHtml(project.summary)}</strong></p>
-      <p>${escapeHtml(project.description)}</p>
+      ${project.summary ? `<p><strong>${escapeHtml(project.summary)}</strong></p>` : ''}
+      ${project.description ? `<p>${escapeHtml(project.description)}</p>` : ''}
       ${featuresHtml}
       ${project.repo ? renderChangelog(project) : ''}
     `;
@@ -246,15 +246,6 @@ export function initModal() {
       mLink.innerHTML = `Visitar sitio <span class="m-link-arrow">→</span>`;
     } else {
       mLink.style.display = 'none';
-    }
-
-    if (mRepoLink) {
-      if (project.repo && project.repo.url) {
-        mRepoLink.href = project.repo.url;
-        mRepoLink.style.display = 'inline-flex';
-      } else {
-        mRepoLink.style.display = 'none';
-      }
     }
 
     const galleryImages = (project.gallery && project.gallery.length)

@@ -30,14 +30,50 @@ Portfolio/
 
 ---
 
-## 🔄 Proyectos personales auto-sincronizados con GitHub
+## 🔐 Panel de administración (`/admin`)
 
-Los proyectos personales no están hardcodeados: cada uno está atado a su repositorio y se actualiza solo cuando pusheás.
+Desde `tu-dominio/admin` se editan **todos los proyectos** (personales y de clientes): textos, tags, funcionalidades, orden, visibilidad, portada, galería y video. Las imágenes se achican y se convierten a WebP en el navegador antes de subirse (máx. 3 MB por archivo).
 
 ```text
-content/personal-projects.config.json   # ✏️ Registro (lo único que se edita a mano)
+admin/                                  # Panel (HTML/CSS/JS, sin build)
+api/admin/{login,content,upload}.js     # Vercel Functions del panel
+api/_lib/                               # Auth, almacenamiento (GitHub / local) y validación
+content/client-projects.json            # Trabajos de clientes
+content/personal-projects.config.json   # Proyectos personales (repo, imágenes, textos fijados)
+```
+
+- **Contraseña:** se verifica en el servidor contra un hash (`api/_lib/auth.js`); no importan mayúsculas ni espacios. Para cambiarla sin tocar código, definí `ADMIN_PASSWORD` en Vercel.
+- **Cómo guarda:** no hay base de datos. Cada "Guardar cambios" es **un commit** al repo vía la API de GitHub (con las imágenes nuevas incluidas) y Vercel redeploya en 1–2 minutos. Si cambiaste un proyecto personal, además corre el sync.
+- **Proyectos personales:** los textos los mantiene al día la sincronización con el repo. Si editás uno desde el panel queda **"Fijado a mano"** (`overrides` en la config) y la sync deja de pisarlo; "Volver a automático" lo libera.
+
+### Configuración en Vercel (una sola vez)
+
+| Variable de entorno | Para qué | ¿Obligatoria? |
+|---|---|---|
+| `GITHUB_TOKEN` | Que el panel pueda guardar (commitear al repo) | Sí, para guardar |
+| `ADMIN_PASSWORD` | Cambiar la contraseña sin tocar código | No |
+| `ADMIN_SESSION_SECRET` | Clave propia para firmar las sesiones | No |
+
+`GITHUB_TOKEN`: GitHub → Settings → Developer settings → **Fine-grained tokens** → Generate new token → *Only select repositories*: `portfolio2026` → Permissions → **Contents: Read and write**. Pegalo en Vercel → Project → Settings → Environment Variables y hacé un Redeploy. Sin token el panel abre en modo solo lectura.
+
+### Probarlo en local
+
+```bash
+npm run dev
+```
+
+Abre el sitio en `http://localhost:5173` y el panel en `/admin/`. En local guarda directo en los archivos de la carpeta (después commiteás vos).
+
+---
+
+## 🔄 Proyectos personales auto-sincronizados con GitHub
+
+Los proyectos personales no están hardcodeados: cada uno está atado a su repositorio y se actualiza solo cuando pusheás. En el sitio no se muestra ningún link al repo ni al código.
+
+```text
+content/personal-projects.config.json   # ✏️ Registro — se edita desde /admin
 scripts/sync-projects.mjs               # Lee los repos y genera la ficha de cada proyecto
-data/personal-projects.json             # 🤖 Generado — lo lee la web (no editar)
+data/personal-projects.json             # 🤖 Generado — la web lo combina con la config (no editar)
 .github/workflows/sync-projects.yml     # Corre el sync cada 6 h, a mano o por aviso del repo
 scripts/templates/notify-portfolio.yml  # Plantilla opcional para el repo de cada proyecto
 ```
@@ -46,9 +82,7 @@ scripts/templates/notify-portfolio.yml  # Plantilla opcional para el repo de cad
 
 ### Agregar un proyecto
 
-1. Sumá una entrada a `content/personal-projects.config.json` con `id`, `repo` (`owner/nombre`), `title`, `subtitle`, `link` y las capturas/video en `assets/projects/`.
-2. Opcional: `ai.notes` (contexto para la IA), `ai.contextFiles` (archivos del repo que conviene que lea) y `seed` (texto inicial).
-3. Corré `npm run sync:projects` (o el Action "Sync proyectos personales" desde GitHub) y commiteá.
+Desde `/admin` → "Proyectos personales" → **+ Nuevo**: título, repositorio (`usuario/nombre`), link e imágenes, y guardar. El guardado dispara el sync, que completa resumen, funcionalidades y changelog en unos minutos. Opcional: notas y archivos de contexto para la IA.
 
 ### Comandos
 
@@ -74,7 +108,7 @@ npm run sync:projects -- --dry-run             # Muestra el resultado sin escrib
 
 ## ✏️ ¿Cómo subir y administrar la información?
 
-¡No necesitas tocar archivos HTML ni CSS! Para agregar, editar o eliminar proyectos, experiencia o habilidades, simplemente abre:
+Los **proyectos** se administran desde el panel `/admin` (ver arriba). El resto del contenido (hero, experiencia, rubros, habilidades) sigue en:
 
 👉 **`js/data/portfolio-data.js`**
 
@@ -90,24 +124,7 @@ personal: {
 }
 ```
 
-#### 2. Agregar un nuevo Proyecto
-Simplemente añade un objeto al arreglo `projects`:
-```javascript
-{
-  id: "nuevo-proyecto",
-  index: "05",
-  title: "Mi Nuevo Proyecto",
-  subtitle: "Descripción corta para la card",
-  tags: ["WordPress", "React", "WooCommerce"],
-  summary: "Resumen destacado del proyecto.",
-  description: "Explicación detallada que aparecerá dentro del modal al hacer clic.",
-  image: "assets/proyectos/mi-captura.png", // o null para placeholder
-  link: "https://misitio.com",
-  featured: true
-}
-```
-
-#### 3. Actualizar Experiencia Laboral
+#### 2. Actualizar Experiencia Laboral
 Añade o modifica elementos en `experience`:
 ```javascript
 {
@@ -118,7 +135,7 @@ Añade o modifica elementos en `experience`:
 }
 ```
 
-#### 4. Añadir o Categorizar Habilidades (Skills)
+#### 3. Añadir o Categorizar Habilidades (Skills)
 En el objeto `skills`, puedes modificar o crear grupos con iconos de [SimpleIcons](https://simpleicons.org/):
 ```javascript
 {
@@ -142,4 +159,8 @@ En el objeto `skills`, puedes modificar o crear grupos con iconos de [SimpleIcon
 
 ## 🛠️ Ejecución Local
 
-Puedes abrir directamente el archivo `index.html` en cualquier navegador moderno o servirlo con cualquier servidor estático local (como Live Server en VS Code, `npx serve`, Vite, o GitHub Pages).
+```bash
+npm run dev
+```
+
+Sirve el sitio en `http://localhost:5173` junto con las funciones de `/api` (el panel incluido). Abrir `index.html` directo con doble clic no funciona porque el sitio usa módulos ES y carga los proyectos con `fetch`.

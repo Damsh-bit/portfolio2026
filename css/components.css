@@ -1503,19 +1503,6 @@ section {
   transform: translateX(3px);
 }
 
-.modal-body .m-link-ghost {
-  color: var(--ink);
-  background: transparent;
-  border-color: var(--line-strong);
-  animation: none;
-}
-
-.modal-body .m-link-ghost:hover {
-  border-color: var(--accent-primary);
-  background: var(--accent-glow-soft);
-  box-shadow: none;
-}
-
 @keyframes m-link-pulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(245, 245, 247, 0.4); }
   50% { box-shadow: 0 0 0 5px rgba(245, 245, 247, 0); }

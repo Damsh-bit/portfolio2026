@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Panel · Portfolio</title>
+  <link rel="icon" href="/assets/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/admin/admin.css">
+</head>
+<body>
+
+  <!-- Login -->
+  <main id="login" class="login">
+    <form id="loginForm" class="login-card" novalidate>
+      <span class="eyebrow mono">&lt;DamiánCoronel/&gt;</span>
+      <h1>Panel del portfolio</h1>
+      <label for="password">Contraseña</label>
+      <input type="password" id="password" autocomplete="current-password" required>
+      <button type="submit" class="btn primary" id="loginBtn">Entrar</button>
+      <p class="form-error" id="loginError" role="alert"></p>
+    </form>
+  </main>
+
+  <!-- Panel -->
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <div class="brand mono">Panel <span>/ proyectos</span></div>
+      <div class="status mono" id="status" aria-live="polite"></div>
+      <div class="topbar-actions">
+        <a class="btn ghost" href="/" target="_blank" rel="noopener">Ver sitio ↗</a>
+        <button type="button" class="btn ghost" id="logoutBtn">Salir</button>
+        <button type="button" class="btn primary" id="saveBtn" disabled>Guardar cambios</button>
+      </div>
+    </header>
+
+    <div class="notice mono" id="notice" hidden></div>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <section class="list-group">
+          <header>
+            <h2 class="mono">Proyectos personales</h2>
+            <button type="button" class="btn small" data-add="personal">+ Nuevo</button>
+          </header>
+          <ol class="project-list" id="personalList"></ol>
+        </section>
+        <section class="list-group">
+          <header>
+            <h2 class="mono">Trabajos de clientes</h2>
+            <button type="button" class="btn small" data-add="client">+ Nuevo</button>
+          </header>
+          <ol class="project-list" id="clientList"></ol>
+        </section>
+      </aside>
+
+      <main class="editor" id="editor"></main>
+    </div>
+  </div>
+
+  <!-- Media library -->
+  <dialog id="mediaDialog" class="media-dialog" aria-labelledby="mediaDialogTitle">
+    <div class="media-dialog-inner">
+      <header>
+        <h2 id="mediaDialogTitle">Biblioteca</h2>
+        <button type="button" class="btn small" id="mediaDialogClose">Cerrar</button>
+      </header>
+      <div class="media-grid" id="mediaGrid"></div>
+    </div>
+  </dialog>
+
+  <script type="module" src="/admin/admin.js"></script>
+</body>
+</html>

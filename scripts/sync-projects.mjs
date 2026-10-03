@@ -37,6 +37,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CONTENT_FIELDS } from '../js/modules/project-model.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = path.join(ROOT, 'content', 'personal-projects.config.json');
@@ -59,8 +60,6 @@ const LIMITS = {
   treePaths: 400
 };
 
-const PRESENTATION_FIELDS = ['title', 'subtitle', 'link', 'image', 'video', 'gallery'];
-const CONTENT_FIELDS = ['summary', 'description', 'tags', 'stack', 'features'];
 const ITEM_KINDS = ['new', 'improve', 'fix'];
 
 /* ------------------------------------------------------------------ */
@@ -402,7 +401,7 @@ function clip(content, label) {
   return `${content.slice(0, LIMITS.contextFileChars)}\n[… recortado]`;
 }
 
-function buildUserPrompt({ cfg, base, snapshot, details, commits, changedFiles, mode, recentChangelog }) {
+function buildUserPrompt({ cfg, base, pinned, snapshot, details, commits, changedFiles, mode, recentChangelog }) {
   const parts = [];
 
   parts.push(`<proyecto>
@@ -416,6 +415,9 @@ repositorio: ${snapshot.url}
   if (cfg.ai?.notes) parts.push(`<notas_del_autor>\n${cfg.ai.notes}\n</notas_del_autor>`);
 
   parts.push(`<ficha_actual>\n${JSON.stringify(base, null, 2)}\n</ficha_actual>`);
+  if (pinned.length) {
+    parts.push(`<campos_fijados>\nEl autor fijó a mano estos campos y se muestran tal cual en el sitio: ${pinned.join(', ')}. Usalos como referencia de tono y contenido para el resto de la ficha.\n</campos_fijados>`);
+  }
 
   if (mode === 'incremental' && recentChangelog.length) {
     parts.push(`<changelog_reciente>\n${JSON.stringify(recentChangelog, null, 2)}\n</changelog_reciente>`);
@@ -539,11 +541,14 @@ function seedContent(cfg) {
   };
 }
 
-/** Arma la ficha final: presentación desde la config, el resto desde el estado sincronizado. */
-function composeProject(cfg, state) {
+/**
+ * Entrada pública del proyecto: solo lo que genera el sync. Título, imágenes
+ * y textos fijados a mano los toma la web de la config (ver
+ * js/modules/project-model.js). Sin links al repo ni al código.
+ */
+function toEntry(id, state) {
   return {
-    id: cfg.id,
-    ...pick(cfg, PRESENTATION_FIELDS),
+    id,
     ...pick(state, CONTENT_FIELDS),
     changelog: state.changelog || [],
     repo: state.repo,
@@ -565,8 +570,12 @@ async function syncProject(cfg, prev, args, aiEnabled) {
   if (!hasState || args.full || upgradeToAi) mode = 'full';
   else if (prev.repo.headSha === head.sha) mode = 'skip';
 
-  const base = hasState ? { ...seedContent(cfg), ...pick(prev, CONTENT_FIELDS) } : seedContent(cfg);
-  let content = base;
+  // Lo generado se guarda separado de lo que fijaste a mano (overrides): si
+  // después liberás un campo, vuelve al valor automático y no a tu texto.
+  const prevContent = hasState ? { ...seedContent(cfg), ...pick(prev, CONTENT_FIELDS) } : seedContent(cfg);
+  const pinned = pick(cfg.overrides, CONTENT_FIELDS);
+  const base = { ...prevContent, ...pinned };
+  let content = prevContent;
   let changelog = hasState ? prev.changelog || [] : [];
   let analysis = hasState ? prev.analysis : null;
   let version = hasState ? prev.repo.version : null;
@@ -592,7 +601,7 @@ async function syncProject(cfg, prev, args, aiEnabled) {
     if (aiEnabled && relevant.length) {
       try {
         const result = await analyzeWithClaude({
-          cfg, base, snapshot, details, mode,
+          cfg, base, pinned: Object.keys(pinned), snapshot, details, mode,
           commits: relevant,
           changedFiles: history.changedFiles,
           recentChangelog: changelog.slice(0, 3)
@@ -623,8 +632,6 @@ async function syncProject(cfg, prev, args, aiEnabled) {
     ...content,
     changelog,
     repo: {
-      fullName: snapshot.fullName,
-      url: snapshot.url,
       branch: snapshot.branch,
       headSha: head.sha,
       createdAt: snapshot.createdAt,
@@ -637,14 +644,13 @@ async function syncProject(cfg, prev, args, aiEnabled) {
     lastCommit: {
       sha: head.sha,
       date: head.date,
-      message: firstLine(head.message),
-      url: head.url
+      message: firstLine(head.message)
     },
     analysis,
     syncedAt: prev?.syncedAt || now
   };
 
-  const project = composeProject(cfg, state);
+  const project = toEntry(cfg.id, state);
   const { syncedAt: _a, ...nextComparable } = project;
   const { syncedAt: _b, ...prevComparable } = prev || {};
   if (JSON.stringify(nextComparable) !== JSON.stringify(prevComparable)) project.syncedAt = now;
@@ -686,7 +692,7 @@ async function main() {
     const prev = prevById.get(cfg.id) || null;
 
     if (!matchesOnly(cfg)) {
-      if (prev) projects.push(composeProject(cfg, prev));
+      if (prev) projects.push(toEntry(cfg.id, prev));
       continue;
     }
 
@@ -696,7 +702,7 @@ async function main() {
     } catch (err) {
       failures++;
       warn(`${cfg.id}: no se pudo sincronizar (${err.message})`);
-      if (prev) projects.push(composeProject(cfg, prev));
+      if (prev) projects.push(toEntry(cfg.id, prev));
     }
   }
 
