@@ -581,35 +581,6 @@ section {
   border: 1px solid var(--line-accent);
 }
 
-/* ---------- Work Filters ---------- */
-.work-filters {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
-}
-
-.filter-btn {
-  font-size: 12px;
-  padding: 8px 18px;
-  border-radius: 100px;
-  border: 1px solid var(--line-strong);
-  background: var(--bg-card);
-  color: var(--ink-dim);
-  transition: color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease);
-}
-
-.filter-btn:hover {
-  color: var(--accent-bright);
-  border-color: var(--accent-primary);
-}
-
-.filter-btn.active {
-  color: var(--accent-bright);
-  background: var(--accent-glow-soft);
-  border-color: var(--accent-primary);
-}
-
 /* ---------- Work Grid & Cards ---------- */
 .work-grid {
   display: grid;
@@ -629,10 +600,6 @@ section {
     grid-template-columns: 1fr;
     gap: 20px;
   }
-}
-
-.work-card.is-hidden {
-  display: none;
 }
 
 .work-card {
@@ -726,7 +693,8 @@ section {
   color: var(--ink);
 }
 
-.work-card .meta h3 .underline {
+.work-card .meta h3 .underline,
+.personal-card h3 .underline {
   position: absolute;
   left: 0;
   bottom: -2px;
@@ -738,7 +706,8 @@ section {
   transition: transform 0.4s var(--ease);
 }
 
-.work-card:hover .meta h3 .underline {
+.work-card:hover .meta h3 .underline,
+.personal-card:hover h3 .underline {
   transform: scaleX(1);
 }
 
@@ -748,7 +717,8 @@ section {
   margin-top: 8px;
 }
 
-.work-card .meta .arrow {
+.work-card .meta .arrow,
+.personal-card .arrow {
   font-size: 20px;
   color: var(--ink-muted);
   width: 36px;
@@ -762,11 +732,179 @@ section {
   transition: transform 0.4s var(--ease), color 0.3s var(--ease), border-color 0.3s var(--ease), background 0.3s var(--ease);
 }
 
-.work-card:hover .meta .arrow {
+.work-card:hover .meta .arrow,
+.personal-card:hover .arrow {
   color: var(--accent-bright);
   border-color: var(--accent-primary);
   background: var(--accent-glow-soft);
   transform: rotate(45deg);
+}
+
+/* ---------- Personal Projects (featured, synced from GitHub) ---------- */
+.personal-grid {
+  display: grid;
+  gap: 28px;
+}
+
+.personal-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+}
+
+.personal-card .thumb {
+  aspect-ratio: auto;
+  min-height: 360px;
+  border-bottom: none;
+  border-right: 1px solid var(--line);
+}
+
+@media (max-width: 860px) {
+  .personal-card {
+    grid-template-columns: 1fr;
+  }
+  .personal-card .thumb {
+    min-height: 0;
+    aspect-ratio: 16/9;
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+  }
+}
+
+.personal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 28px 30px 24px;
+  min-width: 0;
+}
+
+@media (max-width: 600px) {
+  .personal-body {
+    padding: 20px 18px 20px;
+  }
+}
+
+.personal-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.personal-top .index {
+  color: var(--accent-light);
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  color: var(--ink-dim);
+  padding: 4px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  background: var(--bg-soft);
+}
+
+.live-badge .dot,
+.m-repo-facts .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-light);
+  box-shadow: 0 0 6px var(--accent-glow);
+  animation: pulse-dot 1.8s ease-in-out infinite;
+}
+
+.personal-card h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.1;
+  position: relative;
+  align-self: flex-start;
+  color: var(--ink);
+}
+
+.personal-subtitle {
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-top: -6px;
+}
+
+.personal-summary {
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink);
+  max-width: 60ch;
+}
+
+.personal-latest {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px 14px;
+  border-left: 2px solid var(--accent-primary);
+  border-radius: 0 8px 8px 0;
+  background: var(--accent-glow-soft);
+}
+
+.personal-latest .label {
+  font-size: 10.5px;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+}
+
+.personal-latest-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.personal-stack,
+.m-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.personal-stack span,
+.m-stack span {
+  font-size: 11px;
+  color: var(--ink-dim);
+  padding: 4px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  background: var(--bg-soft);
+}
+
+.personal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.personal-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  font-size: 11.5px;
+  color: var(--ink-muted);
+}
+
+.personal-empty {
+  font-size: 12px;
+  color: var(--ink-dim);
+  text-align: center;
+  padding: 28px;
+  border: 1px dashed var(--line-strong);
+  border-radius: 12px;
 }
 
 /* ---------- Industries / Rubros Grid ---------- */
@@ -1179,6 +1317,153 @@ section {
   line-height: 1.4;
 }
 
+/* ---------- Project Modal — Repo strip & changelog (synced projects) ---------- */
+.m-repo {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 68ch;
+  margin-bottom: 18px;
+}
+
+.m-repo-facts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+}
+
+.m-repo-facts .dot {
+  margin-right: -6px;
+}
+
+.m-changelog {
+  max-width: 68ch;
+  margin: 26px 0 8px;
+}
+
+.m-changelog > .label {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--ink-muted);
+  margin-bottom: 14px;
+}
+
+.m-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 18px;
+  border-left: 1px solid var(--line-strong);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.m-timeline-entry {
+  position: relative;
+}
+
+/* Node on the timeline rail: centered on the ol's 1px left border */
+.m-timeline-entry::before {
+  content: '';
+  position: absolute;
+  left: -22.5px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--accent-primary);
+}
+
+.m-timeline-entry:first-child::before {
+  background: var(--accent-light);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Collapsed by default to the latest 4 entries (CHANGELOG_VISIBLE in modal.js) */
+.m-changelog:not(.is-expanded) .m-timeline-entry:nth-child(n + 5) {
+  display: none;
+}
+
+.m-timeline-entry time {
+  display: block;
+  font-size: 11px;
+  color: var(--ink-muted);
+  margin-bottom: 2px;
+}
+
+.m-timeline-entry strong {
+  display: block;
+  font-size: 13.5px;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.m-timeline-entry ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.m-timeline-entry li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: var(--ink-dim);
+}
+
+.m-kind {
+  flex: none;
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border: 1px solid var(--line-strong);
+  border-radius: 4px;
+  color: var(--ink-dim);
+}
+
+.m-kind[data-kind="new"] {
+  color: var(--accent-bright);
+  border-color: var(--line-accent);
+  background: var(--accent-glow-soft);
+}
+
+.m-kind[data-kind="fix"] {
+  color: var(--ink-muted);
+}
+
+.m-changelog-more {
+  margin-top: 14px;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  padding: 6px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 100px;
+  background: var(--bg-card);
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+
+.m-changelog-more:hover {
+  color: var(--accent-bright);
+  border-color: var(--accent-primary);
+}
+
+.m-sync-note {
+  display: block;
+  margin-top: 14px;
+  font-size: 10.5px;
+  color: var(--ink-muted);
+}
+
 /* ---------- Project Modal — Meta Row (visit link + likes/views) ---------- */
 .m-meta-row {
   display: flex;
@@ -1216,6 +1501,19 @@ section {
 
 .modal-body .m-link:hover .m-link-arrow {
   transform: translateX(3px);
+}
+
+.modal-body .m-link-ghost {
+  color: var(--ink);
+  background: transparent;
+  border-color: var(--line-strong);
+  animation: none;
+}
+
+.modal-body .m-link-ghost:hover {
+  border-color: var(--accent-primary);
+  background: var(--accent-glow-soft);
+  box-shadow: none;
 }
 
 @keyframes m-link-pulse {

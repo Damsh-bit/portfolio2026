@@ -58,6 +58,7 @@
     </button>
     <nav class="mono" id="siteNav">
       <a href="#work">Trabajos</a>
+      <a href="#personal">Proyectos</a>
       <a href="#industries">Rubros</a>
       <a href="#experience">Experiencia</a>
       <a href="#about">Sobre mí</a>
@@ -111,13 +112,22 @@
         </div>
         <span class="count mono" id="workCount">(00)</span>
       </div>
-      <div class="work-filters mono" id="workFilters">
-        <button type="button" class="filter-btn active" data-filter="all">Todos</button>
-        <button type="button" class="filter-btn" data-filter="trabajo">Trabajos</button>
-        <button type="button" class="filter-btn" data-filter="personal">Proyectos personales</button>
-      </div>
       <div class="work-grid" id="workGrid">
         <!-- Rendered dynamically from portfolio-data.js -->
+      </div>
+    </section>
+
+    <!-- Personal Projects Section (synced from GitHub) -->
+    <section id="personal">
+      <div class="section-head">
+        <div class="section-head-title">
+          <h2 data-typewriter>Proyectos personales</h2>
+          <span class="section-note mono"><i class="dot"></i>Sincronizados con GitHub</span>
+        </div>
+        <span class="count mono" id="personalCount">(00)</span>
+      </div>
+      <div class="personal-grid" id="personalGrid">
+        <!-- Rendered dynamically from data/personal-projects.json -->
       </div>
     </section>
 
@@ -215,6 +225,7 @@
           <h2 id="mTitle">Nombre del proyecto</h2>
           <div class="m-meta-row">
             <a href="#" class="m-link mono" id="mLink" target="_blank" rel="noopener noreferrer">Visitar sitio <span class="m-link-arrow">→</span></a>
+            <a href="#" class="m-link m-link-ghost mono" id="mRepoLink" target="_blank" rel="noopener noreferrer" style="display: none">Ver código <span class="m-link-arrow">↗</span></a>
             <div class="m-stats mono">
               <button type="button" class="m-like" id="mLikeBtn" aria-label="Me gusta este proyecto" aria-pressed="false">
                 <span class="m-like-icon" aria-hidden="true">♥</span><span id="mLikeCount">0</span>

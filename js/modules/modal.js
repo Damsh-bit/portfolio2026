@@ -6,15 +6,73 @@
  * lets you slide between projects (swipe, arrows, or arrow keys) with a
  * GSAP parallax transition — the hero image travels farther and settles
  * slower than the text, giving the swap a sense of depth.
+ *
+ * Projects synced from GitHub (they carry a `repo`) also get a repo strip
+ * (stack, commits, version, last update) and a "latest changes" timeline.
  */
 
-import { portfolioData } from '../data/portfolio-data.js';
+import { getProjects } from './projects-store.js';
+import { escapeHtml, relativeDate, shortDate } from './format.js';
 import { renderGallery, isLightboxActive } from './gallery.js';
 import { openVideoLightbox } from './video-lightbox.js';
 import { isLiked, registerView, toggleLike } from './project-stats.js';
 
 const SWIPE_THRESHOLD = 80;
 const DRAG_LOCK = 10;
+const CHANGELOG_VISIBLE = 4;
+const KIND_LABELS = { new: 'NUEVO', improve: 'MEJORA', fix: 'FIX' };
+
+function renderRepoStrip(project) {
+  const { repo } = project;
+  const facts = [
+    repo.updatedAt ? `Actualizado ${relativeDate(repo.updatedAt)}` : '',
+    repo.commits ? `${repo.commits} commits` : '',
+    repo.version ? `v${escapeHtml(repo.version)}` : '',
+    (repo.languages || []).slice(0, 2).map((l) => `${escapeHtml(l.name)} ${Math.round(l.pct)}%`).join(' · ')
+  ].filter(Boolean);
+
+  return `
+    <div class="m-repo">
+      <div class="m-repo-facts mono">
+        <i class="dot" aria-hidden="true"></i>${facts.map((f) => `<span>${f}</span>`).join('')}
+      </div>
+      ${project.stack && project.stack.length
+        ? `<div class="m-stack mono">${project.stack.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}</div>`
+        : ''}
+    </div>
+  `;
+}
+
+function renderChangelog(project) {
+  const entries = project.changelog || [];
+  if (!entries.length) return '';
+
+  const aiNote = project.analysis && project.analysis.mode === 'ai'
+    ? 'Resumen generado con IA a partir del repositorio'
+    : 'Tomado de los commits del repositorio';
+  const hidden = entries.length - CHANGELOG_VISIBLE;
+
+  return `
+    <div class="m-changelog${hidden > 0 ? '' : ' is-expanded'}">
+      <span class="label mono">ÚLTIMOS CAMBIOS</span>
+      <ol class="m-timeline">
+        ${entries.map((entry) => `
+          <li class="m-timeline-entry">
+            <time class="mono" datetime="${escapeHtml(entry.date)}">${escapeHtml(shortDate(entry.date))}</time>
+            <strong>${escapeHtml(entry.title)}</strong>
+            <ul>
+              ${entry.items.map((item) => `
+                <li><span class="m-kind mono" data-kind="${escapeHtml(item.kind)}">${KIND_LABELS[item.kind] || 'CAMBIO'}</span>${escapeHtml(item.text)}</li>
+              `).join('')}
+            </ul>
+          </li>
+        `).join('')}
+      </ol>
+      ${hidden > 0 ? `<button type="button" class="m-changelog-more mono" data-changelog-more>Ver ${hidden} más ↓</button>` : ''}
+      <span class="m-sync-note mono">${aiNote} · sincronizado con GitHub</span>
+    </div>
+  `;
+}
 
 export function initModal() {
   const modal = document.getElementById('modal');
@@ -30,6 +88,7 @@ export function initModal() {
   const mThumbPlay = document.getElementById('mThumbPlay');
   const mDesc = document.getElementById('mDesc');
   const mLink = document.getElementById('mLink');
+  const mRepoLink = document.getElementById('mRepoLink');
   const mLikeBtn = document.getElementById('mLikeBtn');
   const mLikeCount = document.getElementById('mLikeCount');
   const mViewsCount = document.getElementById('mViewsCount');
@@ -135,7 +194,8 @@ export function initModal() {
   }
 
   function fillContent(index) {
-    const project = portfolioData.projects[index];
+    const projects = getProjects();
+    const project = projects[index];
     if (!project) return;
 
     currentProjectId = project.id;
@@ -143,15 +203,15 @@ export function initModal() {
     statsToken += 1;
 
     mTitle.textContent = project.title;
-    mIndex.textContent = `${project.index || String(index + 1).padStart(2, '0')} / ${String(portfolioData.projects.length).padStart(2, '0')}`;
+    mIndex.textContent = `${project.index || String(index + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')}`;
     if (mStationLabel) mStationLabel.textContent = `ESTACIÓN ${project.index || String(index + 1).padStart(2, '0')}`;
 
-    mTags.innerHTML = project.tags.map(t => `<span>${t}</span>`).join('');
+    mTags.innerHTML = project.tags.map(t => `<span>${escapeHtml(t)}</span>`).join('');
 
     if (project.image) {
-      mThumb.innerHTML = `<img src="${project.image}" alt="${project.title}">`;
+      mThumb.innerHTML = `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}">`;
     } else {
-      mThumb.innerHTML = `<span>${project.subtitle || 'Agregá tu captura'}</span>`;
+      mThumb.innerHTML = `<span>${escapeHtml(project.subtitle || 'Agregá tu captura')}</span>`;
     }
 
     mThumbPlay.hidden = !currentVideoSrc;
@@ -165,17 +225,19 @@ export function initModal() {
           <div class="m-feature">
             <span class="m-feature-ico">✓</span>
             <div class="m-feature-body">
-              <strong>${f.title}</strong>
-              <span>${f.text}</span>
+              <strong>${escapeHtml(f.title)}</strong>
+              <span>${escapeHtml(f.text)}</span>
             </div>
           </div>
         `).join('')}</div>`
       : '';
 
     mDesc.innerHTML = `
-      <p><strong>${project.summary}</strong></p>
-      <p>${project.description}</p>
+      ${project.repo ? renderRepoStrip(project) : ''}
+      <p><strong>${escapeHtml(project.summary)}</strong></p>
+      <p>${escapeHtml(project.description)}</p>
       ${featuresHtml}
+      ${project.repo ? renderChangelog(project) : ''}
     `;
 
     if (project.link && project.link !== '#') {
@@ -184,6 +246,15 @@ export function initModal() {
       mLink.innerHTML = `Visitar sitio <span class="m-link-arrow">→</span>`;
     } else {
       mLink.style.display = 'none';
+    }
+
+    if (mRepoLink) {
+      if (project.repo && project.repo.url) {
+        mRepoLink.href = project.repo.url;
+        mRepoLink.style.display = 'inline-flex';
+      } else {
+        mRepoLink.style.display = 'none';
+      }
     }
 
     const galleryImages = (project.gallery && project.gallery.length)
@@ -232,7 +303,7 @@ export function initModal() {
    *  text container, reading as a parallax layer instead of a flat swap. */
   function goToProject(direction, opts = {}) {
     if (isAnimating) return;
-    const total = portfolioData.projects.length;
+    const total = getProjects().length;
     const nextIndex = (currentIndex + direction + total) % total;
     const outX = direction > 0 ? -90 : 90;
     const outDuration = opts.outDuration ?? 0.28;
@@ -278,6 +349,13 @@ export function initModal() {
       const idx = parseInt(card.dataset.project, 10);
       if (!isNaN(idx)) openModal(idx);
     }
+  });
+
+  mDesc.addEventListener('click', (e) => {
+    const moreBtn = e.target.closest('[data-changelog-more]');
+    if (!moreBtn) return;
+    moreBtn.closest('.m-changelog').classList.add('is-expanded');
+    moreBtn.remove();
   });
 
   if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);

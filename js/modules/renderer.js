@@ -6,12 +6,15 @@
  */
 
 import { portfolioData } from '../data/portfolio-data.js';
+import { getProjects, isPersonalLoaded } from './projects-store.js';
+import { escapeHtml, relativeDate, shortDate } from './format.js';
 
 export function renderPortfolio() {
   injectSEO();
   renderHeader();
   renderHero();
   renderProjects();
+  renderPersonalProjects();
   renderIndustries();
   renderExperience();
   renderAbout();
@@ -143,34 +146,99 @@ function renderHero() {
   if (ratingTextEl) ratingTextEl.textContent = `${personal.upworkRating} en Upwork`;
 }
 
-/** Selected Work Grid */
+const pad = (n) => String(n).padStart(2, '0');
+
+/** Selected Work Grid (client projects). data-project is the index in the
+ *  combined store list, which is what the modal navigates. */
 function renderProjects() {
   const gridEl = document.getElementById('workGrid');
   const countEl = document.getElementById('workCount');
+  const entries = getProjects()
+    .map((project, idx) => ({ project, idx }))
+    .filter(({ project }) => project.type !== 'personal');
 
-  if (countEl) {
-    countEl.textContent = `(${String(portfolioData.projects.length).padStart(2, '0')})`;
-  }
+  if (countEl) countEl.textContent = `(${pad(entries.length)})`;
 
   if (gridEl) {
-    gridEl.innerHTML = portfolioData.projects.map((project, idx) => `
-      <div class="work-card reveal" data-project="${idx}" data-type="${project.type || 'trabajo'}">
+    gridEl.innerHTML = entries.map(({ project, idx }) => `
+      <div class="work-card reveal" data-project="${idx}" data-type="${project.type}">
         <div class="thumb">
           ${project.image
-            ? `<img src="${project.image}" alt="${project.title}" loading="lazy">`
-            : `<span>${project.subtitle || 'Ver detalles del proyecto'}</span>`}
+            ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">`
+            : `<span>${escapeHtml(project.subtitle || 'Ver detalles del proyecto')}</span>`}
         </div>
         <div class="meta">
           <div>
-            <span class="index mono">${project.index || String(idx + 1).padStart(2, '0')}</span>
-            <h3>${project.title}<span class="underline"></span></h3>
-            <div class="tags mono">${project.tags.join(' · ')}</div>
+            <span class="index mono">${project.index || pad(idx + 1)}</span>
+            <h3>${escapeHtml(project.title)}<span class="underline"></span></h3>
+            <div class="tags mono">${project.tags.map(escapeHtml).join(' · ')}</div>
           </div>
           <span class="arrow">↗</span>
         </div>
       </div>
     `).join('');
   }
+}
+
+/** Featured personal projects — each one synced from its GitHub repo, so
+ *  the card shows live repo info (last update, latest change, stack). */
+function renderPersonalProjects() {
+  const gridEl = document.getElementById('personalGrid');
+  const countEl = document.getElementById('personalCount');
+  const entries = getProjects()
+    .map((project, idx) => ({ project, idx }))
+    .filter(({ project }) => project.type === 'personal');
+
+  if (countEl) countEl.textContent = `(${pad(entries.length)})`;
+  if (!gridEl) return;
+
+  if (!entries.length) {
+    gridEl.innerHTML = `<p class="personal-empty mono">${isPersonalLoaded()
+      ? 'Pronto vas a ver acá mis proyectos personales.'
+      : 'No pude cargar los proyectos personales en este momento.'}</p>`;
+    return;
+  }
+
+  gridEl.innerHTML = entries.map(({ project, idx }, i) => {
+    const latest = project.changelog[0];
+    const repo = project.repo;
+    const topLanguage = repo && repo.languages && repo.languages[0];
+    const updated = repo && repo.updatedAt ? relativeDate(repo.updatedAt) : '';
+
+    return `
+      <article class="work-card personal-card reveal" data-project="${idx}" data-type="personal">
+        <div class="thumb">
+          ${project.image
+            ? `<img src="${escapeHtml(project.image)}" alt="${escapeHtml(project.title)}" loading="lazy">`
+            : `<span>${escapeHtml(project.subtitle || 'Ver detalles del proyecto')}</span>`}
+        </div>
+        <div class="personal-body">
+          <div class="personal-top mono">
+            <span class="index">${pad(i + 1)}</span>
+            ${updated ? `<span class="live-badge"><i class="dot"></i>Actualizado ${updated}</span>` : ''}
+          </div>
+          <h3>${escapeHtml(project.title)}<span class="underline"></span></h3>
+          ${project.subtitle ? `<p class="personal-subtitle mono">${escapeHtml(project.subtitle)}</p>` : ''}
+          <p class="personal-summary">${escapeHtml(project.summary)}</p>
+          ${latest ? `
+            <div class="personal-latest">
+              <span class="label mono">ÚLTIMO CAMBIO · ${escapeHtml(shortDate(latest.date))}</span>
+              <span class="personal-latest-text">${escapeHtml(latest.items[0] ? latest.items[0].text : latest.title)}</span>
+            </div>` : ''}
+          ${project.stack && project.stack.length ? `
+            <div class="personal-stack mono">${project.stack.slice(0, 6).map((s) => `<span>${escapeHtml(s)}</span>`).join('')}</div>` : ''}
+          <div class="personal-foot mono">
+            <span class="personal-facts">
+              ${repo && repo.commits ? `<span>${repo.commits} commits</span>` : ''}
+              ${repo && repo.version ? `<span>v${escapeHtml(repo.version)}</span>` : ''}
+              ${topLanguage ? `<span>${escapeHtml(topLanguage.name)} ${Math.round(topLanguage.pct)}%</span>` : ''}
+            </span>
+            <span class="arrow">↗</span>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
 }
 
 /** Industries / Rubros Grid */

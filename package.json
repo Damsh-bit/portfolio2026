@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "sync:projects": "node scripts/sync-projects.mjs"
+  },
   "dependencies": {
     "@vercel/speed-insights": "^2.0.0"
+  },
+  "devDependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
   }
 }

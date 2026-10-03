@@ -5,6 +5,7 @@
  * Initializes renderer, canvas background, cursor, modals, and animations.
  */
 
+import { loadProjects } from './modules/projects-store.js';
 import { renderPortfolio } from './modules/renderer.js';
 import { initUniverseBg } from './modules/universe-bg.js';
 import { initSpaceScene } from './modules/space-scene.js';
@@ -18,7 +19,6 @@ import { initModal } from './modules/modal.js';
 import { initNav } from './modules/nav.js';
 import { initAnimations } from './modules/animations.js';
 import { initTyping } from './modules/typing.js';
-import { initProjectFilters } from './modules/project-filters.js';
 import { initUiToggle } from './modules/ui-toggle.js';
 import { initStarLightbox } from './modules/star-lightbox.js';
 import { initWandererLightbox } from './modules/wanderer-lightbox.js';
@@ -26,8 +26,13 @@ import { initExoplanetLightbox } from './modules/exoplanet-lightbox.js';
 import { initChatbot } from './modules/chatbot.js';
 import { initShipDashboard } from './modules/ship-dashboard.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Render all dynamic content from portfolio-data.js
+// Personal projects live in a static JSON synced from GitHub — start the
+// fetch now so it's usually done by the time the DOM is ready.
+const projectsReady = loadProjects();
+
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Render all dynamic content (portfolio-data.js + synced personal projects)
+  await projectsReady;
   renderPortfolio();
 
   // 2. Initialize Universe Canvas Background
@@ -59,9 +64,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 7. Initialize Typewriter Title Animations
   initTyping();
-
-  // 8. Initialize Project Grid Filters
-  initProjectFilters();
 
   // 9. Initialize UI Visibility Toggle (hide interface to view background)
   initUiToggle();

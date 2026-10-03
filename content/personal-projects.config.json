@@ -1,0 +1,49 @@
+{
+  "$comment": "Registro de proyectos personales. Cada uno está atado a un repo de GitHub: scripts/sync-projects.mjs lee el repo y genera data/personal-projects.json (no editar ese archivo a mano). Campos fijos (title, subtitle, link, image, video, gallery) siempre ganan; 'seed' es el punto de partida que la IA va actualizando con cada commit nuevo.",
+  "projects": [
+    {
+      "id": "alz-stats",
+      "repo": "Damsh-bit/10v10stats",
+      "branch": "main",
+      "title": "ALZ Stats",
+      "subtitle": "App de estadísticas — CS2 5v5",
+      "link": "https://alzstats.pro/",
+      "image": "assets/projects/alz-stats.png",
+      "video": "assets/projects/alz-stats-cover.mp4",
+      "gallery": [
+        "assets/projects/alz-stats.png",
+        "assets/projects/alz-stats-2.png",
+        "assets/projects/alz-stats-3.png",
+        "assets/projects/alz-stats-4.png",
+        "assets/projects/alz-stats-5.png",
+        "assets/projects/alz-stats-6.png",
+        "assets/projects/alz-stats-7.png",
+        "assets/projects/alz-stats-8.png"
+      ],
+      "ai": {
+        "notes": "Proyecto 100% personal: la plataforma de estadísticas de las partidas 5v5 de CS2 que Damián juega hace años con su grupo de amigos. En la interfaz se llama '10v10 Stats'. Las capturas y textos están llenos de apodos y chistes internos (Nelson, fakazos, Taka Bieler, Tiky): mencionalos con humor pero sin explicarlos de más. Lo que interesa destacar para un reclutador es la ingeniería: lectura de scoreboards por IA, algoritmo de balanceo de equipos, cálculos en tiempo real sobre el historial, integraciones (FACEIT, Mercado Pago, Supabase).",
+        "contextFiles": ["lib/novedades.ts", "docs/apuestas.md", "package.json"]
+      },
+      "seed": {
+        "summary": "Plataforma de estadísticas para nuestras partidas semanales de CS2 con el grupo de amigos: carga por IA, rankings por temporada, ladder de FACEIT y generador de equipos autobalanceado.",
+        "description": "ALZ Stats (en la interfaz, '10v10 Stats') es la plataforma que armé para las partidas 5v5 de CS2 que jugamos hace años con mi grupo de amigos. Es un proyecto 100% personal, así que las capturas están llenas de apodos y chistes internos — pero por debajo corre una app con bastante ingeniería real, sobre todo en la lectura automática de resultados por IA, el algoritmo de balanceo de equipos y las integraciones con FACEIT y Mercado Pago. Estas son todas las funcionalidades que le fui agregando:",
+        "tags": ["Dashboard de datos", "IA / OCR", "Algoritmo de balanceo"],
+        "features": [
+          { "title": "Carga de partidas por IA", "text": "Subís el scoreboard final de CS2 y un modelo de visión extrae kills, muertes, asistencias y daño de cada jugador solo." },
+          { "title": "Generador de equipos autobalanceado", "text": "Cruza el rating del 10v10, el nivel de FACEIT y las rachas recientes, prueba las 126 combinaciones posibles y se queda con la más pareja." },
+          { "title": "Apuestas con Mercado Pago", "text": "Pozo por equipos y duelos 1v1 con cuotas calculadas a partir de las chances del generador; se liquidan solas al cargar la partida." },
+          { "title": "Ladder de FACEIT", "text": "Nivel, elo, forma y gráficos de cada jugador, con historial guardado y sincronización periódica." },
+          { "title": "Temporadas", "text": "Rankings por temporada, archivo histórico de la Season 1 y comparación de rendimiento entre temporadas." },
+          { "title": "Análisis dinámico de datos", "text": "Ladder, perfiles, mapas y curiosidades se recalculan en tiempo real sobre el historial, sin valores hardcodeados." },
+          { "title": "Winrate por mapa", "text": "Gráficos de radar comparando el desempeño de cada equipo, mapa por mapa." },
+          { "title": "Perfil individual", "text": "Récord, apodo, KDA, historial de partidas y logros propios de cada jugador." },
+          { "title": "Estadísticas globales", "text": "Hall of Fame con los récords históricos del grupo: más kills, menos daño, mapa más jugado y más." },
+          { "title": "Panel de curiosidades", "text": "Datos random generados sobre la marcha ('Fulano rinde mejor los viernes', etc.)." },
+          { "title": "Novedades in-app", "text": "Pop-ups con demos animadas que le muestran a cada jugador, una sola vez, lo nuevo del sitio." },
+          { "title": "Votación al peor de la fecha", "text": "Nelson Vote semanal, con su propio ranking paralelo: la Nelson League." },
+          { "title": "Contador de 'fakazos'", "text": "Nuestro chiste interno: quién más se hace el picante sin banca atrás." }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+# Mantiene data/personal-projects.json al día con los repos de cada proyecto
+# personal (ver content/personal-projects.config.json). Si algo cambió, commitea
+# el JSON y el push dispara el deploy de Vercel.
+#
+# Se dispara:
+#  - cada 6 horas (cron),
+#  - a mano desde la pestaña Actions (opcionalmente un solo proyecto o reanálisis completo),
+#  - al instante cuando el repo de un proyecto manda un repository_dispatch
+#    "project-updated" (plantilla en scripts/templates/notify-portfolio.yml).
+name: Sync proyectos personales
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      project:
+        description: "id o owner/repo del proyecto (vacío = todos)"
+        required: false
+        default: ""
+      full:
+        description: "Reanalizar toda la historia"
+        type: boolean
+        default: false
+  repository_dispatch:
+    types: [project-updated]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-projects
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sincronizar
+        env:
+          # Para repos privados, crear el secret PROJECTS_GITHUB_TOKEN (PAT con lectura de esos repos).
+          GITHUB_TOKEN: ${{ secrets.PROJECTS_GITHUB_TOKEN || secrets.GITHUB_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ONLY: ${{ github.event.inputs.project || github.event.client_payload.repo || '' }}
+          FULL: ${{ github.event.inputs.full || 'false' }}
+        run: |
+          args=()
+          if [ -n "$ONLY" ]; then args+=("--only=$ONLY"); fi
+          if [ "$FULL" = "true" ]; then args+=("--full"); fi
+          node scripts/sync-projects.mjs "${args[@]}"
+
+      - name: Commit y push si hubo cambios
+        run: |
+          if git diff --quiet -- data/personal-projects.json; then
+            echo "Sin cambios."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/personal-projects.json
+          git commit -m "chore(data): sync proyectos personales"
+          git pull --rebase --autostash
+          git push

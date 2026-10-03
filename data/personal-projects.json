@@ -1,0 +1,294 @@
+{
+  "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
+  "generatedAt": "2026-10-03T19:32:51.867Z",
+  "projects": [
+    {
+      "id": "alz-stats",
+      "title": "ALZ Stats",
+      "subtitle": "App de estadísticas — CS2 5v5",
+      "link": "https://alzstats.pro/",
+      "image": "assets/projects/alz-stats.png",
+      "video": "assets/projects/alz-stats-cover.mp4",
+      "gallery": [
+        "assets/projects/alz-stats.png",
+        "assets/projects/alz-stats-2.png",
+        "assets/projects/alz-stats-3.png",
+        "assets/projects/alz-stats-4.png",
+        "assets/projects/alz-stats-5.png",
+        "assets/projects/alz-stats-6.png",
+        "assets/projects/alz-stats-7.png",
+        "assets/projects/alz-stats-8.png"
+      ],
+      "summary": "Plataforma de estadísticas para nuestras partidas semanales de CS2 con el grupo de amigos: carga por IA, rankings por temporada, ladder de FACEIT y generador de equipos autobalanceado.",
+      "description": "ALZ Stats (en la interfaz, '10v10 Stats') es la plataforma que armé para las partidas 5v5 de CS2 que jugamos hace años con mi grupo de amigos. Es un proyecto 100% personal, así que las capturas están llenas de apodos y chistes internos — pero por debajo corre una app con bastante ingeniería real, sobre todo en la lectura automática de resultados por IA, el algoritmo de balanceo de equipos y las integraciones con FACEIT y Mercado Pago. Estas son todas las funcionalidades que le fui agregando:",
+      "tags": [
+        "Dashboard de datos",
+        "IA / OCR",
+        "Algoritmo de balanceo"
+      ],
+      "stack": [
+        "Next.js 16",
+        "React 19",
+        "TypeScript",
+        "Tailwind CSS 4",
+        "Supabase",
+        "Motion",
+        "Recharts",
+        "Gemini API"
+      ],
+      "features": [
+        {
+          "title": "Carga de partidas por IA",
+          "text": "Subís el scoreboard final de CS2 y un modelo de visión extrae kills, muertes, asistencias y daño de cada jugador solo."
+        },
+        {
+          "title": "Generador de equipos autobalanceado",
+          "text": "Cruza el rating del 10v10, el nivel de FACEIT y las rachas recientes, prueba las 126 combinaciones posibles y se queda con la más pareja."
+        },
+        {
+          "title": "Apuestas con Mercado Pago",
+          "text": "Pozo por equipos y duelos 1v1 con cuotas calculadas a partir de las chances del generador; se liquidan solas al cargar la partida."
+        },
+        {
+          "title": "Ladder de FACEIT",
+          "text": "Nivel, elo, forma y gráficos de cada jugador, con historial guardado y sincronización periódica."
+        },
+        {
+          "title": "Temporadas",
+          "text": "Rankings por temporada, archivo histórico de la Season 1 y comparación de rendimiento entre temporadas."
+        },
+        {
+          "title": "Análisis dinámico de datos",
+          "text": "Ladder, perfiles, mapas y curiosidades se recalculan en tiempo real sobre el historial, sin valores hardcodeados."
+        },
+        {
+          "title": "Winrate por mapa",
+          "text": "Gráficos de radar comparando el desempeño de cada equipo, mapa por mapa."
+        },
+        {
+          "title": "Perfil individual",
+          "text": "Récord, apodo, KDA, historial de partidas y logros propios de cada jugador."
+        },
+        {
+          "title": "Estadísticas globales",
+          "text": "Hall of Fame con los récords históricos del grupo: más kills, menos daño, mapa más jugado y más."
+        },
+        {
+          "title": "Panel de curiosidades",
+          "text": "Datos random generados sobre la marcha ('Fulano rinde mejor los viernes', etc.)."
+        },
+        {
+          "title": "Novedades in-app",
+          "text": "Pop-ups con demos animadas que le muestran a cada jugador, una sola vez, lo nuevo del sitio."
+        },
+        {
+          "title": "Votación al peor de la fecha",
+          "text": "Nelson Vote semanal, con su propio ranking paralelo: la Nelson League."
+        },
+        {
+          "title": "Contador de 'fakazos'",
+          "text": "Nuestro chiste interno: quién más se hace el picante sin banca atrás."
+        }
+      ],
+      "changelog": [
+        {
+          "date": "2026-10-01",
+          "title": "Novedades · Apuestas · Home",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Pop-up de las apuestas encadenado con el del generador"
+            },
+            {
+              "kind": "fix",
+              "text": "Checkout de Mercado Pago andando en localhost"
+            },
+            {
+              "kind": "new",
+              "text": "Pozo por equipos y duelos 1v1 con Mercado Pago"
+            },
+            {
+              "kind": "new",
+              "text": "Pop-up de novedades con demo animada del generador"
+            },
+            {
+              "kind": "new",
+              "text": "Generador con nivel de FACEIT, rachas del 10v10 y duelos"
+            },
+            {
+              "kind": "new",
+              "text": "Historial guardado en Supabase y sincronización estable"
+            }
+          ]
+        },
+        {
+          "date": "2026-09-30",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "fix",
+              "text": "Responsive, modales por encima de todo, ranking desde la 1ra partida y Taka Bieler"
+            },
+            {
+              "kind": "new",
+              "text": "Season 2 — temporadas, archivo de la Season 1 y rediseño con Motion"
+            }
+          ]
+        },
+        {
+          "date": "2026-09-05",
+          "title": "Correcciones",
+          "items": [
+            {
+              "kind": "fix",
+              "text": "Ladder por partidas en vez de días, elimina feature de highlights/video"
+            }
+          ]
+        },
+        {
+          "date": "2026-09-02",
+          "title": "Correcciones",
+          "items": [
+            {
+              "kind": "fix",
+              "text": "Optimize Next.js caching and images to reduce Supabase egress"
+            }
+          ]
+        },
+        {
+          "date": "2026-08-21",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Agregar modo de últimas 20 partidas al generador de equipos"
+            }
+          ]
+        },
+        {
+          "date": "2026-08-20",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Add Super Final del Mundo teaser page with anonymous expectations wall"
+            }
+          ]
+        },
+        {
+          "date": "2026-08-12",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Agregar validacion de clave en StatTrak de Fakasos y bump v1.0.1"
+            }
+          ]
+        },
+        {
+          "date": "2026-08-07",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Add curiosities banner and insights feature"
+            }
+          ]
+        },
+        {
+          "date": "2026-08-06",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Add monthly ladder toggle on home dashboard"
+            }
+          ]
+        },
+        {
+          "date": "2026-07-07",
+          "title": "Nuevas funcionalidades",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Add app version to footer and bump to v1.0.0"
+            },
+            {
+              "kind": "fix",
+              "text": "Implement singleton for supabase clients to prevent realtime connection leaks"
+            }
+          ]
+        },
+        {
+          "date": "2026-07-06",
+          "title": "UI",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Add AnimatedNumber and apply to stats/matches/player components"
+            }
+          ]
+        },
+        {
+          "date": "2026-07-04",
+          "title": "Mejoras",
+          "items": [
+            {
+              "kind": "fix",
+              "text": "Perfil de jugadores"
+            },
+            {
+              "kind": "fix",
+              "text": "Empate"
+            },
+            {
+              "kind": "improve",
+              "text": "Logica de empate"
+            }
+          ]
+        }
+      ],
+      "repo": {
+        "fullName": "Damsh-bit/10v10stats",
+        "url": "https://github.com/Damsh-bit/10v10stats",
+        "branch": "main",
+        "headSha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
+        "createdAt": "2026-06-23T19:27:39Z",
+        "updatedAt": "2026-10-01T22:35:03Z",
+        "commits": 130,
+        "stars": 1,
+        "version": "2.0.0",
+        "languages": [
+          {
+            "name": "TypeScript",
+            "pct": 96.9
+          },
+          {
+            "name": "PLpgSQL",
+            "pct": 1.8
+          },
+          {
+            "name": "CSS",
+            "pct": 1.2
+          },
+          {
+            "name": "JavaScript",
+            "pct": 0.1
+          }
+        ]
+      },
+      "lastCommit": {
+        "sha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
+        "date": "2026-10-01T22:35:03Z",
+        "message": "feat(novedades): pop-up de las apuestas encadenado con el del generador",
+        "url": "https://github.com/Damsh-bit/10v10stats/commit/621884b129fe7593307fb67494d26fb4b3cf16e6"
+      },
+      "analysis": {
+        "mode": "heuristic",
+        "sha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
+        "at": "2026-10-03T19:32:51.867Z"
+      },
+      "syncedAt": "2026-10-03T19:32:51.867Z"
+    }
+  ]
+}

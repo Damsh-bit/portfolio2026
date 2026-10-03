@@ -30,6 +30,48 @@ Portfolio/
 
 ---
 
+## 🔄 Proyectos personales auto-sincronizados con GitHub
+
+Los proyectos personales no están hardcodeados: cada uno está atado a su repositorio y se actualiza solo cuando pusheás.
+
+```text
+content/personal-projects.config.json   # ✏️ Registro (lo único que se edita a mano)
+scripts/sync-projects.mjs               # Lee los repos y genera la ficha de cada proyecto
+data/personal-projects.json             # 🤖 Generado — lo lee la web (no editar)
+.github/workflows/sync-projects.yml     # Corre el sync cada 6 h, a mano o por aviso del repo
+scripts/templates/notify-portfolio.yml  # Plantilla opcional para el repo de cada proyecto
+```
+
+**Flujo:** pusheás al repo del proyecto → el Action del portfolio detecta los commits nuevos → (con `ANTHROPIC_API_KEY`) Claude actualiza resumen, stack, la lista acumulativa de funcionalidades y redacta el changelog → se commitea `data/personal-projects.json` → Vercel redeploya. Sin API key funciona igual, pero el changelog sale directo de los mensajes de commit y las funcionalidades quedan como en `seed`. No hay base de datos: el estado vive en el JSON y su historial en git.
+
+### Agregar un proyecto
+
+1. Sumá una entrada a `content/personal-projects.config.json` con `id`, `repo` (`owner/nombre`), `title`, `subtitle`, `link` y las capturas/video en `assets/projects/`.
+2. Opcional: `ai.notes` (contexto para la IA), `ai.contextFiles` (archivos del repo que conviene que lea) y `seed` (texto inicial).
+3. Corré `npm run sync:projects` (o el Action "Sync proyectos personales" desde GitHub) y commiteá.
+
+### Comandos
+
+```bash
+npm run sync:projects                          # Todos los proyectos
+npm run sync:projects -- --only=alz-stats      # Uno solo
+npm run sync:projects -- --full                # Reanaliza toda la historia
+npm run sync:projects -- --reset               # Descarta lo generado y arranca desde 'seed'
+npm run sync:projects -- --dry-run             # Muestra el resultado sin escribir
+```
+
+### Secrets del repo (Settings → Secrets and variables → Actions)
+
+| Secret | Para qué | ¿Obligatorio? |
+|---|---|---|
+| `ANTHROPIC_API_KEY` | Resúmenes, funcionalidades y changelog redactados por Claude | No (sin ella usa los commits) |
+| `PROJECTS_GITHUB_TOKEN` | Leer repos **privados** de proyectos | Solo con repos privados |
+| `PORTFOLIO_DISPATCH_TOKEN` | En el repo de cada proyecto, para avisar al portfolio al instante | No (si no, espera al cron de 6 h) |
+
+> Escribir los commits como *conventional commits* (`feat(scope): …`, `fix: …`) mejora tanto el modo con IA como el modo sin IA.
+
+---
+
 ## ✏️ ¿Cómo subir y administrar la información?
 
 ¡No necesitas tocar archivos HTML ni CSS! Para agregar, editar o eliminar proyectos, experiencia o habilidades, simplemente abre:
