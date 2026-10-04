@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-03T23:26:44.499Z",
+  "generatedAt": "2026-10-04T05:49:23.358Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -76,6 +76,46 @@
         }
       ],
       "changelog": [
+        {
+          "date": "2026-10-04",
+          "title": "UI",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Librería de animaciones Amicro instalada y aplicada en el sitio"
+            },
+            {
+              "kind": "new",
+              "text": "Transición \"menu dropdown\" de transitions.dev en los dropdowns"
+            }
+          ]
+        },
+        {
+          "date": "2026-10-03",
+          "title": "Ladder · Home",
+          "items": [
+            {
+              "kind": "fix",
+              "text": "El puesto 10 está \"en peligro de descenso\""
+            },
+            {
+              "kind": "new",
+              "text": "Zonas en la ladder y top donadores"
+            },
+            {
+              "kind": "new",
+              "text": "Season 2 en segundo plano"
+            },
+            {
+              "kind": "new",
+              "text": "El Cartel — donaciones que compran el cartel de la home"
+            },
+            {
+              "kind": "new",
+              "text": "MVP sólo del equipo ganador + pestaña de Novedades"
+            }
+          ]
+        },
         {
           "date": "2026-10-01",
           "title": "Novedades · Apuestas · Home",
@@ -235,42 +275,42 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
+        "headSha": "b65b31dea15d7521e3c104b5a84ef9f428db86c1",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-10-01T22:35:03Z",
-        "commits": 130,
+        "updatedAt": "2026-10-04T04:16:24Z",
+        "commits": 137,
         "stars": 1,
         "version": "2.0.0",
         "languages": [
           {
             "name": "TypeScript",
-            "pct": 96.9
+            "pct": 97
           },
           {
             "name": "PLpgSQL",
-            "pct": 1.8
+            "pct": 1.9
           },
           {
             "name": "CSS",
-            "pct": 1.2
+            "pct": 1.1
           },
           {
             "name": "JavaScript",
-            "pct": 0.1
+            "pct": 0
           }
         ]
       },
       "lastCommit": {
-        "sha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
-        "date": "2026-10-01T22:35:03Z",
-        "message": "feat(novedades): pop-up de las apuestas encadenado con el del generador"
+        "sha": "b65b31dea15d7521e3c104b5a84ef9f428db86c1",
+        "date": "2026-10-04T04:16:24Z",
+        "message": "feat(ui): librería de animaciones Amicro instalada y aplicada en el sitio"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "621884b129fe7593307fb67494d26fb4b3cf16e6",
-        "at": "2026-10-03T19:32:51.867Z"
+        "sha": "b65b31dea15d7521e3c104b5a84ef9f428db86c1",
+        "at": "2026-10-04T05:49:23.358Z"
       },
-      "syncedAt": "2026-10-03T23:26:44.499Z"
+      "syncedAt": "2026-10-04T05:49:23.358Z"
     }
   ]
 }
