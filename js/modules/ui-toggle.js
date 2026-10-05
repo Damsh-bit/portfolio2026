@@ -3,7 +3,12 @@
  * UI VISIBILITY TOGGLE
  * =========================================================================
  * Lets visitors hide the entire interface layer to appreciate the
- * universe canvas background undisturbed. Escape restores the UI.
+ * universe background undisturbed ("observe mode", body.ui-hidden).
+ *
+ * Escape restores the UI — but only as the LAST step back: an open info
+ * card closes first, then a focused planet, and only then observe mode.
+ * This listener runs in the capture phase so it sees the state from
+ * before the card/planet handlers react to the same key press.
  */
 
 export function initUiToggle() {
@@ -23,8 +28,8 @@ export function initUiToggle() {
   });
 
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && body.classList.contains('ui-hidden')) {
-      setHidden(false);
-    }
-  });
+    if (e.key !== 'Escape' || !body.classList.contains('ui-hidden')) return;
+    if (body.classList.contains('star-lightbox-open') || body.classList.contains('planet-focused')) return;
+    setHidden(false);
+  }, { capture: true });
 }

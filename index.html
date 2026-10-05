@@ -38,11 +38,9 @@
 <!-- Minimalist Cosmic Canvas & Ambient Gradient -->
 <div class="space-ambient"></div>
 <div class="glitch-overlay" aria-hidden="true"></div>
-<canvas id="bg-canvas"></canvas>
-<canvas id="space3d-canvas"></canvas>
-<canvas id="space3d-saturn-canvas"></canvas>
-<canvas id="space3d-coruscant-canvas"></canvas>
-<canvas id="space3d-blackhole-canvas"></canvas>
+<canvas id="bg-canvas" aria-hidden="true"></canvas>
+<!-- Single WebGL layer for every 3D body and effect (js/space/) -->
+<canvas id="space-canvas" aria-hidden="true"></canvas>
 
 <!-- Custom Monochrome Glowing Cursor -->
 <div class="cursor" id="cursor"></div>
@@ -328,9 +326,9 @@
   </svg>
 </button>
 
-<!-- Planet Navigation Panel: observe mode only, cycles between every focal
-     body (the 3 2D planets + the 3D Earth); shows extra rotate/zoom
-     controls only while the 3D planet is the active one. -->
+<!-- Planet Navigation Panel: observe mode only, cycles between the six 3D
+     bodies (one per section, see js/space/config.js) with rotate/zoom
+     controls for the focused one. -->
 <div class="planet-nav" id="planetNav">
   <button type="button" class="planet-nav-btn" id="planetNavPrev" aria-label="Planeta anterior">‹</button>
   <div class="planet-nav-info">
@@ -412,7 +410,7 @@
 
 <!-- Exoplanet Lightbox: shared card for exoplanet click easter eggs
      (currently just TRAPPIST-1e), content swapped per planet by
-     exoplanet-lightbox.js -->
+     js/modules/space-cards.js -->
 <div class="star-lightbox" id="exoplanetLightbox">
   <div class="star-lightbox-backdrop" id="exoplanetLightboxBackdrop"></div>
   <div class="star-card">
@@ -425,10 +423,11 @@
   </div>
 </div>
 
-<!-- Earth (3D) surface hotspot markers: positioned every frame by space-scene.js -->
-<div class="earth-hotspots" id="earthHotspots" aria-hidden="true"></div>
+<!-- 3D markers (Earth surface hotspots + the small bodies' fact rings):
+     real buttons, projected from the 3D layer every frame (js/space/interaction/markers.js) -->
+<div class="space-markers" id="spaceMarkers"></div>
 
-<!-- Earth Hotspot Lightbox: shared card, content swapped per hotspot by space-scene.js -->
+<!-- Earth Hotspot Lightbox: shared card, content swapped per hotspot (js/modules/space-cards.js) -->
 <div class="star-lightbox" id="earthLightbox">
   <div class="star-lightbox-backdrop" id="earthLightboxBackdrop"></div>
   <div class="star-card">
