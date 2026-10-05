@@ -3,26 +3,24 @@
  * SPACE PAN — free-roam keyboard controls for observe mode
  * =========================================================================
  * A shared pixel offset (panOffset) that every background layer adds to its
- * own on-screen position each frame: the 2D starfield/planets/constellations
- * in universe-bg.js, and the idle framing of the 3D Earth/Saturn scenes.
+ * own on-screen position each frame: the 2D starfield/constellations in
+ * universe-bg.js, and the resting position of every 3D body (js/space/).
  * Arrow keys / WASD nudge it, gated to observe mode with nothing focused,
- * since that's the only state where no planet is already claiming a
- * drag/zoom gesture of its own. No on-screen controls — keeping this to
- * keyboard-only input (plus the quiet text hint in index.html) is what
- * keeps it out of the way.
+ * since that's the only state where no planet is already claiming the
+ * arrow keys (a focused planet uses them to rotate/zoom). No on-screen
+ * controls — keyboard-only input plus the quiet text hint in index.html.
  *
  * Sign convention: panOffset.x/y grow while holding right/down. Consumers
- * SUBTRACT panOffset from their own screen-space X/Y (universe-bg.js), or
- * ADD it to their existing idle view-offset (space-scene*.js, which already
- * uses the opposite-signed off-axis projection trick) — both read as
- * "content slides away from the pressed direction," the usual camera-pan
- * feel.
+ * SUBTRACT panOffset from their own screen-space X/Y — content slides away
+ * from the pressed direction, the usual camera-pan feel.
  */
+
+import { onFrame, ease } from './frame-loop.js';
 
 export const panOffset = { x: 0, y: 0 };
 
 const PAN_MAX = 520;
-const PAN_ACCEL = 13; // px/frame while a direction is held
+const PAN_SPEED = 780; // px/s while a direction is held
 const EASE = 0.08;
 
 let targetX = 0;
@@ -61,9 +59,8 @@ export function initSpacePan() {
   });
   window.addEventListener('blur', () => held.clear());
 
-  function animate() {
-    requestAnimationFrame(animate);
-
+  // Runs before every visual layer (order 0) so they all read this frame's offset.
+  onFrame((dt) => {
     if (!isObserveMode()) {
       // Leaving observe mode entirely always recenters, so the page never
       // stays visually shifted once the normal UI is back.
@@ -73,14 +70,14 @@ export function initSpacePan() {
     } else if (!isFreeToRoam()) {
       held.clear();
     } else {
-      if (held.has('up')) targetY = clamp(targetY - PAN_ACCEL, PAN_MAX);
-      if (held.has('down')) targetY = clamp(targetY + PAN_ACCEL, PAN_MAX);
-      if (held.has('left')) targetX = clamp(targetX - PAN_ACCEL, PAN_MAX);
-      if (held.has('right')) targetX = clamp(targetX + PAN_ACCEL, PAN_MAX);
+      const step = PAN_SPEED * dt;
+      if (held.has('up')) targetY = clamp(targetY - step, PAN_MAX);
+      if (held.has('down')) targetY = clamp(targetY + step, PAN_MAX);
+      if (held.has('left')) targetX = clamp(targetX - step, PAN_MAX);
+      if (held.has('right')) targetX = clamp(targetX + step, PAN_MAX);
     }
 
-    panOffset.x += (targetX - panOffset.x) * EASE;
-    panOffset.y += (targetY - panOffset.y) * EASE;
-  }
-  animate();
+    panOffset.x = ease(panOffset.x, targetX, EASE, dt);
+    panOffset.y = ease(panOffset.y, targetY, EASE, dt);
+  }, 0);
 }

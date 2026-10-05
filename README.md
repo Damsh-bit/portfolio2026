@@ -14,18 +14,31 @@ Portfolio/
 ├── css/
 │   ├── variables.css             # Tokens de diseño (Monochrome Cosmic palette, tipografías)
 │   ├── base.css                  # Estilos base, resets y cursor personalizado
-│   ├── universe.css              # Capa de fondo y canvas espacial
-│   └── components.css            # Estilos de Header, Hero, Work, Modal, Skills, Contacto
+│   ├── universe.css              # Capas de fondo (canvas 2D + canvas WebGL)
+│   └── components.css            # Header, Hero, Work, Modal, Skills, Contacto, marcadores 3D
 ├── js/
 │   ├── data/
-│   ├── portfolio-data.js     # 🌟 CENTRO DE DATOS (Toda la información editable aquí)
+│   │   └── portfolio-data.js     # 🌟 CENTRO DE DATOS (toda la información editable aquí)
 │   ├── modules/
-│   │   ├── universe-bg.js        # Motor Canvas de Universo (estrellas, planetas, stardust)
+│   │   ├── frame-loop.js         # UN solo requestAnimationFrame para todo el sitio (delta time)
+│   │   ├── space-state.js        # Contrato compartido entre el canvas 2D y la capa 3D
+│   │   ├── universe-bg.js        # Canvas 2D: estrellas, polvo, constelaciones, fugaces
+│   │   ├── space-cards.js        # Tarjetas de easter eggs de los cuerpos 3D
+│   │   ├── planet-nav.js         # Panel de navegación entre planetas (modo observar)
+│   │   ├── space-pan.js          # Paneo con flechas/WASD (modo observar)
 │   │   ├── renderer.js           # Generador de DOM y SEO (JSON-LD) dinámico
-│   │   ├── cursor.js             # Cursor inteligente con brillo monocromático
-│   │   ├── modal.js              # Controlador de vistas de proyectos
-│   │   └── animations.js         # Transiciones de entrada y ScrollTrigger con GSAP
+│   │   └── ...                   # cursor, modal, animaciones, chatbot, etc.
+│   ├── space/                    # 🪐 CAPA THREE.JS (cargada de forma diferida)
+│   │   ├── index.js              # Punto de entrada: orquesta el frame 3D
+│   │   ├── config.js             # Los 6 cuerpos: sección, anclaje y tamaños (datos puros)
+│   │   ├── core/                 # engine (renderer único), assets, anchors, math
+│   │   ├── bodies/               # CelestialBody base + Tierra, Saturno, Alfa Muscae,
+│   │   │                         #   Coruscant, El Lucero, TRAPPIST-1e
+│   │   ├── shaders/              # GLSL: planetas terrestres, glows, ruido simplex
+│   │   ├── effects/              # Agujero negro (lente gravitacional), asteroides 3D
+│   │   └── interaction/          # Foco, router de punteros, marcadores DOM
 │   └── main.js                   # Script principal de inicialización
+└── assets/space/                 # Texturas y modelos 3D optimizados (ver CREDITS.md)
 ```
 
 ---
@@ -146,14 +159,37 @@ En el objeto `skills`, puedes modificar o crear grupos con iconos de [SimpleIcon
 }
 ```
 
+#### 5. Editar las curiosidades del universo 3D
+Los textos de los marcadores también viven en `portfolio-data.js`:
+```javascript
+// Puntos clicables sobre la Tierra (lat/lon en grados)
+earthHotspots: [
+  { name: "Buenos Aires", lat: -34.6, lon: -58.4, title: "Base de operaciones", text: "..." }
+],
+// Curiosidades alrededor de Alfa Muscae, El Lucero y TRAPPIST-1e
+// (angle en grados: -90 = arriba; `card: true` es el marcador dorado que abre la ficha)
+spaceFacts: {
+  "trappist-1e": [
+    { angle: -90, text: "Uno de los 7 planetas de TRAPPIST-1, a ~40 años luz." },
+    { angle: 135, card: true }
+  ]
+}
+```
+La posición y el tamaño de cada cuerpo se ajustan en `js/space/config.js`.
+
 ---
 
-## 🎨 Animación de Universo y Tema Monocromático
+## 🎨 Universo 3D y Tema Monocromático
 
-- **Estrellas y Polvo Cósmico:** Canvas dinámico optimizado a 60 FPS con profundidad multi-capa.
-- **Planetas Minimalistas:** Cuerpos celestes flotantes con suaves gradientes en tonos grises/blancos y anillos de luz.
-- **Interactividad:** El movimiento del cursor genera reacciones magnéticas en el polvo estelar y destellos láser grises; los planetas esconden easter eggs al hacer clic.
-- **Modo Accesibilidad:** Respeta automáticamente la preferencia `prefers-reduced-motion` del sistema operativo.
+- **Un solo renderer WebGL:** los seis cuerpos, los asteroides y el agujero negro se dibujan en un único canvas/contexto (antes eran 4 contextos WebGL y 7 loops de animación). Cada cuerpo tiene su propia escena y cámara con proyección off-axis, anclado a su sección de la página.
+- **Un cuerpo por sección:** Tierra (hero), Saturno (trabajos), Alfa Muscae (rubros), Coruscant (experiencia), El Lucero (sobre mí) y TRAPPIST-1e (contacto).
+- **Shaders propios:** día/noche con luces de ciudad sólo en el lado nocturno, brillo especular en océanos, nubes con sombra, atmósfera, anillos de Saturno con sombras en ambos sentidos, estrella con granulación animada, planetas procedurales.
+- **Modelos reales de la NASA:** ISS, Cassini, Spitzer, un CubeSat y el asteroide Bennu (ver `assets/space/CREDITS.md`).
+- **Agujero negro (escribí "agujero"):** lente gravitacional real que deforma tanto las estrellas como los planetas 3D, con disco de acreción y efecto Doppler.
+- **Modo observar (botón del ojo):** clic en un cuerpo para enfocarlo, arrastrar para rotarlo, rueda/pinch para zoom, flechas para rotar; los cuerpos chicos muestran curiosidades y una tarjeta. `Esc` retrocede de a un nivel (tarjeta → zoom → modo observar).
+- **Rendimiento:** carga diferida por proximidad, culling de cuerpos fuera de pantalla, resolución adaptativa, shaders precompilados y animación independiente de los Hz del monitor.
+- **Robustez:** si WebGL o el CDN de Three.js fallan, el portfolio se renderiza igual (la capa 3D se importa dinámicamente).
+- **Accesibilidad:** respeta `prefers-reduced-motion`; los marcadores 3D son botones reales con etiquetas.
 
 ---
 

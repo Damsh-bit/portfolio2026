@@ -1,13 +1,24 @@
 /**
  * =========================================================================
- * UNIVERSE CANVAS ANIMATION ENGINE
+ * UNIVERSE CANVAS (2D) — the deep-space backdrop
  * =========================================================================
- * Minimalist space universe background featuring twinkling starfields,
- * floating glowing planets with ring systems, cosmic dust, cursor interaction,
- * ambient digital-glitch bursts, and click-triggered planet easter eggs.
+ * Twinkling multi-layer starfield, cursor-reactive stardust, per-section
+ * constellations, shooting stars and the black hole's trigger/timing.
+ *
+ * Every focal body (Earth, Saturn, Alfa Muscae, Coruscant, El Lucero,
+ * TRAPPIST-1e) and the asteroid flybys are real 3D now (js/space/) and sit
+ * on the WebGL canvas above this one. This layer reads their live screen
+ * positions from spaceState — Musca's stick figure is drawn around Alfa
+ * Muscae wherever the 3D star is — and fades itself while a body is
+ * focused.
+ *
+ * Runs on the shared frame loop (modules/frame-loop.js) right after the 3D
+ * layer, in real seconds, so it moves at the same speed on any monitor.
  */
 
 import { panOffset } from './space-pan.js';
+import { onFrame, ease, decay } from './frame-loop.js';
+import { spaceState, claimTooltip } from './space-state.js';
 
 export function initUniverseBg() {
   const canvas = document.getElementById('bg-canvas');
@@ -15,14 +26,13 @@ export function initUniverseBg() {
 
   const ctx = canvas.getContext('2d');
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch = window.matchMedia('(pointer: coarse)').matches;
 
   let width = 0;
   let height = 0;
   let stars = [];
   let stardust = [];
-  let planets = [];
   let burstParticles = [];
-  let asteroids = [];
   let shootingStars = [];
   const mouse = { x: -9999, y: -9999, targetX: -9999, targetY: -9999 };
   let parallaxX = 0;
@@ -30,51 +40,37 @@ export function initUniverseBg() {
   let cancerBounds = null;
 
   // Scroll-driven starfield drift: scrolling the page pans the deep-space
-  // star layer, as if flying past it toward whatever section is next,
-  // instead of the background sitting frozen behind the content.
+  // star layer, as if flying past it toward whatever section is next.
   let scrollTarget = window.scrollY || 0;
   let scrollEased = scrollTarget;
-  let asteroidTimer = 1500 + Math.random() * 1800; // ~25-55s at 60fps
-  let shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
-  const starTooltip = document.getElementById('starTooltip');
+  let shootingStarTimer = 4 + Math.random() * 5; // seconds
 
   // "agujero negro" keyword easter egg
   let blackHole = null;
   let keyBuffer = '';
 
-  // Observe-mode planet focus/zoom state
-  let focusIndex = -1;
-  let focusTarget = 0;
-  let focusProgress = 0;
-
-  function enterFocus(index) {
-    focusIndex = index;
-    focusTarget = 1;
-    document.body.classList.add('planet-focused');
-    window.dispatchEvent(new CustomEvent('planet-focus-changed', {
-      detail: { system: '2d', index, name: planets[index] ? planets[index].name : null }
-    }));
+  function isObserveMode() {
+    return document.body.classList.contains('ui-hidden');
   }
 
-  function exitFocus() {
-    focusTarget = 0;
-    if (focusIndex >= 0 && planets[focusIndex] && planets[focusIndex].infoPoints) {
-      planets[focusIndex].infoPoints.forEach((pt) => { pt.expanded = false; });
+  // Responsive setup. On phones the URL bar sliding in/out fires resize
+  // with a slightly different height while scrolling — keep the field
+  // instead of re-randomizing every star on each of those.
+  function resize(force) {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (!force && isTouch && w === width && h <= height && height - h < 160) return;
+    const widthChanged = w !== width;
+    width = canvas.width = w;
+    height = canvas.height = h;
+
+    if (force || widthChanged || stars.length === 0) {
+      createStars();
+      createStardust();
+    } else {
+      createStars();
     }
-    document.body.classList.remove('planet-focused');
-    window.dispatchEvent(new CustomEvent('planet-focus-changed', { detail: null }));
-  }
-
-  // Responsive setup
-  function resize() {
-    width = canvas.width = window.innerWidth;
-    height = canvas.height = window.innerHeight;
-
-    createStars();
-    createStardust();
-    createPlanets();
     burstParticles = [];
-    asteroids = [];
     shootingStars = [];
   }
 
@@ -106,8 +102,8 @@ export function initUniverseBg() {
       stardust.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.2,
-        vy: (Math.random() - 0.5) * 0.2,
+        vx: (Math.random() - 0.5) * 12, // px/s
+        vy: (Math.random() - 0.5) * 12,
         radius: Math.random() * 2 + 0.5,
         alpha: Math.random() * 0.4 + 0.1,
         color: Math.random() > 0.5 ? '#d4d4d8' : '#a1a1aa'
@@ -115,118 +111,10 @@ export function initUniverseBg() {
     }
   }
 
-  // Create minimalist celestial planets — each anchored to its OWN page
-  // section (relX/relY are fractions of THAT section's box, not the
-  // viewport), one body per section, in scroll order: Earth (hero, 3D —
-  // see space-scene.js), Saturn (work, 3D — see space-scene-saturn.js) and
-  // Coruscant (experience, 3D — see space-scene-coruscant.js) aren't in
-  // this array, but everything below follows the same one-per-section
-  // rule, picking up where those three leave off. Living on their own
-  // section's box (rather than all crammed into hero's) is what lets each
-  // one hold its place as its section scrolls through, instead of staying
-  // encapsulated near the top of the page.
-  function createPlanets() {
-    planets = [
-      {
-        // Alpha Muscae (α Mus) — brightest star of Musca, the Fly.
-        // Click easter egg reveals its real astronomical data.
-        name: 'Alfa Muscae',
-        sectionId: 'industries',
-        relX: 0.88,
-        relY: 0.09,
-        radius: 34,
-        ringRadiusX: 0,
-        ringRadiusY: 0,
-        tilt: 0,
-        colorCore: '#a1a1aa',
-        colorEdge: '#3f3f46',
-        glowColor: 'rgba(161, 161, 170, 0.18)',
-        ringColor: 'transparent',
-        floatOffset: Math.PI,
-        floatSpeed: 0.0012,
-        infoPoints: [
-          { angle: -Math.PI / 2, text: 'Pulsa cada 2.17 horas — variable Beta Cephei.' },
-          { angle: -Math.PI / 6, text: 'A ~315 años luz, en el hemisferio sur celeste.' },
-          { angle: Math.PI * 0.6, text: '8.8 masas solares: candidata a supernova.' },
-          { angle: Math.PI * 0.15, text: 'Ancla la constelación de Musca, la Mosca.' },
-          { angle: -Math.PI / 4, isCard: true }
-        ].map((pt) => ({ ...pt, expanded: false })),
-        ...createPlanetInteractionState()
-      },
-      {
-        // Deep Space Celestial Sphere — "El Lucero", dedicated to Hannah.
-        // Fits "about": the personal, dedicated body in the personal section.
-        name: 'El Lucero',
-        sectionId: 'about',
-        relX: 0.9,
-        relY: 0.15,
-        radius: 22,
-        ringRadiusX: 44,
-        ringRadiusY: 11,
-        tilt: 0.4,
-        colorCore: '#f5f5f7',
-        colorEdge: '#52525b',
-        glowColor: 'rgba(245, 245, 247, 0.14)',
-        ringColor: 'rgba(212, 212, 216, 0.3)',
-        floatOffset: Math.PI * 0.5,
-        floatSpeed: 0.0008,
-        infoPoints: [
-          { angle: -Math.PI / 2, text: 'Vagó a la deriva durante 36 semanas y 4 días.' },
-          { angle: -Math.PI / 8, text: 'Superficie helada; brilló por primera vez el 5 de mayo de 2026.' },
-          { angle: Math.PI * 0.65, text: 'Emite una señal cálida y constante desde las 20:57 hs.' },
-          { angle: Math.PI * 0.15, text: 'Su alineación coincide con Tauro.' },
-          { angle: Math.PI * 0.75, isCard: true }
-        ].map((pt) => ({ ...pt, expanded: false })),
-        ...createPlanetInteractionState()
-      },
-      {
-        // TRAPPIST-1e — one of seven roughly Earth-sized worlds around an
-        // ultra-cool dwarf star, among the best current bets for finding
-        // a habitable world. Fits "contact": still listening for a signal.
-        name: 'TRAPPIST-1e',
-        sectionId: 'contact',
-        relX: 0.85,
-        relY: 0.22,
-        radius: 25,
-        ringRadiusX: 0,
-        ringRadiusY: 0,
-        tilt: 0,
-        colorCore: '#8fb3c9',
-        colorEdge: '#2e3f4a',
-        glowColor: 'rgba(143, 179, 201, 0.16)',
-        ringColor: 'transparent',
-        floatOffset: Math.PI * 0.2,
-        floatSpeed: 0.0011,
-        infoPoints: [
-          { angle: -Math.PI / 2, text: 'Uno de los 7 planetas de TRAPPIST-1, a ~40 años luz.' },
-          { angle: -Math.PI / 6, text: 'El más prometedor del sistema para albergar agua líquida.' },
-          { angle: Math.PI * 0.6, text: 'Su estrella es una enana ultra-fría, mucho más tenue que el Sol.' },
-          { angle: Math.PI * 0.15, text: 'Descubierto en 2017 con el telescopio TRAPPIST.' },
-          { angle: Math.PI * 0.75, isCard: true }
-        ].map((pt) => ({ ...pt, expanded: false })),
-        lightbox: {
-          eyebrow: 'EASTER EGG · EXOPLANETA',
-          name: 'TRAPPIST-1e',
-          designation: 'Sistema TRAPPIST-1 · Constelación Acuario',
-          stats: [
-            ['Tipo', 'Rocoso, tamaño Tierra'],
-            ['Distancia', '~40 años luz'],
-            ['Radio', '~0.92 R⊕'],
-            ['Período orbital', '~6.1 días']
-          ],
-          desc: 'Uno de los siete planetas rocosos que orbitan TRAPPIST-1, una enana ultra-fría muy compacta. De los siete, es uno de los mejores candidatos para tener agua líquida en superficie — y por eso, uno de los blancos favoritos en la búsqueda de señales de vida.'
-        },
-        ...createPlanetInteractionState()
-      }
-    ];
-
-    planets.forEach((p) => { p.sectionEl = document.getElementById(p.sectionId) || null; });
-  }
-
   // ------------------------------------------------------------------
-  // Musca constellation, anchored on the "Alpha Muscae" planet (index 0).
-  // Companion star offsets (px) reproduce the traditional Musca stick
-  // figure: a β–δ–γ–α kite with an ε–λ tail trailing off toward the edge.
+  // Musca constellation, anchored on Alfa Muscae (the 3D star in the
+  // "industries" section). Companion star offsets (px) reproduce the
+  // traditional Musca stick figure: a β–δ–γ–α kite with an ε–λ tail.
   // ------------------------------------------------------------------
 
   const MUSCA_STARS = [
@@ -239,10 +127,26 @@ export function initUniverseBg() {
   const MUSCA_LINES = [
     ['α', 'β'], ['β', 'δ'], ['δ', 'γ'], ['γ', 'α'], ['α', 'ε'], ['ε', 'λ']
   ];
+  const MUSCA_FALLBACK = { sectionId: 'industries', relX: 0.88, relY: 0.09, radius: 30 };
+  const muscaSection = document.getElementById(MUSCA_FALLBACK.sectionId);
+
+  // Where Alfa Muscae is right now: the 3D star's live position, or its
+  // section anchor if the 3D layer isn't running.
+  function getMuscaAnchor() {
+    const live = spaceState.bodies['alfa-muscae'];
+    if (live && spaceState.webgl) return { x: live.x, y: live.y, r: Math.max(8, live.r) };
+    const box = muscaSection ? muscaSection.getBoundingClientRect() : { left: 0, top: 0, width, height };
+    return {
+      x: box.left + box.width * MUSCA_FALLBACK.relX - panOffset.x,
+      y: box.top + box.height * MUSCA_FALLBACK.relY - panOffset.y,
+      r: MUSCA_FALLBACK.radius
+    };
+  }
 
   // β Muscae is the nearest companion to Alpha and — fittingly — a real
   // binary star system, so it shares Alpha's attention-grabbing twinkle.
   function drawMuscaConstellation(p, time) {
+    if (p.y < -300 || p.y > height + 300) return;
     const nodes = { 'α': { dx: 0, dy: 0 } };
     MUSCA_STARS.forEach((s) => { nodes[s.name] = s; });
 
@@ -254,8 +158,8 @@ export function initUniverseBg() {
       const na = nodes[a];
       const nb = nodes[b];
       ctx.beginPath();
-      ctx.moveTo(p.px + na.dx, p.py + na.dy);
-      ctx.lineTo(p.px + nb.dx, p.py + nb.dy);
+      ctx.moveTo(p.x + na.dx, p.y + na.dy);
+      ctx.lineTo(p.x + nb.dx, p.y + nb.dy);
       ctx.stroke();
     }
 
@@ -266,8 +170,8 @@ export function initUniverseBg() {
       const s = MUSCA_STARS[i];
       let r = Math.max(0.7, 2.6 - s.mag * 0.35);
       let alpha = Math.max(0.35, 1 - s.mag * 0.13);
-      const sx = p.px + s.dx;
-      const sy = p.py + s.dy;
+      const sx = p.x + s.dx;
+      const sy = p.y + s.dy;
 
       if (s.name === 'β') {
         r *= 1 + twinkle * 0.7;
@@ -293,7 +197,7 @@ export function initUniverseBg() {
     }
 
     ctx.fillStyle = 'rgba(212, 212, 216, 0.4)';
-    ctx.fillText('α', p.px + p.radius + 6, p.py + 4);
+    ctx.fillText('α', p.x + p.r + 6, p.y + 4);
     ctx.restore();
   }
 
@@ -549,230 +453,13 @@ export function initUniverseBg() {
   }
 
   // ------------------------------------------------------------------
-  // Observe-mode info markers: small clickable "+" points scattered
-  // around the focused planet, each expanding into a short fact.
-  // ------------------------------------------------------------------
-
-  function drawInfoPoints(p, effRadius, focusProgress, time) {
-    if (!p.infoPoints) return;
-
-    const alpha = Math.max(0, (focusProgress - 0.45) / 0.55);
-    if (alpha <= 0.001) {
-      p.infoPoints.forEach((pt) => { pt.screenX = undefined; pt.screenY = undefined; });
-      return;
-    }
-
-    const markerDist = effRadius + 34;
-    const markerR = 9;
-
-    for (let i = 0; i < p.infoPoints.length; i++) {
-      const pt = p.infoPoints[i];
-      const mx = p.px + Math.cos(pt.angle) * markerDist;
-      const my = p.py + Math.sin(pt.angle) * markerDist;
-      pt.screenX = mx;
-      pt.screenY = my;
-
-      ctx.save();
-      ctx.globalAlpha *= alpha;
-
-      // Connector line from the planet's edge to the marker
-      ctx.strokeStyle = 'rgba(212, 212, 216, 0.25)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(p.px + Math.cos(pt.angle) * effRadius, p.py + Math.sin(pt.angle) * effRadius);
-      ctx.lineTo(mx, my);
-      ctx.stroke();
-
-      // The card marker stands out from the curiosity markers — a glowing,
-      // pulsing accent point that opens the planet's info Card.
-      if (pt.isCard) {
-        const cardR = 11;
-        pt.hitRadius = cardR + 5;
-        const pulse = 0.5 + 0.5 * Math.sin(time * 1.6);
-        const glowR = cardR * (2.4 + pulse * 1.2);
-        const glow = ctx.createRadialGradient(mx, my, 0, mx, my, glowR);
-        glow.addColorStop(0, `rgba(255, 201, 74, ${0.4 + pulse * 0.25})`);
-        glow.addColorStop(1, 'rgba(255, 201, 74, 0)');
-        ctx.beginPath();
-        ctx.fillStyle = glow;
-        ctx.arc(mx, my, glowR, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.beginPath();
-        ctx.arc(mx, my, cardR, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 201, 74, 0.95)';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.lineWidth = 1.2;
-        ctx.stroke();
-
-        // Small "card" glyph: two horizontal lines
-        ctx.strokeStyle = 'rgba(16, 16, 16, 0.85)';
-        ctx.lineWidth = 1.3;
-        ctx.beginPath();
-        ctx.moveTo(mx - 4, my - 2);
-        ctx.lineTo(mx + 4, my - 2);
-        ctx.moveTo(mx - 4, my + 2);
-        ctx.lineTo(mx + 4, my + 2);
-        ctx.stroke();
-
-        ctx.restore();
-        continue;
-      }
-
-      pt.hitRadius = markerR + 4;
-
-      // Marker circle
-      ctx.beginPath();
-      ctx.arc(mx, my, markerR, 0, Math.PI * 2);
-      ctx.fillStyle = pt.expanded ? 'rgba(245, 245, 247, 0.95)' : 'rgba(16, 16, 16, 0.8)';
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(212, 212, 216, 0.55)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      // Plus / minus glyph
-      ctx.strokeStyle = pt.expanded ? 'rgba(16, 16, 16, 0.9)' : 'rgba(245, 245, 247, 0.9)';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.moveTo(mx - 3.5, my);
-      ctx.lineTo(mx + 3.5, my);
-      if (!pt.expanded) {
-        ctx.moveTo(mx, my - 3.5);
-        ctx.lineTo(mx, my + 3.5);
-      }
-      ctx.stroke();
-
-      // Expanded caption popover
-      if (pt.expanded) {
-        ctx.font = '11px "IBM Plex Mono", monospace';
-        const paddingX = 10;
-        const paddingY = 8;
-        const textW = ctx.measureText(pt.text).width;
-        const boxW = textW + paddingX * 2;
-        const boxH = 14 + paddingY * 2;
-        const dirX = Math.cos(pt.angle);
-        const offset = markerR + 10;
-        const boxX = mx + (dirX >= 0 ? offset : -offset - boxW);
-        const boxY = my - boxH / 2;
-
-        ctx.fillStyle = 'rgba(12, 12, 14, 0.92)';
-        ctx.strokeStyle = 'rgba(212, 212, 216, 0.35)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(boxX, boxY, boxW, boxH, 8);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = 'rgba(245, 245, 247, 0.92)';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(pt.text, boxX + paddingX, boxY + boxH / 2 + 0.5);
-      }
-
-      ctx.restore();
-    }
-  }
-
-  // ------------------------------------------------------------------
-  // Asteroids: a rocky body drifts across the screen at a fixed cadence
-  // ------------------------------------------------------------------
-
-  function createAsteroidShape(radius) {
-    const sides = 7 + Math.floor(Math.random() * 4);
-    const points = [];
-    for (let i = 0; i < sides; i++) {
-      const angle = (i / sides) * Math.PI * 2;
-      points.push({ angle, r: radius * (0.65 + Math.random() * 0.5) });
-    }
-    return points;
-  }
-
-  function spawnAsteroid() {
-    const fromLeft = Math.random() > 0.5;
-    const radius = 7 + Math.random() * 6;
-    const speed = 0.9 + Math.random() * 0.7;
-
-    asteroids.push({
-      x: fromLeft ? -80 : width + 80,
-      y: height * (0.08 + Math.random() * 0.55),
-      vx: (fromLeft ? 1 : -1) * speed,
-      vy: (Math.random() - 0.5) * 0.3,
-      radius,
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.025,
-      shape: createAsteroidShape(radius)
-    });
-  }
-
-  function updateAsteroids() {
-    if (!reducedMotion) {
-      asteroidTimer--;
-      if (asteroidTimer <= 0) {
-        spawnAsteroid();
-        asteroidTimer = 1500 + Math.random() * 1800; // occasional, ~25-55s at 60fps
-      }
-    }
-
-    for (let i = asteroids.length - 1; i >= 0; i--) {
-      const a = asteroids[i];
-      a.x += a.vx;
-      a.y += a.vy;
-      a.rotation += a.rotationSpeed;
-
-      if (a.x < -120 || a.x > width + 120 || a.y < -120 || a.y > height + 120) {
-        asteroids.splice(i, 1);
-      }
-    }
-  }
-
-  function drawAsteroids() {
-    for (let i = 0; i < asteroids.length; i++) {
-      const a = asteroids[i];
-
-      // Faint motion trail
-      ctx.beginPath();
-      ctx.strokeStyle = 'rgba(161, 161, 170, 0.15)';
-      ctx.lineWidth = 1.5;
-      ctx.moveTo(a.x, a.y);
-      ctx.lineTo(a.x - a.vx * 7, a.y - a.vy * 7);
-      ctx.stroke();
-
-      ctx.save();
-      ctx.translate(a.x, a.y);
-      ctx.rotate(a.rotation);
-
-      ctx.beginPath();
-      for (let j = 0; j < a.shape.length; j++) {
-        const pt = a.shape[j];
-        const px = Math.cos(pt.angle) * pt.r;
-        const py = Math.sin(pt.angle) * pt.r;
-        if (j === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-      }
-      ctx.closePath();
-
-      const grad = ctx.createRadialGradient(-a.radius * 0.3, -a.radius * 0.3, a.radius * 0.1, 0, 0, a.radius);
-      grad.addColorStop(0, '#9a9aa2');
-      grad.addColorStop(0.7, '#4a4a52');
-      grad.addColorStop(1, '#1c1c20');
-      ctx.fillStyle = grad;
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-
-      ctx.restore();
-    }
-  }
-
-  // ------------------------------------------------------------------
   // Shooting stars: quick fading streaks crossing the whole site
   // ------------------------------------------------------------------
 
   function spawnShootingStar() {
     const dir = Math.random() > 0.5 ? 1 : -1;
     const angle = Math.PI * 0.22 + Math.random() * 0.2; // shallow downward diagonal
-    const speed = 1.6 + Math.random() * 1.1;
+    const speed = 96 + Math.random() * 66; // px/s
 
     shootingStars.push({
       x: Math.random() * width * 1.2 - width * 0.1,
@@ -781,24 +468,24 @@ export function initUniverseBg() {
       vy: Math.sin(angle) * speed,
       length: 220 + Math.random() * 140,
       life: 0,
-      maxLife: 340 + Math.random() * 140
+      maxLife: 5.6 + Math.random() * 2.4 // s
     });
   }
 
-  function updateShootingStars() {
+  function updateShootingStars(dt) {
     if (!reducedMotion) {
-      shootingStarTimer--;
+      shootingStarTimer -= dt;
       if (shootingStarTimer <= 0) {
         spawnShootingStar();
-        shootingStarTimer = 240 + Math.random() * 300; // ~4-9s at 60fps
+        shootingStarTimer = 4 + Math.random() * 5;
       }
     }
 
     for (let i = shootingStars.length - 1; i >= 0; i--) {
       const s = shootingStars[i];
-      s.x += s.vx;
-      s.y += s.vy;
-      s.life++;
+      s.x += s.vx * dt;
+      s.y += s.vy * dt;
+      s.life += dt;
 
       if (s.life >= s.maxLife || s.x < -150 || s.x > width + 150 || s.y > height + 150) {
         shootingStars.splice(i, 1);
@@ -816,8 +503,8 @@ export function initUniverseBg() {
       const tailY = s.y - uy * s.length;
 
       let alpha = 1;
-      if (s.life < 14) alpha = s.life / 14;
-      else if (s.life > s.maxLife - 35) alpha = Math.max(0, (s.maxLife - s.life) / 35);
+      if (s.life < 0.23) alpha = s.life / 0.23;
+      else if (s.life > s.maxLife - 0.58) alpha = Math.max(0, (s.maxLife - s.life) / 0.58);
 
       // Soft outer glow trail
       const glowGrad = ctx.createLinearGradient(s.x, s.y, tailX, tailY);
@@ -854,107 +541,15 @@ export function initUniverseBg() {
     }
   }
 
-  // Shared ambient-glitch + easter-egg state every planet starts with
-  function createPlanetInteractionState() {
-    return {
-      glitchTimer: 300 + Math.random() * 420,
-      glitchActive: false,
-      glitchFrames: 0,
-      glitchSliceY: 0,
-      glitchOffsetX: 0,
-      origCore: null,
-      origEdge: null,
-      pendingRestore: false,
-      burst: null,
-      px: undefined,
-      py: undefined,
-      currentRadius: undefined
-    };
-  }
-
-  // Ambient random glitch trigger + per-frame glitch countdown (also drives
-  // the planet-3 click egg, which forces glitchActive on directly)
-  function updatePlanetGlitch(p) {
-    if (p.glitchActive) {
-      p.glitchFrames--;
-      if (p.glitchFrames <= 0) {
-        p.glitchActive = false;
-        if (p.pendingRestore) {
-          p.colorCore = p.origCore;
-          p.colorEdge = p.origEdge;
-          p.pendingRestore = false;
-        }
-      }
-      return;
-    }
-
-    if (reducedMotion) return; // no ambient random glitches under reduced motion
-
-    p.glitchTimer--;
-    if (p.glitchTimer <= 0) {
-      p.glitchActive = true;
-      p.glitchFrames = 6 + Math.floor(Math.random() * 6);
-      p.glitchSliceY = (Math.random() - 0.5) * p.radius * 1.2;
-      p.glitchOffsetX = (Math.random() > 0.5 ? 1 : -1) * (3 + Math.random() * 5);
-      p.glitchTimer = 300 + Math.random() * 420;
-    }
-  }
-
-  // ------------------------------------------------------------------
-  // Planet click easter eggs
-  // ------------------------------------------------------------------
-
-  function triggerPlanetEasterEgg(index, p) {
-    if (index === 0) {
-      spawnSatellite(p);
-      window.dispatchEvent(new CustomEvent('open-star-lightbox'));
-    }
-    else if (index === 1) {
-      spawnGlitchPulse(p);
-      window.dispatchEvent(new CustomEvent('open-wanderer-lightbox'));
-    }
-    else {
-      spawnGlitchPulse(p);
-      window.dispatchEvent(new CustomEvent('open-exoplanet-lightbox', { detail: p.lightbox }));
-    }
-  }
-
-  // Planet 1: a tiny satellite wakes up, orbits briefly, then fades
-  function spawnSatellite(p) {
-    const rmFactor = reducedMotion ? 0.25 : 1;
-    const life = Math.max(60, Math.round(240 * rmFactor));
-    p.burst = {
-      type: 'satellite',
-      angle: 0,
-      distance: p.radius * 2.2,
-      speed: 0.08,
-      life,
-      maxLife: life
-    };
-  }
-
-  // Planet 2: a longer, inverted-color glitch pulse
-  function spawnGlitchPulse(p) {
-    const rmFactor = reducedMotion ? 0.35 : 1;
-    if (!p.origCore) {
-      p.origCore = p.colorCore;
-      p.origEdge = p.colorEdge;
-    }
-    p.glitchActive = true;
-    p.glitchFrames = Math.max(8, Math.round(20 * rmFactor));
-    p.glitchSliceY = 0;
-    p.glitchOffsetX = 6;
-    p.colorCore = '#000000';
-    p.colorEdge = '#ffffff';
-    p.pendingRestore = true;
-  }
-
   // ------------------------------------------------------------------
   // Black hole easter egg: typing "agujero" anywhere on the page, or
   // clicking #blackHoleBtn (only visible in observe mode), spawns a
   // black hole that pulls in nearby stardust and stays put — no timer.
   // It only goes away when the same trigger is used again to collapse
-  // it, or (in observe mode) it's clicked directly on the canvas.
+  // it, or (in observe mode) it's clicked directly.
+  //
+  // This module owns the state machine; the visual is the WebGL lensing
+  // shader in js/space/effects/black-hole.js, fed through spaceState.
   // ------------------------------------------------------------------
 
   const BLACK_HOLE_RADIUS = 85;
@@ -977,8 +572,8 @@ export function initUniverseBg() {
       phase: 'forming',
       t: 0,
       ringAngle: 0,
-      formDuration: reducedMotion ? 20 : 40,
-      collapseDuration: reducedMotion ? 12 : 26
+      formDuration: reducedMotion ? 0.33 : 0.67, // s
+      collapseDuration: reducedMotion ? 0.2 : 0.43
     };
     syncBlackHoleBtn();
   }
@@ -999,7 +594,7 @@ export function initUniverseBg() {
     const count = Math.max(10, Math.round(40 * rmFactor));
     for (let i = 0; i < count; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 2.5 + Math.random() * 4.5;
+      const speed = 150 + Math.random() * 270; // px/s
       burstParticles.push({
         x, y,
         vx: Math.cos(angle) * speed,
@@ -1017,27 +612,24 @@ export function initUniverseBg() {
     return Math.hypot(mx - blackHole.x, my - blackHole.y) <= BLACK_HOLE_RADIUS * 1.3;
   }
 
-  // The actual rendering is a real WebGL shader (event horizon + lensing +
-  // accretion disk) owned by space-scene-blackhole.js — this just keeps
-  // driving the phase/position/stardust-pull state machine, same as
-  // always, and broadcasts it each frame for that module to draw.
-  function updateBlackHole() {
+  function updateBlackHole(dt) {
     const bh = blackHole;
     if (!bh) {
-      window.dispatchEvent(new CustomEvent('blackhole-state', { detail: null }));
+      spaceState.blackHole = null;
       return;
     }
 
-    bh.t++;
-    bh.ringAngle += 0.05;
+    bh.t += dt;
+    bh.ringAngle += 3 * dt;
 
     let radius = BLACK_HOLE_RADIUS;
     let ringAlpha = 1;
 
     if (bh.phase === 'forming') {
       const p = Math.min(1, bh.t / bh.formDuration);
-      radius = BLACK_HOLE_RADIUS * p;
-      ringAlpha = p;
+      const eased = 1 - Math.pow(1 - p, 3);
+      radius = BLACK_HOLE_RADIUS * eased;
+      ringAlpha = eased;
       if (p >= 1) { bh.phase = 'active'; bh.t = 0; }
     } else if (bh.phase === 'active') {
       const pullRadius = BLACK_HOLE_RADIUS * 4;
@@ -1047,27 +639,30 @@ export function initUniverseBg() {
         const dy = bh.y - sd.y;
         const dist = Math.hypot(dx, dy) || 1;
         if (dist < pullRadius) {
-          const force = (1 - dist / pullRadius) * 0.6;
+          const force = (1 - dist / pullRadius) * 36 * dt; // px
           sd.x += (dx / dist) * force;
           sd.y += (dy / dist) * force;
         }
       }
     } else {
       const p = Math.min(1, bh.t / bh.collapseDuration);
-      radius = BLACK_HOLE_RADIUS * (1 - p);
+      radius = BLACK_HOLE_RADIUS * (1 - p * p);
       ringAlpha = 1 - p;
       if (p >= 1) {
         spawnBlackHoleFlash(bh.x, bh.y);
         blackHole = null;
         syncBlackHoleBtn();
-        window.dispatchEvent(new CustomEvent('blackhole-state', { detail: null }));
+        spaceState.blackHole = null;
         return;
       }
     }
 
-    window.dispatchEvent(new CustomEvent('blackhole-state', {
-      detail: { x: bh.x, y: bh.y, radius, ringAlpha, angle: bh.ringAngle }
-    }));
+    const state = spaceState.blackHole || (spaceState.blackHole = {});
+    state.x = bh.x;
+    state.y = bh.y;
+    state.radius = radius;
+    state.ringAlpha = ringAlpha;
+    state.angle = bh.ringAngle;
   }
 
   window.addEventListener('keydown', (e) => {
@@ -1083,129 +678,30 @@ export function initUniverseBg() {
     blackHoleBtn.addEventListener('click', toggleBlackHole);
   }
 
-  // Hit-test clicks against each planet's last-rendered screen position.
-  // Planets are only interactive in observe mode (UI hidden via the eye
-  // button). Clicking one there just zooms in; the info Card only opens
-  // from the standout marker among the scattered curiosity points.
-  // Zoomed view is exited only via the dedicated back button, never by
-  // clicking elsewhere — that used to also fire on clicks inside the
-  // Card itself (e.g. its close button), zooming back out unintentionally.
+  // In observe mode (nothing focused) the black hole itself is clickable
+  // to collapse it.
   window.addEventListener('click', (e) => {
-    const observeMode = document.body.classList.contains('ui-hidden');
-    if (!observeMode) return;
-
-    if (focusIndex >= 0) {
-      const fp = planets[focusIndex];
-
-      // Marker click: the standout "card" marker opens the info Card,
-      // any other marker just toggles its expanded caption
-      if (fp.infoPoints) {
-        for (let j = 0; j < fp.infoPoints.length; j++) {
-          const pt = fp.infoPoints[j];
-          if (pt.screenX === undefined) continue;
-          const mdx = e.clientX - pt.screenX;
-          const mdy = e.clientY - pt.screenY;
-          if (Math.hypot(mdx, mdy) <= (pt.hitRadius || 13)) {
-            if (pt.isCard) triggerPlanetEasterEgg(focusIndex, fp);
-            else pt.expanded = !pt.expanded;
-            return;
-          }
-        }
-      }
-      return;
-    }
-
-    // The black hole is only clickable (to collapse it) in observe mode
-    if (isPointOnBlackHole(e.clientX, e.clientY)) {
-      collapseBlackHole();
-      return;
-    }
-
-    for (let i = 0; i < planets.length; i++) {
-      const p = planets[i];
-      if (p.px === undefined) continue;
-
-      const dx = e.clientX - p.px;
-      const dy = e.clientY - p.py;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-
-      if (dist <= (p.currentRadius || p.radius) * 1.4) {
-        enterFocus(i);
-        break;
-      }
-    }
+    if (!isObserveMode() || document.body.classList.contains('planet-focused')) return;
+    if (isPointOnBlackHole(e.clientX, e.clientY)) collapseBlackHole();
   });
 
-  // Dedicated back button: the only way to exit a zoomed/focused planet.
-  const backBtn = document.getElementById('planetBackBtn');
-  if (backBtn) {
-    backBtn.addEventListener('click', () => {
-      if (focusIndex >= 0) exitFocus();
-    });
-  }
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && focusIndex >= 0) exitFocus();
-  });
-
-  // Planet nav panel (planet-nav.js): jumps straight to a given 2D planet,
-  // or exits focus — same guard as a direct click (only one body focused at
-  // a time, only meaningful once observe mode is on).
-  window.addEventListener('nav-focus-planet', (e) => {
-    const d = e.detail;
-    if (!d || d.system !== '2d') return;
-    if (!document.body.classList.contains('ui-hidden')) return;
-    if (focusIndex < 0 && document.body.classList.contains('planet-focused')) return;
-    if (planets[d.index]) enterFocus(d.index);
-  });
-
-  window.addEventListener('nav-exit-focus', () => {
-    if (focusIndex >= 0) exitFocus();
-  });
-
-  // Hover tooltip + pointer cursor: only meaningful in observe mode, since
-  // that's the only state where planets are actually clickable.
+  // Hover tooltip (black hole, Cancer): only meaningful in observe mode.
+  // The 3D bodies claim the same tooltip for their names and take
+  // precedence (see space-state.js).
   function updateHoverState(mx, my) {
-    const observeMode = document.body.classList.contains('ui-hidden');
     let hoverName = null;
-    let showPointer = false;
 
-    if (observeMode && focusIndex < 0) {
+    if (isObserveMode() && !document.body.classList.contains('planet-focused')) {
       if (isPointOnBlackHole(mx, my)) {
         hoverName = 'Agujero negro — clic para colapsar';
-        showPointer = true;
-      }
-
-      for (let i = 0; i < planets.length && !hoverName; i++) {
-        const p = planets[i];
-        if (p.px === undefined) continue;
-        const dx = mx - p.px;
-        const dy = my - p.py;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist <= (p.currentRadius || p.radius) * 1.4) {
-          hoverName = p.name;
-          showPointer = true;
-          break;
-        }
-      }
-
-      if (!hoverName && cancerBounds &&
+      } else if (cancerBounds &&
         mx >= cancerBounds.x && mx <= cancerBounds.x + cancerBounds.w &&
         my >= cancerBounds.y && my <= cancerBounds.y + cancerBounds.h) {
         hoverName = 'Constelación de Cáncer';
       }
     }
 
-    canvas.style.cursor = showPointer ? 'pointer' : 'default';
-
-    if (!starTooltip) return;
-    if (hoverName) {
-      starTooltip.textContent = hoverName;
-      starTooltip.style.opacity = '1';
-      starTooltip.style.transform = `translate(${mx + 16}px, ${my - 12}px)`;
-    } else {
-      starTooltip.style.opacity = '0';
-    }
+    claimTooltip('canvas2d', hoverName, mx, my);
   }
 
   // Mouse movement handlers
@@ -1215,18 +711,17 @@ export function initUniverseBg() {
     updateHoverState(e.clientX, e.clientY);
   });
 
-  window.addEventListener('mouseleave', () => {
+  document.documentElement.addEventListener('mouseleave', () => {
     mouse.targetX = -9999;
     mouse.targetY = -9999;
-    canvas.style.cursor = 'default';
-    if (starTooltip) starTooltip.style.opacity = '0';
+    claimTooltip('canvas2d', null);
   });
 
   window.addEventListener('scroll', () => {
     scrollTarget = window.scrollY;
   }, { passive: true });
 
-  window.addEventListener('resize', resize);
+  window.addEventListener('resize', () => resize(false));
 
   // Fade each section's constellation in while its section is in view
   if ('IntersectionObserver' in window) {
@@ -1240,27 +735,19 @@ export function initUniverseBg() {
     });
   }
 
-  // Main Render Loop
+  // Main render loop (shared frame loop, after the 3D layer)
   let time = 0;
 
-  function render() {
-    time += reducedMotion ? 0.003 : 0.008;
+  function render(dt) {
+    time += (reducedMotion ? 0.18 : 0.48) * dt;
 
-    // Observe-mode planet focus/zoom: auto-exit if the UI comes back, ease
-    // progress toward its target, and fully clear the focus once settled.
-    if (focusIndex >= 0 && !document.body.classList.contains('ui-hidden')) {
-      exitFocus();
-    }
-    focusProgress += ((focusIndex >= 0 ? focusTarget : 0) - focusProgress) * 0.09;
-    if (focusIndex >= 0 && focusTarget === 0 && focusProgress < 0.01) {
-      focusProgress = 0;
-      focusIndex = -1;
-    }
-    const dim = focusIndex >= 0 ? focusProgress : 0;
+    // Fade the backdrop while a 3D body is focused.
+    const dim = spaceState.focus.dim;
+    const fade = 1 - dim * 0.85;
 
     // Smooth mouse interpolation
-    mouse.x += (mouse.targetX - mouse.x) * 0.08;
-    mouse.y += (mouse.targetY - mouse.y) * 0.08;
+    mouse.x = ease(mouse.x, mouse.targetX, 0.08, dt);
+    mouse.y = ease(mouse.y, mouse.targetY, 0.08, dt);
 
     // Starfield parallax: pixel offset of the mouse from screen center, clamped
     // and eased toward its target so stars drift as if the camera pans through space
@@ -1269,23 +756,23 @@ export function initUniverseBg() {
     const rawTargetY = mouse.targetY > -9000 ? mouse.y - height / 2 : 0;
     const targetParallaxX = Math.max(-maxOffset, Math.min(maxOffset, rawTargetX));
     const targetParallaxY = Math.max(-maxOffset, Math.min(maxOffset, rawTargetY));
-    parallaxX += (targetParallaxX - parallaxX) * 0.06;
-    parallaxY += (targetParallaxY - parallaxY) * 0.06;
+    parallaxX = ease(parallaxX, targetParallaxX, 0.06, dt);
+    parallaxY = ease(parallaxY, targetParallaxY, 0.06, dt);
 
     // Scroll drift: eased toward the real scroll position, then turned into
     // a slow diagonal pan — a gentle sideways wander plus steady forward
     // travel — so scrolling through the page reads as flying to a new
     // patch of sky rather than the same frozen view sliding underneath it.
-    scrollEased += (scrollTarget - scrollEased) * 0.05;
+    scrollEased = ease(scrollEased, scrollTarget, 0.05, dt);
     const driftX = reducedMotion ? 0 : Math.sin(scrollEased * 0.0006) * 340;
     const driftY = scrollEased * 0.45;
 
     ctx.clearRect(0, 0, width, height);
 
-    // 1. Draw Starfield
+    // 1. Starfield
     const parallaxStrength = reducedMotion ? 0 : 0.26;
     ctx.save();
-    ctx.globalAlpha = 1 - dim * 0.85;
+    ctx.globalAlpha = fade;
     for (let i = 0; i < stars.length; i++) {
       const star = stars[i];
       const twinkle = Math.sin(time * star.twinkleSpeed * 100 + star.phase);
@@ -1305,181 +792,36 @@ export function initUniverseBg() {
     }
     ctx.restore();
 
-    // 1.5 Draw Cancer Constellation (observe mode only)
-    const observeModeActive = document.body.classList.contains('ui-hidden');
-    if (observeModeActive) {
+    // 2. Cancer constellation (observe mode only)
+    if (isObserveMode()) {
       ctx.save();
-      ctx.globalAlpha = 1 - dim * 0.85;
+      ctx.globalAlpha = fade;
       drawCancerConstellation(time);
       ctx.restore();
     } else {
       cancerBounds = null;
     }
 
-    // 1.6 Draw per-section constellations (cross-fade as sections scroll by)
+    // 3. Per-section constellations (cross-fade as sections scroll by)
     for (let i = 0; i < SECTION_CONSTELLATIONS.length; i++) {
       const c = SECTION_CONSTELLATIONS[i];
-      c.alpha += (c.target - c.alpha) * 0.05;
-      if (c.alpha > 0.01) {
-        drawSectionConstellation(c, c.alpha * (1 - dim * 0.85), time);
-      }
+      c.alpha = ease(c.alpha, c.target, 0.05, dt);
+      if (c.alpha > 0.01) drawSectionConstellation(c, c.alpha * fade, time);
     }
 
-    // 2. Draw Minimalist Planets
-    const bigRadius = Math.min(width, height) * 0.32;
-    for (let i = 0; i < planets.length; i++) {
-      const p = planets[i];
-      const floatY = Math.sin(time * 0.25 + p.floatOffset) * 12;
-      // relX/relY are fractions of the anchor section's own box (read fresh
-      // every frame, since it moves as the page scrolls) — falls back to
-      // the viewport itself if the section wasn't found.
-      const box = p.sectionEl ? p.sectionEl.getBoundingClientRect() : { left: 0, top: 0, width, height };
-      // panOffset (space-pan.js, observe-mode free-roam controls) shifts
-      // everything the opposite way from the direction held, same as a
-      // camera pan — see that module's sign-convention note.
-      const naturalPx = box.left + p.relX * box.width - panOffset.x;
-      const naturalPy = box.top + p.relY * box.height + floatY - panOffset.y;
+    // 4. Musca, around Alfa Muscae's live position
+    ctx.save();
+    ctx.globalAlpha = fade;
+    drawMuscaConstellation(getMuscaAnchor(), time);
+    ctx.restore();
 
-      let px = naturalPx;
-      let py = naturalPy;
-      let sizeScale = 1;
-
-      if (i === focusIndex) {
-        px = naturalPx + (width / 2 - naturalPx) * focusProgress;
-        py = naturalPy + (height / 2 - naturalPy) * focusProgress;
-        sizeScale = 1 + (bigRadius / p.radius - 1) * focusProgress;
-      }
-
-      p.px = px;
-      p.py = py;
-
-      if (i === 0) {
-        ctx.save();
-        ctx.globalAlpha = 1 - dim * 0.85;
-        drawMuscaConstellation(p, time);
-        ctx.restore();
-      }
-
-      updatePlanetGlitch(p);
-
-      const effRadius = p.radius * sizeScale;
-      p.currentRadius = effRadius;
-
-      ctx.save();
-      if (i !== focusIndex && dim > 0) ctx.globalAlpha = 1 - dim * 0.9;
-      ctx.translate(px, py);
-
-      // Planet Glow Aura — kept tight rather than a big diffuse bloom, for a
-      // calmer, more minimal read now that these bodies are bigger.
-      const glowGrad = ctx.createRadialGradient(0, 0, effRadius * 0.5, 0, 0, effRadius * 1.9);
-      glowGrad.addColorStop(0, p.glowColor);
-      glowGrad.addColorStop(1, 'rgba(7, 7, 7, 0)');
-      ctx.beginPath();
-      ctx.fillStyle = glowGrad;
-      ctx.arc(0, 0, effRadius * 1.9, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Alpha Muscae attention-grabbing twinkle: a slow pulsing halo loop
-      if (i === 0) {
-        const twinkle = 0.5 + 0.5 * Math.sin(time * 0.5);
-        const twinkleRadius = effRadius * (1.8 + twinkle * 0.9);
-        const twinkleGrad = ctx.createRadialGradient(0, 0, effRadius * 0.8, 0, 0, twinkleRadius);
-        twinkleGrad.addColorStop(0, `rgba(245, 245, 247, ${0.12 + twinkle * 0.18})`);
-        twinkleGrad.addColorStop(1, 'rgba(245, 245, 247, 0)');
-        ctx.beginPath();
-        ctx.fillStyle = twinkleGrad;
-        ctx.arc(0, 0, twinkleRadius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      // Planet Ring (Back part if tilted ring exists)
-      if (p.ringRadiusX > 0) {
-        ctx.save();
-        ctx.rotate(p.tilt);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.ringRadiusX * sizeScale, p.ringRadiusY * sizeScale, 0, Math.PI, Math.PI * 2);
-        ctx.strokeStyle = p.ringColor;
-        ctx.lineWidth = 1.3;
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // Planet Sphere Gradient
-      const planetGrad = ctx.createRadialGradient(
-        -effRadius * 0.3,
-        -effRadius * 0.3,
-        effRadius * 0.1,
-        0,
-        0,
-        effRadius
-      );
-      planetGrad.addColorStop(0, p.colorCore);
-      planetGrad.addColorStop(0.7, p.colorEdge);
-      planetGrad.addColorStop(1, '#070707');
-
-      ctx.beginPath();
-      ctx.fillStyle = planetGrad;
-      ctx.arc(0, 0, effRadius, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Glitch slice-shift: redraw one clipped horizontal band, offset in X
-      if (p.glitchActive) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(-effRadius, p.glitchSliceY - effRadius * 0.15, effRadius * 2, effRadius * 0.3);
-        ctx.clip();
-        ctx.translate(p.glitchOffsetX, 0);
-        ctx.beginPath();
-        ctx.fillStyle = planetGrad;
-        ctx.arc(0, 0, effRadius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-      }
-
-      // Planet Ring (Front part)
-      if (p.ringRadiusX > 0) {
-        ctx.save();
-        ctx.rotate(p.tilt);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.ringRadiusX * sizeScale, p.ringRadiusY * sizeScale, 0, 0, Math.PI);
-        ctx.strokeStyle = p.ringColor;
-        ctx.lineWidth = 1.6;
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      // Satellite click-egg: a tiny moon orbiting a couple times, then fading
-      if (p.burst && p.burst.type === 'satellite') {
-        const b = p.burst;
-        b.angle += b.speed;
-        b.life--;
-
-        const fadeWindow = Math.min(40, b.maxLife * 0.3);
-        const alpha = b.life < fadeWindow ? Math.max(0, b.life / fadeWindow) : 1;
-
-        ctx.beginPath();
-        ctx.fillStyle = '#e4e4e7';
-        ctx.globalAlpha = alpha;
-        ctx.arc(Math.cos(b.angle) * b.distance, Math.sin(b.angle) * b.distance, 3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = 1;
-
-        if (b.life <= 0) p.burst = null;
-      }
-
-      ctx.restore();
-
-      if (i === focusIndex) drawInfoPoints(p, effRadius, focusProgress, time);
-      else if (p.infoPoints) p.infoPoints.forEach((pt) => { pt.screenX = undefined; pt.screenY = undefined; });
-    }
-
-    // 3. Draw Floating Stardust & Constellations
+    // 5. Floating stardust (cursor-reactive)
     for (let i = 0; i < stardust.length; i++) {
       const p = stardust[i];
 
       if (!reducedMotion) {
-        p.x += p.vx;
-        p.y += p.vy;
+        p.x += p.vx * dt;
+        p.y += p.vy * dt;
 
         if (p.x < 0) p.x = width;
         if (p.x > width) p.x = 0;
@@ -1487,7 +829,6 @@ export function initUniverseBg() {
         if (p.y > height) p.y = 0;
       }
 
-      // Mouse attraction / repulsion glow
       let currentAlpha = p.alpha;
       let currentRadius = p.radius;
 
@@ -1505,7 +846,7 @@ export function initUniverseBg() {
           // Connect stardust near cursor with pale laser lines
           if (dist < 100) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(212, 212, 216, ${0.3 * factor * (1 - dim * 0.85)})`;
+            ctx.strokeStyle = `rgba(212, 212, 216, ${0.3 * factor * fade})`;
             ctx.lineWidth = 0.8;
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
@@ -1516,32 +857,25 @@ export function initUniverseBg() {
 
       ctx.beginPath();
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = Math.min(1, currentAlpha) * (1 - dim * 0.85);
+      ctx.globalAlpha = Math.min(1, currentAlpha) * fade;
       ctx.arc(p.x, p.y, currentRadius, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1.0;
     }
 
-    // 4. Draw Asteroids
-    updateAsteroids();
+    // 6. Shooting stars
+    updateShootingStars(dt);
     ctx.save();
-    ctx.globalAlpha = 1 - dim * 0.85;
-    drawAsteroids();
-    ctx.restore();
-
-    // 5. Draw Shooting Stars
-    updateShootingStars();
-    ctx.save();
-    ctx.globalAlpha = 1 - dim * 0.85;
+    ctx.globalAlpha = fade;
     drawShootingStars();
     ctx.restore();
 
-    // 6. Draw Easter-Egg Burst Particles (supernova debris)
+    // 7. Black hole collapse debris
     for (let i = burstParticles.length - 1; i >= 0; i--) {
       const bp = burstParticles[i];
-      bp.x += bp.vx;
-      bp.y += bp.vy;
-      bp.alpha *= 0.94;
+      bp.x += bp.vx * dt;
+      bp.y += bp.vy * dt;
+      bp.alpha = decay(bp.alpha, 0.94, dt);
 
       if (bp.alpha < 0.02) {
         burstParticles.splice(i, 1);
@@ -1550,19 +884,16 @@ export function initUniverseBg() {
 
       ctx.beginPath();
       ctx.fillStyle = bp.color;
-      ctx.globalAlpha = bp.alpha * (1 - dim * 0.85);
+      ctx.globalAlpha = bp.alpha * fade;
       ctx.arc(bp.x, bp.y, bp.radius, 0, Math.PI * 2);
       ctx.fill();
       ctx.globalAlpha = 1.0;
     }
 
-    // 7. Black Hole state ("agujero" keyword easter egg) — rendered by the
-    // WebGL shader in space-scene-blackhole.js, driven by this broadcast
-    updateBlackHole();
-
-    requestAnimationFrame(render);
+    // 8. Black hole state -> spaceState (drawn by the WebGL lensing shader)
+    updateBlackHole(dt);
   }
 
-  resize();
-  render();
+  resize(true);
+  onFrame(render, 20);
 }

@@ -2959,43 +2959,247 @@ body.ui-hidden.planet-focused .space-pan-hint {
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* ---------- Earth (3D) Surface Hotspot Markers ---------- */
-.earth-hotspots {
+/* ---------- 3D Markers (js/space/interaction/markers.js) ----------
+   Real buttons projected from the WebGL layer every frame: Earth's surface
+   hotspots and the fact rings around Alfa Muscae / El Lucero / TRAPPIST-1e.
+   Hidden markers use visibility (not just opacity) so they're never
+   focusable or clickable while out of view. */
+.space-markers {
   position: fixed;
   inset: 0;
   z-index: 60;
   pointer-events: none;
 }
 
-.earth-hotspot-marker {
+.space-hotspot,
+.space-info {
   position: absolute;
   top: 0;
   left: 0;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.3s var(--ease), visibility 0s linear 0.3s;
+}
+
+.space-hotspot.is-visible,
+.space-info.is-visible {
+  visibility: visible;
+  opacity: 1;
+  transition: opacity 0.3s var(--ease), visibility 0s linear 0s;
+}
+
+.space-marker {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* Earth surface hotspot: a small ringed dot */
+.space-hotspot {
   width: 18px;
   height: 18px;
   margin: -9px 0 0 -9px;
   border-radius: 50%;
   background: rgba(16, 16, 16, 0.8);
   border: 1px solid rgba(212, 212, 216, 0.55);
-  box-shadow: 0 0 0 0 rgba(245, 245, 247, 0);
-  cursor: pointer;
-  pointer-events: auto;
-  opacity: 0;
-  transition: opacity 0.25s var(--ease), transform 0.25s var(--ease), border-color 0.2s var(--ease), background 0.2s var(--ease);
 }
 
-.earth-hotspot-marker::after {
+.space-hotspot::before {
   content: '';
   position: absolute;
   inset: 5px;
   border-radius: 50%;
   background: rgba(245, 245, 247, 0.9);
+  transition: transform 0.25s var(--ease);
 }
 
-.earth-hotspot-marker:hover {
+.space-hotspot::after {
+  content: '';
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px solid rgba(245, 245, 247, 0.4);
+  animation: space-ping 2.4s var(--ease) infinite;
+}
+
+.space-hotspot:hover,
+.space-hotspot:focus-visible {
   border-color: var(--accent-primary);
   background: var(--accent-glow-soft);
-  transform: scale(1.2);
+  outline: none;
+}
+
+.space-hotspot:hover::before,
+.space-hotspot:focus-visible::before {
+  transform: scale(1.35);
+}
+
+@keyframes space-ping {
+  0% { transform: scale(0.6); opacity: 0.9; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+/* Fact ring around a small body: connector + "+" marker + caption */
+.space-info {
+  width: 0;
+  height: 0;
+}
+
+.space-info-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--link-length, 23px);
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 212, 216, 0.4), rgba(212, 212, 216, 0.1));
+  transform-origin: 0 50%;
+  transform: rotate(var(--link-angle, 0deg));
+  pointer-events: none;
+}
+
+.space-info-marker {
+  position: absolute;
+  top: -11px;
+  left: -11px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  background: rgba(16, 16, 16, 0.82);
+  border: 1px solid rgba(212, 212, 216, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+/* "+" glyph, turning into "−" when open */
+.space-info-marker::before,
+.space-info-marker::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 1.4px;
+  border-radius: 1px;
+  background: currentColor;
+  transition: transform 0.25s var(--ease), opacity 0.2s var(--ease);
+}
+
+.space-info-marker::after {
+  transform: rotate(90deg);
+}
+
+.space-info-marker:hover,
+.space-info-marker:focus-visible {
+  border-color: var(--accent-bright);
+  transform: scale(1.1);
+  outline: none;
+}
+
+.space-info.is-open .space-info-marker {
+  color: #101010;
+  background: rgba(245, 245, 247, 0.95);
+}
+
+.space-info.is-open .space-info-marker::after {
+  transform: rotate(0deg);
+  opacity: 0;
+}
+
+.space-info-caption {
+  position: absolute;
+  top: 0;
+  left: 20px;
+  transform: translate(0, -50%) scale(0.96);
+  transform-origin: 0 50%;
+  padding: 8px 11px;
+  max-width: min(320px, 70vw);
+  width: max-content;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(245, 245, 247, 0.92);
+  background: rgba(12, 12, 14, 0.92);
+  border: 1px solid rgba(212, 212, 216, 0.35);
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease), visibility 0s linear 0.22s;
+}
+
+.space-info.is-left .space-info-caption {
+  left: auto;
+  right: 20px;
+  transform-origin: 100% 50%;
+}
+
+.space-info.is-open .space-info-caption {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(0, -50%) scale(1);
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease), visibility 0s linear 0s;
+}
+
+/* The standout gold marker: opens the body's info card */
+.space-info.is-card .space-info-marker {
+  width: 24px;
+  height: 24px;
+  top: -12px;
+  left: -12px;
+  color: rgba(16, 16, 16, 0.85);
+  background: rgba(255, 201, 74, 0.95);
+  border-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 0 0 rgba(255, 201, 74, 0.5);
+  animation: space-card-pulse 2.2s ease-in-out infinite;
+}
+
+/* Card glyph: two short lines */
+.space-info.is-card .space-info-marker::before {
+  transform: translateY(-2px);
+}
+
+.space-info.is-card .space-info-marker::after {
+  transform: translateY(2px);
+}
+
+.space-info.is-card .space-info-marker:hover,
+.space-info.is-card .space-info-marker:focus-visible {
+  background: #ffd36e;
+}
+
+@keyframes space-card-pulse {
+  0%, 100% { box-shadow: 0 0 10px 2px rgba(255, 201, 74, 0.35); }
+  50% { box-shadow: 0 0 22px 8px rgba(255, 201, 74, 0.55); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .space-hotspot::after,
+  .space-info.is-card .space-info-marker {
+    animation: none;
+  }
+}
+
+/* Hovering a 3D body in observe mode: the custom cursor grows, like over
+   any other clickable thing; it tightens while spinning one. */
+body.space-hover .cursor {
+  width: 52px;
+  height: 52px;
+  background: rgba(212, 212, 216, 0.25);
+  border: 1px solid var(--accent-light);
+  box-shadow: 0 0 25px var(--accent-glow);
+}
+
+body.space-dragging .cursor {
+  width: 34px;
+  height: 34px;
+  background: rgba(212, 212, 216, 0.35);
+}
+
+/* No WebGL / 3D layer failed to load: the planet controls have nothing to
+   drive. */
+body.no-space3d .planet-nav {
+  display: none;
 }
 
 /* ---------- Planet Info Card (docked, doesn't cover the zoomed planet) ---------- */

@@ -204,7 +204,49 @@ export const portfolioData = {
       ]
     }
   ],
-  // Click-to-open easter eggs on the surface of the 3D Earth (space-scene.js).
+  // Observe-mode curiosity markers around each small 3D body (js/space/).
+  // `angle` is in degrees on screen, measured clockwise from "3 o'clock"
+  // (-90 = straight up). The `card: true` entry is the standout gold marker
+  // that opens the body's info card; the rest expand into a short caption.
+  spaceFacts: {
+    "alfa-muscae": [
+      { angle: -90, text: "Pulsa cada 2.17 horas — variable Beta Cephei." },
+      { angle: -30, text: "A ~315 años luz, en el hemisferio sur celeste." },
+      { angle: 108, text: "8.8 masas solares: candidata a supernova." },
+      { angle: 27, text: "Ancla la constelación de Musca, la Mosca." },
+      { angle: -45, card: true }
+    ],
+    "el-lucero": [
+      { angle: -90, text: "Vagó a la deriva durante 36 semanas y 4 días." },
+      { angle: -22.5, text: "Superficie helada; brilló por primera vez el 5 de mayo de 2026." },
+      { angle: 117, text: "Emite una señal cálida y constante desde las 20:57 hs." },
+      { angle: 27, text: "Su alineación coincide con Tauro." },
+      { angle: 135, card: true }
+    ],
+    "trappist-1e": [
+      { angle: -90, text: "Uno de los 7 planetas de TRAPPIST-1, a ~40 años luz." },
+      { angle: -30, text: "El más prometedor del sistema para albergar agua líquida." },
+      { angle: 108, text: "Su estrella es una enana ultra-fría, mucho más tenue que el Sol." },
+      { angle: 27, text: "Descubierto en 2017 con el telescopio TRAPPIST." },
+      { angle: 135, card: true }
+    ]
+  },
+  // Info card for the TRAPPIST-1e marker (shared #exoplanetLightbox).
+  exoplanetCards: {
+    "trappist-1e": {
+      eyebrow: "EASTER EGG · EXOPLANETA",
+      name: "TRAPPIST-1e",
+      designation: "Sistema TRAPPIST-1 · Constelación Acuario",
+      stats: [
+        ["Tipo", "Rocoso, tamaño Tierra"],
+        ["Distancia", "~40 años luz"],
+        ["Radio", "~0.92 R⊕"],
+        ["Período orbital", "~6.1 días"]
+      ],
+      desc: "Uno de los siete planetas rocosos que orbitan TRAPPIST-1, una enana ultra-fría muy compacta. De los siete, es uno de los mejores candidatos para tener agua líquida en superficie — y por eso, uno de los blancos favoritos en la búsqueda de señales de vida."
+    }
+  },
+  // Click-to-open easter eggs on the surface of the 3D Earth (js/space/bodies/earth.js).
   // lat/lon in degrees; edit freely — no code changes needed.
   earthHotspots: [
     {
