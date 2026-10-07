@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-04T05:49:23.358Z",
+  "generatedAt": "2026-10-07T13:18:16.059Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -76,6 +76,24 @@
         }
       ],
       "changelog": [
+        {
+          "date": "2026-10-07",
+          "title": "Perfil",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Perfil de jugador con pestañas, curiosidades, me gusta y recomendaciones anónimas"
+            },
+            {
+              "kind": "improve",
+              "text": "Sitio más fluido y botón para apagar las animaciones"
+            },
+            {
+              "kind": "improve",
+              "text": "Saco la librería de animaciones Amicro"
+            }
+          ]
+        },
         {
           "date": "2026-10-04",
           "title": "UI",
@@ -275,24 +293,24 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "b65b31dea15d7521e3c104b5a84ef9f428db86c1",
+        "headSha": "1dd3becf6e0ccc3689a17adc0f279ca196bf9971",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-10-04T04:16:24Z",
-        "commits": 137,
+        "updatedAt": "2026-10-07T10:50:53Z",
+        "commits": 140,
         "stars": 1,
         "version": "2.0.0",
         "languages": [
           {
             "name": "TypeScript",
-            "pct": 97
+            "pct": 96.3
           },
           {
             "name": "PLpgSQL",
-            "pct": 1.9
+            "pct": 2.4
           },
           {
             "name": "CSS",
-            "pct": 1.1
+            "pct": 1.3
           },
           {
             "name": "JavaScript",
@@ -301,16 +319,16 @@
         ]
       },
       "lastCommit": {
-        "sha": "b65b31dea15d7521e3c104b5a84ef9f428db86c1",
-        "date": "2026-10-04T04:16:24Z",
-        "message": "feat(ui): librería de animaciones Amicro instalada y aplicada en el sitio"
+        "sha": "1dd3becf6e0ccc3689a17adc0f279ca196bf9971",
+        "date": "2026-10-07T10:50:53Z",
+        "message": "feat(perfil): perfil de jugador con pestañas, curiosidades, me gusta y recomendaciones anónimas"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "b65b31dea15d7521e3c104b5a84ef9f428db86c1",
-        "at": "2026-10-04T05:49:23.358Z"
+        "sha": "1dd3becf6e0ccc3689a17adc0f279ca196bf9971",
+        "at": "2026-10-07T13:18:16.059Z"
       },
-      "syncedAt": "2026-10-04T05:49:23.358Z"
+      "syncedAt": "2026-10-07T13:18:16.059Z"
     }
   ]
 }
