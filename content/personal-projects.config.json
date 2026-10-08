@@ -11,14 +11,20 @@
       "image": "assets/projects/alz-stats/captura-de-pantalla-2026-10-08-201007-vczwx.webp",
       "video": "assets/projects/alz-stats-cover.mp4",
       "gallery": [
-        "assets/projects/alz-stats.png",
-        "assets/projects/alz-stats-2.png",
-        "assets/projects/alz-stats-3.png",
-        "assets/projects/alz-stats-4.png",
-        "assets/projects/alz-stats-5.png",
-        "assets/projects/alz-stats-6.png",
-        "assets/projects/alz-stats-7.png",
-        "assets/projects/alz-stats-8.png"
+        "assets/projects/alz-stats/descarga-5z0o0.webp",
+        "assets/projects/alz-stats/descarga-1-03o5c.webp",
+        "assets/projects/alz-stats/descarga-4-b2mvk.webp",
+        "assets/projects/alz-stats/descarga-3-oxsls.webp",
+        "assets/projects/alz-stats/descarga-2-i24ty.webp",
+        "assets/projects/alz-stats/descarga-12-k1s3s.webp",
+        "assets/projects/alz-stats/descarga-11-q941o.webp",
+        "assets/projects/alz-stats/descarga-10-y70rb.webp",
+        "assets/projects/alz-stats/descarga-9-egh9a.webp",
+        "assets/projects/alz-stats/descarga-8-valq0.webp",
+        "assets/projects/alz-stats/descarga-7-zpe70.webp",
+        "assets/projects/alz-stats/descarga-6-ybe60.webp",
+        "assets/projects/alz-stats/descarga-5-k1qxe.webp",
+        "assets/projects/alz-stats/descarga-4-o2lyf.webp"
       ],
       "ai": {
         "notes": "Proyecto 100% personal: la plataforma de estadísticas de las partidas 5v5 de CS2 que Damián juega hace años con su grupo de amigos. En la interfaz se llama '10v10 Stats'. Las capturas y textos están llenos de apodos y chistes internos (Nelson, fakazos, Taka Bieler, Tiky): mencionalos con humor pero sin explicarlos de más. Lo que interesa destacar para un reclutador es la ingeniería: lectura de scoreboards por IA, algoritmo de balanceo de equipos, cálculos en tiempo real sobre el historial, integraciones (FACEIT, Mercado Pago, Supabase).",
