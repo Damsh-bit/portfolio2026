@@ -11,15 +11,17 @@ import { EDITABLE_FILES, getStore } from '../_lib/storage.js';
 import { mediaPath, validateClientsFile, validatePersonalFile } from '../_lib/validate.js';
 
 async function readContent(store) {
-  const [clients, personal, synced, media] = await Promise.all([
+  const [clients, personal, synced, media, access] = await Promise.all([
     store.readFile('clients'),
     store.readFile('personal'),
     store.readFile('synced').catch(() => ({ data: { projects: [] }, sha: null })),
-    store.listMedia()
+    store.listMedia(),
+    store.checkWrite()
   ]);
   return {
     storage: store.kind,
-    canWrite: store.canWrite(),
+    canWrite: access.canWrite,
+    writeError: access.writeError,
     files: { clients, personal, synced },
     media
   };

@@ -36,6 +36,7 @@ const state = {
   token: null,
   storage: null,
   canWrite: false,
+  writeError: null,
   files: { clients: null, personal: null },
   shas: { clients: null, personal: null },
   synced: new Map(),
@@ -216,6 +217,7 @@ async function loadContent() {
     const data = await api('/content');
     state.storage = data.storage;
     state.canWrite = data.canWrite;
+    state.writeError = data.writeError;
     state.files.clients = data.files.clients.data;
     state.files.personal = data.files.personal.data;
     state.shas = { clients: data.files.clients.sha, personal: data.files.personal.sha };
@@ -243,7 +245,7 @@ function renderNotice() {
     notice.textContent = 'Modo local: los cambios se guardan directo en los archivos de esta carpeta. Después commiteá y pusheá.';
     notice.hidden = false;
   } else if (!state.canWrite) {
-    notice.textContent = 'Solo lectura: para guardar falta configurar GITHUB_TOKEN en Vercel (ver README → Panel de administración).';
+    notice.textContent = `Solo lectura, no se puede guardar ni subir archivos. ${state.writeError || 'Falta configurar GITHUB_TOKEN en Vercel (ver README → Panel de administración).'}`;
     notice.hidden = false;
   } else {
     notice.hidden = true;
@@ -487,6 +489,10 @@ async function uploadFiles(files, project) {
 }
 
 function chooseFiles({ video, multiple }) {
+  if (!state.canWrite) {
+    setStatus('No se pueden subir archivos en modo solo lectura (ver el aviso de arriba).', 'error');
+    return Promise.resolve([]);
+  }
   return new Promise((resolve) => {
     const input = h('input', {
       type: 'file',

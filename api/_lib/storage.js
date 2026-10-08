@@ -36,6 +36,21 @@ export function gitBlobSha(buffer) {
 
 const conflict = () => new HttpError(409, 'Los datos cambiaron desde que abriste el panel (¿otra pestaña o el sync automático?). Recargá para ver la última versión.');
 
+const MISSING_TOKEN = 'Falta configurar GITHUB_TOKEN en Vercel (ver README → Panel de administración).';
+
+/** Turns GitHub's auth errors into what to change, since its own message doesn't say. */
+function authHint(res) {
+  if (res.status === 401) {
+    return ' — GITHUB_TOKEN es inválido o venció: generá uno nuevo, reemplazalo en Vercel y hacé Redeploy.';
+  }
+  if (res.status !== 403) return '';
+  if (res.headers.get('x-ratelimit-remaining') === '0') return ' — se agotó el límite de la API de GitHub, probá en unos minutos.';
+  const needed = res.headers.get('x-accepted-github-permissions');
+  return ` — el token no puede escribir en ${REPO}${needed ? ` (GitHub pide: ${needed})` : ''}. `
+    + `En GitHub → Settings → Developer settings → Fine-grained tokens, editá el token: Repository access tiene que incluir ${REPO} `
+    + 'y Permissions → Contents en "Read and write".';
+}
+
 /* ------------------------------------------------------------------ */
 /*  GitHub                                                            */
 /* ------------------------------------------------------------------ */
@@ -59,10 +74,7 @@ async function github(pathname, { method = 'GET', body } = {}) {
   try { data = text ? JSON.parse(text) : null; } catch { data = null; }
 
   if (!res.ok) {
-    const hint = res.status === 401 || res.status === 403
-      ? ' — revisá que GITHUB_TOKEN tenga permiso Contents: Read and write sobre el repo'
-      : '';
-    const err = new HttpError(502, `GitHub ${res.status}: ${(data && data.message) || text.slice(0, 160)}${hint}`);
+    const err = new HttpError(502, `GitHub ${res.status}: ${(data && data.message) || text.slice(0, 160)}${authHint(res)}`);
     err.githubStatus = res.status;
     throw err;
   }
@@ -79,6 +91,22 @@ const githubStore = {
   kind: 'github',
 
   canWrite: () => !!process.env.GITHUB_TOKEN,
+
+  /**
+   * Whether the token can really commit. Having one isn't enough: a token
+   * with read-only Contents passes every read and only fails on the first
+   * upload or save. Staging an empty blob is a write that leaves no trace.
+   */
+  async checkWrite() {
+    if (!process.env.GITHUB_TOKEN) return { canWrite: false, writeError: MISSING_TOKEN };
+    try {
+      await github('/git/blobs', { method: 'POST', body: { content: '', encoding: 'utf-8' } });
+    } catch (err) {
+      if (err.githubStatus === 401 || err.githubStatus === 403) return { canWrite: false, writeError: err.message };
+      console.warn('No pude verificar el permiso de escritura:', err.message);
+    }
+    return { canWrite: true, writeError: null };
+  },
 
   async readFile(key) {
     return githubReadFile(CONTENT_FILES[key]);
@@ -181,6 +209,10 @@ const localStore = {
   kind: 'local',
 
   canWrite: () => true,
+
+  async checkWrite() {
+    return { canWrite: true, writeError: null };
+  },
 
   async readFile(key) {
     const buffer = await fs.readFile(localPath(CONTENT_FILES[key]));
