@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-07T13:18:16.059Z",
+  "generatedAt": "2026-10-08T05:59:17.893Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -76,6 +76,16 @@
         }
       ],
       "changelog": [
+        {
+          "date": "2026-10-08",
+          "title": "Cartel",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Dedicar el cartel a varias personas"
+            }
+          ]
+        },
         {
           "date": "2026-10-07",
           "title": "Perfil",
@@ -293,10 +303,10 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "1dd3becf6e0ccc3689a17adc0f279ca196bf9971",
+        "headSha": "ff9d51b2245ee091bf93694bb5adc021fd58a2cd",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-10-07T10:50:53Z",
-        "commits": 140,
+        "updatedAt": "2026-10-08T03:58:21Z",
+        "commits": 141,
         "stars": 1,
         "version": "2.0.0",
         "languages": [
@@ -319,16 +329,16 @@
         ]
       },
       "lastCommit": {
-        "sha": "1dd3becf6e0ccc3689a17adc0f279ca196bf9971",
-        "date": "2026-10-07T10:50:53Z",
-        "message": "feat(perfil): perfil de jugador con pestañas, curiosidades, me gusta y recomendaciones anónimas"
+        "sha": "ff9d51b2245ee091bf93694bb5adc021fd58a2cd",
+        "date": "2026-10-08T03:58:21Z",
+        "message": "feat(cartel): dedicar el cartel a varias personas"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "1dd3becf6e0ccc3689a17adc0f279ca196bf9971",
-        "at": "2026-10-07T13:18:16.059Z"
+        "sha": "ff9d51b2245ee091bf93694bb5adc021fd58a2cd",
+        "at": "2026-10-08T05:59:17.893Z"
       },
-      "syncedAt": "2026-10-07T13:18:16.059Z"
+      "syncedAt": "2026-10-08T05:59:17.893Z"
     }
   ]
 }
