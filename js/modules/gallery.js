@@ -7,10 +7,24 @@
  * prev/next navigation on click. Add more screenshots to a project by
  * pushing image paths into its `gallery` array in portfolio-data.js —
  * layout and lightbox scale automatically.
+ *
+ * On mouse devices each thumbnail also works as a magnifier: hovering
+ * zooms into the screenshot and moving the cursor pans across it.
  */
+
+import { onFrame, ease } from './frame-loop.js';
 
 const GAP = 8;
 const MIN_ASPECT = 0.5; // clamp very tall full-page screenshots so they don't collapse into slivers
+
+const ZOOM = 2.5;        // hover magnification over the thumbnail
+const ZOOM_MIN = 1.6;    // floor for small screenshots that hit their native resolution early
+const ZOOM_EASE = 0.2;   // per-frame ease (tuned at 60 fps) toward the cursor and zoom level
+const ZOOM_EDGE = 0.1;   // the outer 10% of the tile already reaches the image's edge
+const ZOOM_REST = { x: 0.5, y: 0, s: 1 }; // matches the thumbnail's object-position: top center
+
+const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let lightboxEl = null;
 let currentImages = [];
@@ -71,6 +85,7 @@ export function renderGallery(container, images) {
 
   items.forEach((item, idx) => {
     item.el.addEventListener('click', () => openLightbox(images, idx));
+    attachHoverZoom(item);
   });
 
   relayout();
@@ -116,6 +131,91 @@ function layoutJustified(row, items) {
       item.el.style.height = `${height}px`;
       item.el.style.width = `${item.aspect * height}px`;
     });
+  });
+}
+
+/* ---------- Hover zoom ---------- */
+
+/** Magnifier: a second copy of the screenshot, scaled up and panned so the
+ *  cursor position maps onto the *whole* image, including what the
+ *  thumbnail's object-fit: cover crops away (the bottom of full-page
+ *  captures). It starts and ends on the exact thumbnail framing, so
+ *  entering and leaving read as one continuous zoom. */
+function attachHoverZoom({ el, img }) {
+  const lens = document.createElement('img');
+  lens.className = 'g-zoom';
+  lens.alt = '';
+  lens.setAttribute('aria-hidden', 'true');
+  el.appendChild(lens);
+
+  const cur = { ...ZOOM_REST };
+  const target = { ...ZOOM_REST };
+  let box = null;
+  let stopFrame = null;
+  let hovering = false;
+
+  const render = () => {
+    const { w, h, bw, bh } = box;
+    const tx = -(bw * cur.s - w) * cur.x;
+    const ty = -(bh * cur.s - h) * cur.y;
+    lens.style.transform = `translate3d(${tx}px, ${ty}px, 0) scale(${cur.s})`;
+  };
+
+  const aim = (e) => {
+    const r = el.getBoundingClientRect();
+    const map = (v) => Math.min(Math.max((v - ZOOM_EDGE) / (1 - 2 * ZOOM_EDGE), 0), 1);
+    target.x = map((e.clientX - r.left) / r.width);
+    target.y = map((e.clientY - r.top) / r.height);
+  };
+
+  const step = (dt) => {
+    // Gallery re-rendered (project swap) while hovered: no mouseleave will come.
+    if (!el.isConnected) hovering = false;
+
+    let settled = true;
+    for (const key of ['x', 'y', 's']) {
+      cur[key] = reducedMotion.matches ? target[key] : ease(cur[key], target[key], ZOOM_EASE, dt);
+      if (Math.abs(cur[key] - target[key]) > 0.001) settled = false;
+    }
+    render();
+
+    if (settled && !hovering) {
+      el.classList.remove('is-zooming');
+      stopFrame();
+      stopFrame = null;
+    }
+  };
+
+  el.addEventListener('mouseenter', (e) => {
+    if (!canHover.matches || !img.naturalWidth) return;
+    hovering = true;
+
+    // Size the lens to the thumbnail's "cover" box; zoom is applied as scale.
+    const w = el.clientWidth;
+    const h = el.clientHeight;
+    const base = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+    box = { w, h, bw: img.naturalWidth * base, bh: img.naturalHeight * base };
+    lens.style.width = `${box.bw}px`;
+    lens.style.height = `${box.bh}px`;
+    if (!lens.src) lens.src = img.currentSrc || img.src;
+
+    // Past native resolution a screenshot only gets blurrier.
+    target.s = Math.max(ZOOM_MIN, Math.min(ZOOM, 1 / base));
+    aim(e);
+
+    render();
+    el.classList.add('is-zooming');
+    if (!stopFrame) stopFrame = onFrame(step);
+  });
+
+  el.addEventListener('mousemove', (e) => {
+    if (hovering) aim(e);
+  });
+
+  el.addEventListener('mouseleave', () => {
+    if (!hovering) return;
+    hovering = false;
+    Object.assign(target, ZOOM_REST);
   });
 }
 

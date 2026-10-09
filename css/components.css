@@ -1654,6 +1654,35 @@ section {
   transform: scale(1.06);
 }
 
+/* Hover magnifier (gallery.js): a scaled copy panned by the cursor. */
+.g-item .g-zoom {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  object-fit: fill;
+  transform-origin: 0 0;
+  transition: none;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.g-item.is-zooming .g-zoom {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .g-item {
+    cursor: zoom-in;
+  }
+
+  /* The magnifier replaces the subtle hover scale. */
+  .g-item:hover img:not(.g-zoom) {
+    transform: none;
+  }
+}
+
 .g-item::after {
   content: '⤢';
   position: absolute;
