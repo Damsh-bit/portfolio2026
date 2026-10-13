@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-09T22:36:03.368Z",
+  "generatedAt": "2026-10-13T14:07:24.450Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -76,6 +76,20 @@
         }
       ],
       "changelog": [
+        {
+          "date": "2026-10-13",
+          "title": "Ladder",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Jugadores inactivos fuera de la ladder (Taka Bieler)"
+            },
+            {
+              "kind": "new",
+              "text": "Explicación del KDA y comparador de por qué uno está arriba de otro"
+            }
+          ]
+        },
         {
           "date": "2026-10-09",
           "title": "Perfil",
@@ -313,24 +327,24 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "df3efd6d57f5dc7f6cb4945f426e2ef190df0645",
+        "headSha": "a652811bf6b0418c453ea9f9035d8a1cfe80e4eb",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-10-09T13:57:59Z",
-        "commits": 142,
+        "updatedAt": "2026-10-13T14:02:37Z",
+        "commits": 144,
         "stars": 1,
         "version": "2.0.0",
         "languages": [
           {
             "name": "TypeScript",
-            "pct": 96.3
+            "pct": 96.4
           },
           {
             "name": "PLpgSQL",
-            "pct": 2.4
+            "pct": 2.3
           },
           {
             "name": "CSS",
-            "pct": 1.3
+            "pct": 1.2
           },
           {
             "name": "JavaScript",
@@ -339,16 +353,16 @@
         ]
       },
       "lastCommit": {
-        "sha": "df3efd6d57f5dc7f6cb4945f426e2ef190df0645",
-        "date": "2026-10-09T13:57:59Z",
-        "message": "feat(perfil): recomendaciones al pie del resumen, como comentarios"
+        "sha": "a652811bf6b0418c453ea9f9035d8a1cfe80e4eb",
+        "date": "2026-10-13T14:02:37Z",
+        "message": "feat(ladder): jugadores inactivos fuera de la ladder (Taka Bieler)"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "df3efd6d57f5dc7f6cb4945f426e2ef190df0645",
-        "at": "2026-10-09T22:36:03.368Z"
+        "sha": "a652811bf6b0418c453ea9f9035d8a1cfe80e4eb",
+        "at": "2026-10-13T14:07:24.450Z"
       },
-      "syncedAt": "2026-10-09T22:36:03.368Z"
+      "syncedAt": "2026-10-13T14:07:24.450Z"
     }
   ]
 }
