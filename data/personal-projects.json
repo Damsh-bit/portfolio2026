@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-15T16:57:39.541Z",
+  "generatedAt": "2026-10-15T21:20:37.070Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -78,8 +78,16 @@
       "changelog": [
         {
           "date": "2026-10-15",
-          "title": "Partidas",
+          "title": "Sitio · Partidas",
           "items": [
+            {
+              "kind": "new",
+              "text": "Versión, commit y hora del commit en el footer (v2.1.0)"
+            },
+            {
+              "kind": "new",
+              "text": "Chances de ganar ronda por ronda y la ronda bisagra"
+            },
             {
               "kind": "fix",
               "text": "El replay 2D entra entero en cualquier pantalla"
@@ -361,16 +369,16 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "e30e24c5ba892741c582f76cdbc5f6eb04cf7cf8",
+        "headSha": "28b47860a723e64e4731078eb4e6b265f07b8a59",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-10-15T16:49:46Z",
-        "commits": 151,
+        "updatedAt": "2026-10-15T17:18:48Z",
+        "commits": 153,
         "stars": 1,
-        "version": "2.0.0",
+        "version": "2.1.0",
         "languages": [
           {
             "name": "TypeScript",
-            "pct": 96.9
+            "pct": 96.8
           },
           {
             "name": "PLpgSQL",
@@ -382,21 +390,21 @@
           },
           {
             "name": "JavaScript",
-            "pct": 0
+            "pct": 0.2
           }
         ]
       },
       "lastCommit": {
-        "sha": "e30e24c5ba892741c582f76cdbc5f6eb04cf7cf8",
-        "date": "2026-10-15T16:49:46Z",
-        "message": "fix(partidas): el replay 2D entra entero en cualquier pantalla"
+        "sha": "28b47860a723e64e4731078eb4e6b265f07b8a59",
+        "date": "2026-10-15T17:18:48Z",
+        "message": "feat(sitio): versión, commit y hora del commit en el footer (v2.1.0)"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "e30e24c5ba892741c582f76cdbc5f6eb04cf7cf8",
-        "at": "2026-10-15T16:57:39.541Z"
+        "sha": "28b47860a723e64e4731078eb4e6b265f07b8a59",
+        "at": "2026-10-15T21:20:37.070Z"
       },
-      "syncedAt": "2026-10-15T16:57:39.541Z"
+      "syncedAt": "2026-10-15T21:20:37.070Z"
     }
   ]
 }
