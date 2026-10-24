@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-10-18T04:27:21.865Z",
+  "generatedAt": "2026-10-24T15:54:36.848Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -76,6 +76,16 @@
         }
       ],
       "changelog": [
+        {
+          "date": "2026-10-24",
+          "title": "Home",
+          "items": [
+            {
+              "kind": "new",
+              "text": "Tiky y Foco resucitaron como el ave fénix (v2.5.0)"
+            }
+          ]
+        },
         {
           "date": "2026-10-17",
           "title": "Home · Vercel · Sitio",
@@ -395,16 +405,16 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "be4e65f136b00f044306638b282e12628cd0c5aa",
+        "headSha": "6552f119d0351338c376b19ed2ac1fa4db87c074",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-10-17T23:49:19Z",
-        "commits": 158,
+        "updatedAt": "2026-10-24T12:56:13Z",
+        "commits": 159,
         "stars": 1,
-        "version": "2.4.0",
+        "version": "2.5.0",
         "languages": [
           {
             "name": "TypeScript",
-            "pct": 96.9
+            "pct": 96.8
           },
           {
             "name": "PLpgSQL",
@@ -412,7 +422,7 @@
           },
           {
             "name": "CSS",
-            "pct": 1
+            "pct": 1.1
           },
           {
             "name": "JavaScript",
@@ -421,16 +431,16 @@
         ]
       },
       "lastCommit": {
-        "sha": "be4e65f136b00f044306638b282e12628cd0c5aa",
-        "date": "2026-10-17T23:49:19Z",
-        "message": "feat(home): banner \"Comienza una nueva temporada sin depresivos\" (v2.4.0) (#8)"
+        "sha": "6552f119d0351338c376b19ed2ac1fa4db87c074",
+        "date": "2026-10-24T12:56:13Z",
+        "message": "feat(home): Tiky y Foco resucitaron como el ave fénix (v2.5.0)"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "be4e65f136b00f044306638b282e12628cd0c5aa",
-        "at": "2026-10-18T04:27:21.865Z"
+        "sha": "6552f119d0351338c376b19ed2ac1fa4db87c074",
+        "at": "2026-10-24T15:54:36.848Z"
       },
-      "syncedAt": "2026-10-18T04:27:21.865Z"
+      "syncedAt": "2026-10-24T15:54:36.848Z"
     }
   ]
 }
