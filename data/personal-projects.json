@@ -1,6 +1,6 @@
 {
   "$comment": "Generado por scripts/sync-projects.mjs — no editar a mano. La configuración vive en content/personal-projects.config.json.",
-  "generatedAt": "2026-11-16T21:57:57.925Z",
+  "generatedAt": "2026-11-17T07:50:39.222Z",
   "projects": [
     {
       "id": "alz-stats",
@@ -80,6 +80,14 @@
           "date": "2026-11-16",
           "title": "WOW",
           "items": [
+            {
+              "kind": "new",
+              "text": "Cada uno muestra si está jugando ahora o cuándo se lo vio por última vez (v2.9.0)"
+            },
+            {
+              "kind": "fix",
+              "text": "El tiempo de hoy se ve en vivo mientras alguien juega (v2.8.1)"
+            },
             {
               "kind": "new",
               "text": "Tiempo de Juego 2.0 — límite semanal, estadísticas, logros y en vivo (v2.8.0)"
@@ -433,42 +441,42 @@
       ],
       "repo": {
         "branch": "main",
-        "headSha": "677da99565f194a6bc28d8cb02deeb45510ad65f",
+        "headSha": "9efc5faf60ea83ec6851f127b9b45bdad3707836",
         "createdAt": "2026-06-23T19:27:39Z",
-        "updatedAt": "2026-11-16T21:46:30Z",
-        "commits": 163,
+        "updatedAt": "2026-11-16T22:35:07Z",
+        "commits": 165,
         "stars": 1,
-        "version": "2.8.0",
+        "version": "2.9.0",
         "languages": [
           {
             "name": "TypeScript",
-            "pct": 96.8
+            "pct": 93.8
+          },
+          {
+            "name": "JavaScript",
+            "pct": 2.2
+          },
+          {
+            "name": "CSS",
+            "pct": 2
           },
           {
             "name": "PLpgSQL",
             "pct": 1.9
-          },
-          {
-            "name": "CSS",
-            "pct": 1.1
-          },
-          {
-            "name": "JavaScript",
-            "pct": 0.1
           }
         ]
       },
       "lastCommit": {
-        "sha": "677da99565f194a6bc28d8cb02deeb45510ad65f",
-        "date": "2026-11-16T21:46:30Z",
-        "message": "feat(wow): Tiempo de Juego 2.0 — límite semanal, estadísticas, logros y en vivo (v2.8.0)"
+        "sha": "9efc5faf60ea83ec6851f127b9b45bdad3707836",
+        "date": "2026-11-16T22:35:07Z",
+        "message": "feat(wow): cada uno muestra si está jugando ahora o cuándo se lo vio por última vez (v2.9.0)"
       },
       "analysis": {
         "mode": "heuristic",
-        "sha": "677da99565f194a6bc28d8cb02deeb45510ad65f",
-        "at": "2026-11-16T21:57:57.925Z"
+        "sha": "9efc5faf60ea83ec6851f127b9b45bdad3707836",
+        "at": "2026-11-17T07:50:39.222Z"
       },
-      "syncedAt": "2026-11-16T21:57:57.925Z"
+      "syncedAt": "2026-11-17T07:50:39.222Z"
     }
   ]
 }
